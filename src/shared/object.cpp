@@ -31,23 +31,6 @@
 //(not used yet, only for storing 3d list pointers...)
 Object_Template::Object_Template(const char *name): Racetime_Data(name)
 {
-	//debug identification bools set to false
-	box = false;
-	funbox = false;
-	flipper = false;
-	NH4 = false;
-	building = false;
-	sphere = false;
-	pillar = false;
-	tetrahedron = false;
-
-	//make sure all model pointers are null
-	for (int i=0; i<10; ++i)
-		model[i]=NULL;
-
-	//and the same for trimesh geoms
-	for (int i=0; i<1; ++i)
-		geom[i]=NULL;
 }
 
 

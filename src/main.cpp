@@ -138,14 +138,6 @@ bool tmp_menus(const char *profiledir)
 	if (!load_track(strack.c_str()))
 		return false; //GOTO: track selection menu
 
-	//TMP: load some objects for online spawning
-	if (	!(box = Object_Template::Load("objects/misc/box"))		||
-		!(sphere = Object_Template::Load("objects/misc/beachball"))||
-		!(funbox = Object_Template::Load("objects/misc/funbox"))	||
-		!(molecule = Object_Template::Load("objects/misc/NH4"))	)
-		return false;
-	//
-
 	//MENU: players, please select team/car
 
 	Car_Template *car_template = NULL;

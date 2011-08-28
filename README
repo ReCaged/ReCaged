@@ -23,6 +23,7 @@
 5) Configuration
 6) Hardware Requirements
 7) Software Requirements
+   ... TODO: lua ...
    7.1) OpenGL
    7.2) GLEW
    7.3) SDL
@@ -167,6 +168,8 @@ which might work.
 
 RC needs OpenGL and three libraries (the compiled windows binary includes the
 needed libraries):
+
+   ... TODO: lua ...
 
    7.1) [OPENGL]
    As mentioned above, some kind of OpenGL implementation is needed for
