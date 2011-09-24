@@ -20,14 +20,14 @@
 #
 
 #.o file in build dir for each .cpp file (plus main.cpp)
-OBJS    = $(patsubst %.cpp,build/%.o, $(wildcard */*.cpp) main.cpp)
+OBJS    := $(patsubst %.cpp,build/%.o, $(wildcard */*.cpp) main.cpp)
 
 #needed libraries
 LIBLST	= gl glew sdl ode
 
 #library flag and inclusion arguments
-LIBS	= `pkg-config --libs $(LIBLST)`
-FLAGS	= `pkg-config --cflags $(LIBLST)`
+LIBS	:= $(shell pkg-config --libs $(LIBLST))
+FLAGS	:= $(shell pkg-config --cflags $(LIBLST))
 
 #gcc options:
 #generate dependecy files, optimization level 2, all warnings,
