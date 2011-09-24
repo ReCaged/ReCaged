@@ -23,11 +23,11 @@
 5) Configuration
 6) Hardware Requirements
 7) Software Requirements
-   ... TODO: lua ...
    7.1) OpenGL
    7.2) GLEW
    7.3) SDL
    7.4) ODE
+   7.5) LUA
 8) Compilation
 9) Credits
 10) Links
@@ -166,10 +166,8 @@ which might work.
 
 7) [SOFTWARE REQUIREMENTS]
 
-RC needs OpenGL and three libraries (the compiled windows binary includes the
+RC needs OpenGL and four libraries (the compiled windows binary includes the
 needed libraries):
-
-   ... TODO: lua ...
 
    7.1) [OPENGL]
    As mentioned above, some kind of OpenGL implementation is needed for
@@ -188,12 +186,15 @@ needed libraries):
    7.4) [ODE]
    RC uses the library "Open Dynamics Engine" for some physics simulations.
 
+   7.5) [LUA]
+   RC uses the "Lua" language library for scripting.
+
 
 
 8) [COMPILING]
 
-First of all, you will need the libraries mentioned above (gl, glew, sdl and
-ode). Also check if your distro provides development libraries in separate
+First of all, you will need the libraries mentioned above (gl, glew, sdl, ode
+and lua). Check if your distro provides development libraries in separate
 packages and if so, install them too (look for packages and/or meta-packages
 named like lib<name>-dev). Also make sure you got at least a Make program and
 a C++ compiler (such as GNU Make and the GNU C++ Compiler, g++) and the usual
@@ -204,20 +205,97 @@ to compile, just cd into the src directory and type "make".
 
 
 On windows things will be more difficult: since there is no package manager,
-you will have to install all requirements manually.
+you will have to install libraries, tools and other requirements manually.
 
-First of all, install MinGW (a minimal port of GNU for windows - it provides
-compilers and standard libraries for compilation), make sure to install make,
-autoconf and g++. Msys is also recommended (as it provides a user interface to
-MinGW).
+The following is a step-by-step guide for installing and configuring a
+development system using MinGW:
 
-Then you must compile and install the SDL, ODE and GLEW libraries. This
-process will not be covered in detail here. Once you have downloaded and
-extracted a tarball, cd into the appropriate directory and use:
-./configure && make && make install
-(exception for GLEW: it doesn't use autoconf, just "make" and make install").
 
-Then cd into the src directory of rc and use "make w32" to compile a static
+1) Download and install MinGW and MSYS:
+
+Get the latest installer from: http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/
+
+On installation, make sure you select:
+ * "c compiler"
+ * "c++ compiler"
+ * "MinGW Developer ToolKit"
+
+
+2) Compile and Install libraries:
+
+By this point you will be able to launch a "MinGW Shell". Do so, and prepare:
+ > mkdir tmp
+ > cd tmp
+
+You will need know where you are right now. If you went with the defaults on
+installation, probably C:/MinGW/msys/1.0/home/<username>/tmp (check it).
+
+2.1) Download libraries:
+
+Place all files in the newly created tmp directory:
+
+ * ode: get the latest from http://sourceforge.net/projects/opende/files/ODE/
+
+ * sdl: get the latest from http://www.libsdl.org/download-1.2.php
+
+ * glew: get the latest from http://glew.sourceforge.net/index.html
+
+ * lua: get the latest from http://www.lua.org/download.html
+
+2.2) Extract libraries:
+
+Examples assumes gzipped tarballs (".tar.gz" or ".tgz" suffix). Do use tab
+autocompletion on first letter instead of writing the whole file name).
+
+ > tar xzf ode-0.11.1.tar.gz
+ > tar xzf SDL-1.2.14.tar.gz
+ > tar xzf glew-1.7.0.tgz
+ > tar xzf lua-5.1.4.tar.gz
+
+2.3) Compile and Install:
+
+Each library is compiled and installed in a similar fashion.
+
+ode:
+
+ > cd ode-0.11.1
+ > ./configure
+ > make
+ > make install
+
+sdl:
+
+ > cd ../SDL-1.2.14
+ > ./configure
+ > make
+ > make install
+
+glew:
+
+ > cd ../glew-1.7.0
+ > make
+ > make install
+
+lua:
+
+ > cd ../lua-5.1.4
+
+Important: edit the Makefile (either using a windows text editor or vim) on
+line 44 from "TO_BIN= lua luac" to "TO_BIN= lua.exe luac.exe lua51.dll"!
+
+ > make mingw
+ > make install
+
+3) Clean Up:
+
+Everything is done, so remove the tmp dir:
+
+ > cd ../..
+ > rm -rf tmp
+
+4) Building ReCaged:
+
+Just cd into the src directory of rc and use "make w32" to compile a static
 binary, called "recaged.exe", which includes the needed libraries (for easy
 redistribution).
 

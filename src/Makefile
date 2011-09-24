@@ -23,7 +23,8 @@
 OBJS    = $(patsubst %.cpp,build/%.o, $(wildcard */*.cpp) main.cpp)
 
 #needed libraries
-LIBLST	= gl glew sdl ode
+LIBLST	= gl glew sdl ode lua5.1
+#IMPORTANT: change lua5.1 to what suits your distro&lua version:
 
 #library flag and inclusion arguments
 LIBS	= `pkg-config --libs $(LIBLST)`
@@ -71,8 +72,8 @@ distclean: clean
 w32:
 	@echo "Compiling \"release\" (static+stripped) windows binary..."
 	@make \
-		LIBS='`sdl-config --static-libs --libs` `ode-config --libs` -L/usr/lib -lglew32 -lopengl32 -static -lstdc++ -lwinmm -lgdi32' \
-		FLAGS='`sdl-config --cflags` `ode-config --cflags` -I/usr/include' \
+		LIBS='`sdl-config --static-libs --libs` `ode-config --libs` -L/usr/lib -lglew32 -L/usr/local/lib -llua -lopengl32 -static -lstdc++ -lwinmm -lgdi32' \
+		FLAGS='`sdl-config --cflags` `ode-config --cflags` -I/usr/include -I/usr/local/include' \
 		ARGS='-MD -O2 -pipe -Wall -march=i686 -mtune=i686 $$(FLAGS) -Dwindows -DGLEW_STATIC'
 	@strip ../recaged.exe
 
