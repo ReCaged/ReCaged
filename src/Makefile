@@ -20,15 +20,15 @@
 #
 
 #.o file in build dir for each .cpp file (plus main.cpp)
-OBJS    = $(patsubst %.cpp,build/%.o, $(wildcard */*.cpp) main.cpp)
+OBJS    := $(patsubst %.cpp,build/%.o, $(wildcard */*.cpp) main.cpp)
 
 #needed libraries
 LIBLST	= gl glew sdl ode lua5.1
 #IMPORTANT: change lua5.1 to what suits your distro&lua version:
 
 #library flag and inclusion arguments
-LIBS	= `pkg-config --libs $(LIBLST)`
-FLAGS	= `pkg-config --cflags $(LIBLST)`
+LIBS	:= $(shell pkg-config --libs $(LIBLST))
+FLAGS	:= $(shell pkg-config --cflags $(LIBLST))
 
 #gcc options:
 #generate dependecy files, optimization level 2, all warnings,
