@@ -112,7 +112,7 @@ bool tmp_menus(const char *profiledir)
 	if (!Simulation_Init())
 	{
 		//menu: warn and quit!
-		Interface_Init();
+		Interface_Quit();
 		return false;
 	}
 
