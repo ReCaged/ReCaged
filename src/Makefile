@@ -23,8 +23,8 @@
 OBJS    := $(patsubst %.cpp,build/%.o, $(wildcard */*.cpp) main.cpp)
 
 #needed libraries
-LIBLST	= gl glew sdl ode lua5.1
-#IMPORTANT: change lua5.1 to what suits your distro&lua version:
+$(warning You might have to change "lua5.1" to something else)
+LIBLST	= gl glew sdl ode lua5.1 #change lua5.1 to what suits your distro&lua version
 
 #library flag and inclusion arguments
 LIBS	:= $(shell pkg-config --libs $(LIBLST))
