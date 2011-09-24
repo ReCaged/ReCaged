@@ -23,9 +23,9 @@
 #define _RC_INFO_H
 
 //general info
-const char VERSION[] = "0.7.0 (\"The Sky's the Limit\")";
+const char VERSION[] = "0.7.0 HudHack";
 
-const char TITLE[] = "ReCaged 0.7.0 (\"The Sky's the Limit\") (C) 2009, 2010, 2011 Mats Wahlberg"; 
+const char TITLE[] = "ReCaged 0.7.0 HudHack (C) 2009, 2010, 2011 Mats Wahlberg"; 
 
 const char ISSUE[] = "\
    ReCaged  Copyright (C) 2009, 2010, 2011 Mats Wahlberg\n\

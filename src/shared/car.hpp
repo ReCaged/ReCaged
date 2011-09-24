@@ -237,6 +237,7 @@ class Car:public Object
 
 		static void Physics_Step(dReal step);
 
+		Wheel *wheel; //wheel data
 
 	private:
 		Car(); //not allowed to be allocated freely
@@ -266,7 +267,6 @@ class Car:public Object
 		dJointID joint[4];
 
 		Geom *wheel_geom_data[4];
-		Wheel *wheel; //wheel data
 
 		//flipover sensors
 		Geom *sensor1, *sensor2;
@@ -276,6 +276,8 @@ class Car:public Object
 		bool drift_breaks;
 		dReal throttle, steering; //-1.0 to +1.0
 		dReal velocity; //keep track of car velocity
+		dReal hack_downforce_print1; //HACK!
+		dReal hack_downforce_print2; //HACK!
 
 		//debug options:
 		bool turn;
@@ -293,6 +295,8 @@ class Car:public Object
 
 		//tmp: needs access to above pointers
 		friend int Interface_Loop ();
+
+		friend void HUD(Uint32);
 };
 
 #endif

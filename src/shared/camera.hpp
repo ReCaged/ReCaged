@@ -67,6 +67,7 @@ class Camera
 	private:
 		struct Camera_Settings *settings;
 		Car *car;
+		friend void HUD(Uint32);
 		Object *hide;
 
 		//matrix (generated from everything else)

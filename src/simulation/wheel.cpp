@@ -26,6 +26,11 @@
 #include "../shared/track.hpp"
 #include "../simulation/collision_feedback.hpp"
 
+//hack!
+#include "../interface/hud.hpp"
+int pbcount=0;
+struct POINT pointbuild[100];
+
 //This code tries to implement a reasonably simple and realistic tyre friction model.
 //(it's mostly inspired by different equations based on Pacejka's "magic formula")
 //It also determines if the tyre or rim of the wheel is colliding.
@@ -102,6 +107,9 @@ struct Wheel_List {
 	//for calculating distance
 	dReal zoffset;
 	dReal pos[3];
+
+	//special hud printout
+	float *HUDtotalFz, *HUDFx, *HUDFy;
 };
 
 Wheel_List *wheel_list=NULL;
@@ -345,6 +353,23 @@ bool Wheel::Prepare_Contact(dBodyID b1, dBodyID b2, Geom *g1, Geom *g2, Surface 
 	dReal div_x =sqrt(1.0+diff*diff);
 	dReal div_y =sqrt(1.0+1.0/(diff*diff));
 
+	//print this info
+	float *hudfx=NULL, *hudfy=NULL, *hudfzpoint=NULL;
+	if (pbcount < 100)
+	{
+		pointbuild[pbcount].x=pos[0];
+		pointbuild[pbcount].y=pos[1];
+		pointbuild[pbcount].z=pos[2];
+		pointbuild[pbcount].Fz=Fz;
+		pointbuild[pbcount].tilt=-inclination;
+		pointbuild[pbcount].SR=slip_ratio;
+		pointbuild[pbcount].SA=slip_angle;
+		hudfx = &pointbuild[pbcount].Fx;
+		hudfy = &pointbuild[pbcount].Fy;
+		hudfzpoint = &pointbuild[pbcount].total_Fz;
+		++pbcount;
+	}
+
 	//
 	//4) rolling resistance (breaking torque based on normal force)
 	//
@@ -438,6 +463,11 @@ bool Wheel::Prepare_Contact(dBodyID b1, dBodyID b2, Geom *g1, Geom *g2, Surface 
 	wheel_list[wheel_list_usage].g1 = g1;
 	wheel_list[wheel_list_usage].g2 = g2;
 
+	//hud debug later calculated
+	wheel_list[wheel_list_usage].HUDFx = hudfx;
+	wheel_list[wheel_list_usage].HUDFy = hudfy;
+	wheel_list[wheel_list_usage].HUDtotalFz = hudfzpoint;
+	
 	//increase counter
 	++wheel_list_usage;
 
@@ -494,16 +524,28 @@ void Wheel::Generate_Contacts(dReal stepsize)
 			}
 		}
 
+		//hud/debug hack:
+		if (current->HUDtotalFz)
+			*(current->HUDtotalFz)=current->total_Fz;
+
 		//MUx
 		//max mu value
 		dReal peak = (wheel->xpeak+wheel->xpeaksch*current->total_Fz);
 		dReal MUx = peak*current->amount_x;
 		MUx *= current->surface_mu; //scale by surface friction
 
+		//hud hack:
+		if (current->HUDFx)
+			*(current->HUDFx)=MUx*current->Fz;
+
 		//MUy
 		peak = (wheel->ypeak+wheel->ypeaksch*current->total_Fz);
 		dReal MUy = peak*current->amount_y+current->shift;
 		MUy *= current->surface_mu;
+
+		//hud hack:
+		if (current->HUDFy)
+			*(current->HUDFy)=MUy*current->Fz;
 
 		//scale (combined slip) 
 		MUx/=current->div_x;
