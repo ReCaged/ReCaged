@@ -20,7 +20,7 @@
  */ 
 
 #include "racetime_data.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include <stdio.h>
 #include <string.h>
 

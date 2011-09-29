@@ -321,6 +321,7 @@ Other Projects that made ReCaged possible:
   * "Simple DirectMedia Layer"	OS/hardware abstractions
   * "Open Dynamics Engine"	Rigid body dynamics and collision detection
   * "OpenGL Extension Wrangler" OpenGL version/extension loader
+TODO: lua
 
 
 

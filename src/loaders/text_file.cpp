@@ -22,7 +22,7 @@
 //#include "../shared/shared.hpp"
 //#include "loaders.hpp"
 #include "text_file.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

@@ -25,7 +25,7 @@
 #include "../shared/internal.hpp"
 #include "../shared/camera.hpp"
 #include "../shared/geom.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/object.hpp"
 
 #include "text_file.hpp"

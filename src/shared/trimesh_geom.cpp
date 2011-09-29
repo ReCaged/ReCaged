@@ -22,7 +22,7 @@
 #include "internal.hpp"
 #include "trimesh.hpp"
 #include "geom.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 
 //length of vector
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))

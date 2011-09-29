@@ -26,7 +26,7 @@
 #include "../shared/internal.hpp"
 #include "../shared/runlevel.hpp"
 #include "../shared/track.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/body.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/camera.hpp"

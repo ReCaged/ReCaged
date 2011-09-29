@@ -24,7 +24,7 @@
 
 #include <typeinfo>
 #include <string.h>
-#include "printlog.hpp"
+#include "log.hpp"
 
 class Racetime_Data
 {

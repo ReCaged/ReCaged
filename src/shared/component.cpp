@@ -21,7 +21,7 @@
 
 #include "component.hpp"
 #include "object.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 
 Component::Component(Object *obj)
 {

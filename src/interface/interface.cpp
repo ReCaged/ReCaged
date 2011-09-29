@@ -27,7 +27,7 @@
 #include "../shared/track.hpp"
 #include "../shared/runlevel.hpp"
 #include "../shared/threads.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/profile.hpp"
 
 #include "../shared/camera.hpp"

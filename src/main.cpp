@@ -33,7 +33,7 @@ extern "C" {
 #include "shared/info.hpp"
 #include "shared/internal.hpp"
 #include "shared/threads.hpp"
-#include "shared/printlog.hpp"
+#include "shared/log.hpp"
 #include "shared/runlevel.hpp"
 #include "shared/profile.hpp"
 #include "shared/track.hpp"
@@ -125,7 +125,14 @@ bool tmp_menus(const char *profiledir)
 		return false;
 	}
 
-	luaL_openlibs(tmp_lua_state);
+	//lua libraries allowed/needed:
+	luaopen_string(tmp_lua_state);
+	luaopen_table(tmp_lua_state);
+	luaopen_math(tmp_lua_state);
+
+	//custom libraries:
+	luaL_register(tmp_lua_state, "log", lua_log);
+
 	//end of hack.
 	//
 

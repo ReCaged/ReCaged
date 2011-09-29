@@ -25,7 +25,7 @@
 #include <SDL/SDL.h>
 #include "object.hpp"
 #include "component.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 
 //Joint: (meta)data for joint (connects bodies), is used for:
 //currently only for triggering event script (force threshold)

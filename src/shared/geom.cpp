@@ -21,7 +21,7 @@
 
 #include <ode/ode.h>
 #include "geom.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "track.hpp"
 #include "internal.hpp"
 #include "../simulation/event_buffers.hpp"

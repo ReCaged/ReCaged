@@ -26,7 +26,7 @@
 #include "../shared/threads.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/racetime_data.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 int geom_render_level = 0;

@@ -24,7 +24,7 @@
 
 #include "../shared/threads.hpp"
 #include "../shared/internal.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/trimesh.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/body.hpp"

@@ -20,9 +20,8 @@
  */ 
 
 #include "object.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "track.hpp"
-#include "printlog.hpp"
 #include "../simulation/event_buffers.hpp"
 
 extern "C" {

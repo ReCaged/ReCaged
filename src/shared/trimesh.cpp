@@ -20,7 +20,7 @@
  */ 
 
 #include "trimesh.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include <limits.h>
 
 //length of vector

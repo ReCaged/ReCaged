@@ -23,7 +23,7 @@
 #include "../shared/racetime_data.hpp"
 #include "../shared/car.hpp"
 #include "../shared/camera.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/track.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/body.hpp"

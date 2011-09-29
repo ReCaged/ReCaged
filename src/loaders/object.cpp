@@ -32,7 +32,7 @@ extern "C" {
 
 #include "../shared/racetime_data.hpp"
 #include "../shared/trimesh.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/track.hpp"
 #include "../shared/joint.hpp"
 #include "../shared/geom.hpp"
@@ -57,7 +57,9 @@ Object_Template *Object_Template::Load(const char *path)
 	//load file as chunk
 	if (luaL_loadfile(tmp_lua_state, script))
 	{
-		printlog(0, "ERROR: could not load script \"%s\"!", script);
+		printlog(0, "ERROR: could not load script \"%s\": \"%s\"!",
+				script, lua_tostring(tmp_lua_state, -1));
+		lua_pop(tmp_lua_state, -1);
 		return NULL;
 	}
 

@@ -21,7 +21,7 @@
 
 #include "space.hpp"
 #include "geom.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "track.hpp"
 #include <ode/ode.h>
 

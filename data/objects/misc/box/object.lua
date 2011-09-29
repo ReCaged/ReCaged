@@ -1,7 +1,7 @@
-io.write("hello, this is the Box object loading\n");
+log.print(0, "hello, this is the Box object loading");
 
 function spawn ()
-	io.write("hello, this is the Box object spawning\n");
+	log.print(0, "hello, this is the Box object spawning");
 end
 
 return spawn;

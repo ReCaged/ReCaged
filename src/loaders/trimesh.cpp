@@ -20,7 +20,7 @@
  */ 
 
 #include "../shared/trimesh.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 //
 //for trimesh file loading

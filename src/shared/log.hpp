@@ -19,32 +19,24 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include <stdarg.h>
-#include "internal.hpp"
-#include "printlog.hpp"
+#ifndef _RC_LOG_H
+#define _RC_LOG_H
 
-//verbosity indicators
-const char *indicator[] = {"=> ", " > ", " * "};
-
-//print log message - if it's below or equal to the current verbosity level
-void printlog (int level, const char *text, ...)
-{
-	if (level <= internal.verbosity)
-	{
-		if (level==0)
-			putchar('\n');
-
-		//print verbosity indicator
-		fputs(indicator[level], stdout); //puts adds newline, fputs instead
-
-		//print message
-		va_list list;
-		va_start (list, text);
-		vprintf (text, list);
-		va_end (list);
-
-		//put newline
-		putchar('\n');
-	}
+extern "C" {
+#include <lauxlib.h>
 }
 
+void printlog (int, const char*, ...);
+
+//lua functions
+int lua_log_print (lua_State *lua);
+
+//exposed to lua
+const luaL_Reg lua_log[] =
+{
+	{"print", lua_log_print},
+	{NULL, NULL}
+};
+
+
+#endif

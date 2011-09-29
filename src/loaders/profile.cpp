@@ -21,7 +21,7 @@
 
 //#include "../shared/shared.hpp"
 #include "../shared/profile.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "text_file.hpp"
 //#include "loaders.hpp"
 
