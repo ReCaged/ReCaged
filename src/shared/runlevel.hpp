@@ -23,7 +23,7 @@
 #define _RC_RUNLEVEL_H
 
 //use a "runlevel" (enum) variable to make all threads/loops aware of status
-typedef enum {loading, running, paused, done} runlevel_type;
+typedef enum {paused, running, done} runlevel_type;
 extern runlevel_type runlevel;
 
 #endif

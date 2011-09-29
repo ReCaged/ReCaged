@@ -21,4 +21,4 @@
 
 #include "runlevel.hpp"
 
-runlevel_type runlevel = done;
+runlevel_type runlevel = paused;

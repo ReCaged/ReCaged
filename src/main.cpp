@@ -58,12 +58,15 @@ void Run_Race(void)
 
 	render_list_mutex = SDL_CreateMutex(); //prevent (unlikely) update/render collision
 
-	runlevel  = running;
-
 	starttime = SDL_GetTicks(); //how long it took for race to start
 
 	//launch threads
+	//TODO: start from lua:
+	runlevel  = running; //paused by default, start simulating
 	SDL_Thread *simulation = SDL_CreateThread (Simulation_Loop, NULL);
+	//END of start from lua
+
+	//TODO: run lua
 	Interface_Loop(); //we already got opengl context in main thread
 
 	//wait for threads
@@ -412,7 +415,6 @@ int main (int argc, char *argv[])
 
 	//ok, start loading
 	printlog(0, "Loading...\n");
-	runlevel = loading;
 
 	load_conf ("internal.conf", (char *)&internal, internal_index);
 
