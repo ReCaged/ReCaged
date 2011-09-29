@@ -25,7 +25,6 @@
 
 #include "racetime_data.hpp"
 #include "trimesh.hpp"
-#include "script.hpp"
 #include "component.hpp"
 #include "space.hpp"
 

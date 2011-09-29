@@ -157,7 +157,7 @@ void Body::Angular_Drag (dReal step)
 }
 
 
-void Body::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
+void Body::Set_Buffer_Event(dReal thres, dReal buff, int scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{

@@ -25,7 +25,6 @@
 #include <SDL/SDL.h>
 #include "object.hpp"
 #include "component.hpp"
-#include "script.hpp"
 #include "printlog.hpp"
 
 //Joint: (meta)data for joint (connects bodies), is used for:
@@ -44,7 +43,7 @@ class Joint: public Component
 		dJointID joint_id;
 
 		//buffer event
-		void Set_Buffer_Event(dReal thresh, dReal buff, Script *scr);
+		void Set_Buffer_Event(dReal thresh, dReal buff, int script);
 		void Increase_Buffer(dReal add);
 
 	private:
@@ -59,7 +58,7 @@ class Joint: public Component
 		dJointFeedback *feedback; //used if checking forces
 		dReal threshold; //if force on body exceeds threshold, eat buffer
 		dReal buffer; //if buffer reaches zero, trigger event
-		Script *buffer_script; //the script to run
+		int buffer_script; //the script to run
 };
 
 #endif

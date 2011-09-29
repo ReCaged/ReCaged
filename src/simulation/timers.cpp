@@ -25,7 +25,7 @@
 
 Animation_Timer *Animation_Timer::head = NULL;
 
-Animation_Timer::Animation_Timer (Object *obj, Script *scr, dReal start, dReal stop,
+Animation_Timer::Animation_Timer (Object *obj, int scr, dReal start, dReal stop,
 		dReal duration):object(obj), script(scr), counter(start), goal(stop)
 {
 	speed = (stop-start)/duration;
@@ -60,6 +60,7 @@ Animation_Timer::~Animation_Timer()
 
 void Animation_Timer::Events_Step(dReal  step)
 {
+		/*
 	Animation_Timer *timer, *tmp;
 	timer = head;
 	while (timer)
@@ -111,4 +112,5 @@ void Animation_Timer::Events_Step(dReal  step)
 			timer=timer->next;
 		}
 	}
+		*/
 }

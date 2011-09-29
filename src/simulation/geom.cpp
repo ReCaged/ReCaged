@@ -234,7 +234,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 //
 
 //buffer
-void Geom::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
+void Geom::Set_Buffer_Event(dReal thres, dReal buff, int scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{
@@ -296,7 +296,7 @@ void Geom::Increase_Buffer(dReal buff)
 }
 
 //sensor
-void Geom::Set_Sensor_Event(Script *s1, Script *s2)
+void Geom::Set_Sensor_Event(int s1, int s2)
 {
 	if (s1 || s2) //enable
 	{

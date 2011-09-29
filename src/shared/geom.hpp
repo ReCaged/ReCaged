@@ -25,7 +25,6 @@
 #include "body.hpp"
 #include "object.hpp"
 #include "trimesh.hpp"
-#include "script.hpp"
 #include "../simulation/wheel.hpp"
 #include <SDL/SDL_stdinc.h> //definition for Uint32
 
@@ -93,13 +92,13 @@ class Geom: public Component
 		Trimesh_3D *TMP_pillar_graphics; //TMP
 
 		//for buffer events
-		void Set_Buffer_Event(dReal thresh, dReal buff, Script *scr);
+		void Set_Buffer_Event(dReal thresh, dReal buff, int script);
 		void Increase_Buffer(dReal add);
 		void Set_Buffer_Body(Body*); //send damage to body instead
 		void Damage_Buffer(dReal force, dReal step); //"damage" geom with specified force
 
 		//sensor events
-		void Set_Sensor_Event(Script *s1, Script *s2);
+		void Set_Sensor_Event(int s1, int s2);
 
 	private:
 		//events:
@@ -109,7 +108,7 @@ class Geom: public Component
 
 		//sensor events:
 		bool sensor_last_state; //last state of sensor: enabled or disabled
-		Script *sensor_triggered_script, *sensor_untriggered_script;
+		int sensor_triggered_script, sensor_untriggered_script;
 
 		//buffer events:
 		Body *force_to_body; //send forces to this body instead
@@ -117,7 +116,7 @@ class Geom: public Component
 		//normal buffer handling
 		dReal threshold;
 		dReal buffer;
-		Script *buffer_script; //script to execute when colliding (NULL if not used)
+		int buffer_script; //script to execute when colliding (NULL if not used)
 
 		//for special kind of geoms:
 		//trimesh: how many triangles (0 if not trimesh/disabled) and which colliding:

@@ -24,7 +24,7 @@
 #include "event_buffers.hpp"
 
 //set event
-void Joint::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
+void Joint::Set_Buffer_Event(dReal thres, dReal buff, int scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{

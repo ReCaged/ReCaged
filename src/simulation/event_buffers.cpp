@@ -156,6 +156,7 @@ void Event_Buffer_Remove_All(Object *object)
 //process all events:
 void Event_Buffers_Process(dReal step)
 {
+				/*
 	Geom *geom;
 	Body *body;
 	Joint *joint;
@@ -181,7 +182,7 @@ void Event_Buffers_Process(dReal step)
 				dGeomID g = dCreateBox(0, 2,2,5.0/2.0);
 				Geom *gd = new Geom(g, geom->object_parent);
 				gd->surface.mu = 1.0;
-				gd->Set_Buffer_Event(150000, 1000, (Script*)1337);
+				gd->Set_Buffer_Event(150000, 1000, 1337);
 
 				//body1
 				dBodyID b = dBodyCreate(world);
@@ -199,7 +200,7 @@ void Event_Buffers_Process(dReal step)
 				g = dCreateBox(0, 2,2,5.0/2.0);
 				gd = new Geom(g, geom->object_parent);
 				gd->surface.mu = 1.0;
-				gd->Set_Buffer_Event(150000, 1000, (Script*)1337);
+				gd->Set_Buffer_Event(150000, 1000, 1337);
 
 				//body2
 				b = dBodyCreate(world);
@@ -255,7 +256,7 @@ void Event_Buffers_Process(dReal step)
 				//run script for each step with a value going from <z> to <z+2> over 0.1 seconds
 				const dReal *pos;
 				pos = dGeomGetPosition(geom->flipper_geom); //get position (need z)
-				new Animation_Timer(geom->object_parent, (Script*)geom->flipper_geom, pos[2], pos[2]+2.0, 0.1);
+				new Animation_Timer(geom->object_parent, ()geom->flipper_geom, pos[2], pos[2]+2.0, 0.1);
 				//note: Animation_Timer expects a script, but pass flipper geom instead...
 			}
 		}
@@ -288,5 +289,6 @@ void Event_Buffers_Process(dReal step)
 	//objects buffer:
 	while ((object = (Object*)Pop(&object_inactive)))
 		delete object;
+				*/
 }
 

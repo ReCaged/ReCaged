@@ -23,7 +23,6 @@
 #define _RC_TIMERS_H
 
 #include "../shared/object.hpp"
-#include "../shared/script.hpp"
 
 #include <ode/ode.h>
 #include <SDL/SDL_stdinc.h> //Uint32
@@ -31,13 +30,13 @@
 class Animation_Timer
 {
 	public:
-		Animation_Timer (Object*, Script*, dReal start, dReal stop, dReal duration);
+		Animation_Timer (Object*, int script, dReal start, dReal stop, dReal duration);
 		~Animation_Timer();
 		static void Events_Step(dReal step);
 
 	private:
 		Object *object;
-		Script *script;
+		int script;
 		dReal counter;
 		dReal goal;
 		dReal speed;
