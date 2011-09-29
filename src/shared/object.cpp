@@ -25,14 +25,25 @@
 #include "printlog.hpp"
 #include "../simulation/event_buffers.hpp"
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+#include "../shared/threads.hpp"
+
 #include <stdlib.h>
 
 //allocate new script storage, and add it to list
-//(not used yet, only for storing 3d list pointers...)
 Object_Template::Object_Template(const char *name): Racetime_Data(name)
 {
+	spawn_script=0;
 }
 
+Object_Template::~Object_Template()
+{
+	luaL_unref(tmp_lua_state, LUA_REGISTRYINDEX, spawn_script);
+}
 
 Object *Object::head = NULL;
 

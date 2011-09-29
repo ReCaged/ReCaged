@@ -24,6 +24,10 @@
 
 #include <SDL/SDL_mutex.h>
 
+extern "C" {
+#include <lua.h>
+}
+
 //mutexes
 extern SDL_mutex *ode_mutex;
 extern SDL_mutex *sdl_mutex;
@@ -32,6 +36,10 @@ extern SDL_mutex *render_list_mutex;
 extern SDL_cond  *sync_cond;
 //
 
+//lua states
+//TODO: change into two: one for interface, one for simulation
+extern lua_State *tmp_lua_state;
+//
 
 //prototypes for communication/statistic variables
 //simulation:

@@ -31,4 +31,6 @@ SDL_mutex *sync_mutex = NULL; //for using sync_cond
 SDL_cond  *sync_cond  = NULL; //threads can sleep until synced
 //
 
+//tmp for lua
+lua_State *tmp_lua_state = NULL;
 

@@ -44,10 +44,10 @@ class Object_Template:public Racetime_Data
 
 	private:
 		Object_Template(const char*); //just set some default values
-		//placeholder for script data, now just variables
+		~Object_Template(); //destructor (TODO: virtual?)
 
-		//script to be run when spawning object
-		Script *spawn;
+		//lua script to be run when spawning object
+		int spawn_script;
 };
 
 //can be added/removed at runtime ("racetime")

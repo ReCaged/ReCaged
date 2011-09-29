@@ -22,6 +22,13 @@
 //Required stuff:
 #include <SDL.h>
 
+//tmp: lua
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 //local stuff:
 #include "shared/info.hpp"
 #include "shared/internal.hpp"
@@ -108,6 +115,20 @@ bool tmp_menus(const char *profiledir)
 		return false; //GOTO: profile menu
 
 
+	//
+	//TODO: simulation should have its own lua state (and interface another).
+	//hack: just create the lua state here:
+	tmp_lua_state = luaL_newstate();
+	if (!tmp_lua_state)
+	{
+		printlog(0, "ERROR: could not create new lua state");
+		return false;
+	}
+
+	luaL_openlibs(tmp_lua_state);
+	//end of hack.
+	//
+
 	//initiate simulation
 	if (!Simulation_Init())
 	{
@@ -139,11 +160,11 @@ bool tmp_menus(const char *profiledir)
 		return false; //GOTO: track selection menu
 
 	//TMP: load some objects for online spawning
-	//if (	!(box = Object_Template::Load("objects/misc/box"))		||
+	if (	!(box = Object_Template::Load("objects/misc/box"))) //		||
 		//!(sphere = Object_Template::Load("objects/misc/beachball"))||
 		//!(funbox = Object_Template::Load("objects/misc/funbox"))	||
 		//!(molecule = Object_Template::Load("objects/misc/NH4"))	)
-		//return false;
+		return false;
 	//
 
 	//MENU: players, please select team/car
