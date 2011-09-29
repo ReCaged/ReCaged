@@ -79,7 +79,7 @@ int lua_log_print (lua_State *lua)
 	}
 	else
 	{
-		lua_pushstring(lua, "log:print: expects verbosity number, followed by what to print");
+		lua_pushstring(lua, "log.print: expects verbosity number, followed by what to print");
 		lua_error(lua);
 	}
 
