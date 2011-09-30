@@ -29,14 +29,6 @@ extern "C" {
 void printlog (int, const char*, ...);
 
 //lua functions
-int lua_log_print (lua_State *lua);
-
-//exposed to lua
-const luaL_Reg lua_log[] =
-{
-	{"print", lua_log_print},
-	{NULL, NULL}
-};
-
+extern const luaL_Reg lua_log[];
 
 #endif

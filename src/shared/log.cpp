@@ -86,3 +86,11 @@ int lua_log_print (lua_State *lua)
 	//else, ok. nothing returned
 	return 0;
 }
+
+//list of lua functions:
+const luaL_Reg lua_log[] =
+{
+	{"print", lua_log_print},
+	{NULL, NULL}
+};
+
