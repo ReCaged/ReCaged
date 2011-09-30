@@ -29,10 +29,11 @@ extern "C" {
 }
 
 //mutexes
+extern SDL_mutex *render_list_mutex;
+extern SDL_mutex *log_mutex;
 extern SDL_mutex *ode_mutex;
 extern SDL_mutex *sdl_mutex;
 extern SDL_mutex *sync_mutex;
-extern SDL_mutex *render_list_mutex;
 extern SDL_cond  *sync_cond;
 //
 

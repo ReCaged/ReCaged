@@ -19,9 +19,10 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
+#include "log.hpp"
 #include <stdarg.h>
 #include "internal.hpp"
-#include "log.hpp"
+#include "threads.hpp"
 
 
 //TODO: store all lines (can be rendered in an in-game terminal)
@@ -34,6 +35,8 @@ void printlog (int level, const char *text, ...)
 {
 	if (level <= internal.verbosity)
 	{
+		SDL_mutexP(log_mutex); //make sure alone
+
 		if (level==0)
 			putchar('\n');
 
@@ -48,6 +51,8 @@ void printlog (int level, const char *text, ...)
 
 		//put newline
 		putchar('\n');
+
+		SDL_mutexV(log_mutex); //release
 	}
 }
 
@@ -62,19 +67,20 @@ int lua_log_print (lua_State *lua)
 
 		if (level <= internal.verbosity)
 		{
+			SDL_mutexP(log_mutex);
+
 			if (level==0)
 				putchar('\n');
 
-			//print verbosity indicator
 			fputs(indicator[level], stdout);
 
 			int arg = 2;
 			while (--n)
 				fputs(lua_tostring(lua, arg++), stdout);
-				//TODO: check if number and use lua_tonumber?
 
-			//newline
 			putchar('\n');
+
+			SDL_mutexV(log_mutex);
 		}
 	}
 	else

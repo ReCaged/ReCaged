@@ -21,15 +21,29 @@
 
 #include "threads.hpp"
 
-SDL_mutex *render_list_mutex = NULL; //prevent threads from switching buffers at the same
+//mutexes/conditions:
+
+//prevent threads from switching buffers at the same
 //(probability is low, but it could occur)
+SDL_mutex *render_list_mutex = NULL;
 
-SDL_mutex *ode_mutex = NULL; //only one thread for ode
-SDL_mutex *sdl_mutex = NULL; //only one thread for sdl
+//make sure only working with one line at a time
+SDL_mutex *log_mutex = NULL;
 
-SDL_mutex *sync_mutex = NULL; //for using sync_cond
-SDL_cond  *sync_cond  = NULL; //threads can sleep until synced
-//
+//only one thread for ode
+SDL_mutex *ode_mutex = NULL;
+
+//only one thread for sdl
+SDL_mutex *sdl_mutex = NULL;
+
+//for using sync_cond
+SDL_mutex *sync_mutex = NULL;
+
+//threads can sleep until synced
+SDL_cond  *sync_cond  = NULL;
+
+
+//lua states:
 
 //tmp for lua
 lua_State *tmp_lua_state = NULL;
