@@ -196,6 +196,7 @@ int Simulation_Loop (void *d)
 void Simulation_Quit (void)
 {
 	printlog(1, "Quit simulation");
+	lua_close(lua_sim);
 	dJointGroupDestroy (contactgroup);
 	dSpaceDestroy (space);
 	dWorldDestroy (world);

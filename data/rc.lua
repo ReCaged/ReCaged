@@ -1,9 +1,14 @@
-#this file is meant to solve some problems with the current lack of menus.
-#the current race mode is just a debug mode thing:
-# one single user (with one profile) controls all cars ("players")
-#
-#the idea here is to mimic menu selections for now:
-#hello, welcome to rc! select a profile (or create a new):
+--[[this lua script is the "main loop" for the interface thread. it also takes
+care of start/stop the simulation thread and instructs it what it should
+load. will eventually handle menu]]
+
+--TODO: arguments to recaged should be passed to this script...
+log.print(0, "hello, this is rc.lua providing the user interface");
+
+--[[the following will be used to mimic menu selections
+
+hello, welcome to rc! select a profile (or create a new):
+
 profile default
 
 #main menu... player selects "race"... and free-roam mode
@@ -33,5 +38,7 @@ diameter 2
 tyre Slick
 rim Split
 position 8 0
+]]
 
-#ok, end of file: cage is closed, race will start!
+log.print(0, "no loop in lua yet...");
+

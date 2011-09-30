@@ -32,6 +32,9 @@
 #include "shared/track.hpp"
 #include "shared/trimesh.hpp"
 
+//
+//TODO: move the following to interface lua script!!!
+//
 
 Uint32 starttime = 0;
 Uint32 racetime = 0;
@@ -60,7 +63,11 @@ void Run_Race(void)
 	//END of start from lua
 
 	//TODO: run lua
-	Interface_Loop(); //we already got opengl context in main thread
+	if (!Interface_Loop()) //we already got opengl context in main thread
+	{
+		//failure in interface, make sure simulation knows it needs to quit...
+		runlevel=done;
+	}
 
 	//wait for threads
 	SDL_WaitThread (simulation, NULL);
@@ -305,7 +312,7 @@ bool tmp_menus(const char *profiledir)
 }
 
 //
-//
+//end of what to move to rc.lua
 //
 
 

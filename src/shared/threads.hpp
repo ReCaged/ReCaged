@@ -39,7 +39,7 @@ extern SDL_cond  *sync_cond;
 
 //lua states
 extern lua_State *lua_sim; //simulation
-//extern lua_State *lua_int; //interface
+extern lua_State *lua_int; //interface
 //
 
 //prototypes for communication/statistic variables
@@ -59,7 +59,7 @@ void Interface_Quit(void);
 bool Simulation_Init(void);
 void Simulation_Quit (void);
 
-int Interface_Loop (void);
+bool Interface_Loop (void);
 int Simulation_Loop (void *d);
 
 

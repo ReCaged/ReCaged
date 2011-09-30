@@ -292,7 +292,7 @@ class Car:public Object
 		friend void Profile_Events_Step(Uint32 step);
 
 		//tmp: needs access to above pointers
-		friend int Interface_Loop ();
+		friend bool Interface_Loop ();
 };
 
 #endif

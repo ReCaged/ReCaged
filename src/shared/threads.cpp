@@ -49,5 +49,5 @@ SDL_cond  *sync_cond  = NULL;
 lua_State *lua_sim = NULL;
 
 //interface through lua
-//lua_State *lua_int = NULL;
+lua_State *lua_int = NULL;
 

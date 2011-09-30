@@ -22,6 +22,12 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 #include "../shared/internal.hpp"
 #include "../shared/info.hpp"
 #include "../shared/track.hpp"
@@ -110,6 +116,25 @@ bool Interface_Init(void)
 {
 	printlog(0, "Initiating interface");
 
+	//create lua state
+	lua_int = luaL_newstate();
+	if (!lua_int)
+	{
+		printlog(0, "ERROR: could not create new lua state");
+		return false;
+	}
+
+	//lua libraries allowed/needed:
+	luaopen_string(lua_int);
+	luaopen_table(lua_int);
+	luaopen_math(lua_int);
+
+	//custom libraries:
+	luaL_register(lua_int, "log", lua_log);
+
+	//end of lua init (for now)
+
+
 	//initiate sdl
 	SDL_Init (SDL_INIT_VIDEO);
 
@@ -195,9 +220,29 @@ bool Interface_Init(void)
 
 
 
-int Interface_Loop ()
+bool Interface_Loop ()
 {
 	printlog(1, "Starting interface loop");
+
+	//all following will be moved to rc.lua!
+	//load file as chunk
+	if (luaL_loadfile(lua_int, "rc.lua"))
+	{
+		printlog(0, "ERROR: could not load \"rc.lua\" script: \"%s\"!",
+				lua_tostring(lua_int, -1));
+		lua_pop(lua_int, -1);
+		return false;
+	}
+
+	//execute chunk
+	if (lua_pcall(lua_int, 0, 0, 0))
+	{
+		printlog(0, "ERROR: \"%s\" while running \"rc.lua\"!",
+				lua_tostring(lua_int, -1));
+		lua_pop(lua_int, -1);
+		return false;
+	}
+	//end of lua script
 
 	//just make sure not rendering geoms yet
 	geom_render_level = 0;
@@ -414,12 +459,13 @@ int Interface_Loop ()
 	Geom_Render_Clear();
 	Render_List_Clear();
 
-	return 0;
+	return true;
 }
 
 void Interface_Quit(void)
 {
 	printlog(1, "Quit interface");
+	lua_close(lua_int);
 	SDL_Quit();
 }
 
