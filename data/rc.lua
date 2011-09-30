@@ -1,3 +1,9 @@
+--Copyright (C) 2011 Mats Wahlberg
+--
+--Copying and distribution of this file, with or without modification,
+--are permitted in any medium without royalty provided the copyright
+--notice and this notice are preserved.
+
 --[[this lua script is the "main loop" for the interface thread. it also takes
 care of start/stop the simulation thread and instructs it what it should
 load. will eventually handle menu]]
