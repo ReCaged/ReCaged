@@ -41,7 +41,7 @@ Object_Template::Object_Template(const char *name): Racetime_Data(name)
 
 Object_Template::~Object_Template()
 {
-	luaL_unref(tmp_lua_state, LUA_REGISTRYINDEX, spawn_script);
+	luaL_unref(lua_sim, LUA_REGISTRYINDEX, spawn_script);
 }
 
 Object *Object::head = NULL;

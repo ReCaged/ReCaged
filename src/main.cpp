@@ -22,13 +22,6 @@
 //Required stuff:
 #include <SDL.h>
 
-//tmp: lua
-extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-}
-
 //local stuff:
 #include "shared/info.hpp"
 #include "shared/internal.hpp"
@@ -117,27 +110,6 @@ bool tmp_menus(const char *profiledir)
 	if (!prof)
 		return false; //GOTO: profile menu
 
-
-	//
-	//TODO: simulation should have its own lua state (and interface another).
-	//hack: just create the lua state here:
-	tmp_lua_state = luaL_newstate();
-	if (!tmp_lua_state)
-	{
-		printlog(0, "ERROR: could not create new lua state");
-		return false;
-	}
-
-	//lua libraries allowed/needed:
-	luaopen_string(tmp_lua_state);
-	luaopen_table(tmp_lua_state);
-	luaopen_math(tmp_lua_state);
-
-	//custom libraries:
-	luaL_register(tmp_lua_state, "log", lua_log);
-
-	//end of hack.
-	//
 
 	//initiate simulation
 	if (!Simulation_Init())

@@ -45,6 +45,9 @@ SDL_cond  *sync_cond  = NULL;
 
 //lua states:
 
-//tmp for lua
-lua_State *tmp_lua_state = NULL;
+//simulation through lua
+lua_State *lua_sim = NULL;
+
+//interface through lua
+//lua_State *lua_int = NULL;
 

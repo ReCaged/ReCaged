@@ -22,6 +22,12 @@
 #include <SDL/SDL_timer.h>
 #include <SDL/SDL_mutex.h>
 
+extern "C" {
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+}
+
 #include "../shared/threads.hpp"
 #include "../shared/internal.hpp"
 #include "../shared/runlevel.hpp"
@@ -47,13 +53,30 @@ Uint32 simulation_time = 0;
 bool Simulation_Init(void)
 {
 	printlog(0, "Initiating simulation");
+
+	//lua state
+	lua_sim = luaL_newstate();
+	if (!lua_sim)
+	{
+		printlog(0, "ERROR: could not create new lua state");
+		return false;
+	}
+
+	//lua libraries allowed/needed:
+	luaopen_string(lua_sim);
+	luaopen_table(lua_sim);
+	luaopen_math(lua_sim);
+
+	//custom libraries:
+	luaL_register(lua_sim, "log", lua_log);
+
+	//ode
 	dInitODE2(0);
 	dAllocateODEDataForThread(dAllocateFlagBasicData | dAllocateFlagCollisionData);
 
 	world = dWorldCreate();
 
 	//set global ode parameters (except those specific to track)
-
 	space = dHashSpaceCreate(0);
 	dHashSpaceSetLevels(space, internal.hash_levels[0], internal.hash_levels[1]);
 
@@ -68,7 +91,7 @@ bool Simulation_Init(void)
 	dWorldSetAutoDisableSteps (world, internal.dis_steps);
 	dWorldSetAutoDisableTime (world, internal.dis_time);
 
-	//joint softness
+	//default joint forces
 	dWorldSetERP (world, internal.erp);
 	dWorldSetCFM (world, internal.cfm);
 

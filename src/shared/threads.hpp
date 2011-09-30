@@ -38,8 +38,8 @@ extern SDL_cond  *sync_cond;
 //
 
 //lua states
-//TODO: change into two: one for interface, one for simulation
-extern lua_State *tmp_lua_state;
+extern lua_State *lua_sim; //simulation
+//extern lua_State *lua_int; //interface
 //
 
 //prototypes for communication/statistic variables

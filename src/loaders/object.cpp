@@ -55,25 +55,25 @@ Object_Template *Object_Template::Load(const char *path)
 	strcat(script, "/object.lua");
 
 	//load file as chunk
-	if (luaL_loadfile(tmp_lua_state, script))
+	if (luaL_loadfile(lua_sim, script))
 	{
 		printlog(0, "ERROR: could not load script \"%s\": \"%s\"!",
-				script, lua_tostring(tmp_lua_state, -1));
-		lua_pop(tmp_lua_state, -1);
+				script, lua_tostring(lua_sim, -1));
+		lua_pop(lua_sim, -1);
 		return NULL;
 	}
 
 	//execute chunk and look for one return
-	if (lua_pcall(tmp_lua_state, 0, 1, 0))
+	if (lua_pcall(lua_sim, 0, 1, 0))
 	{
 		printlog(0, "ERROR: \"%s\" while running \"%s\"!",
-				lua_tostring(tmp_lua_state, -1), script);
-		lua_pop(tmp_lua_state, -1);
+				lua_tostring(lua_sim, -1), script);
+		lua_pop(lua_sim, -1);
 		return NULL;
 	}
 
 	//if not returned ok
-	if (!lua_isfunction(tmp_lua_state, -1))
+	if (!lua_isfunction(lua_sim, -1))
 	{
 		printlog(0, "ERROR: no spawning function returned by \"%s\"!", script);
 		return NULL;
@@ -81,7 +81,7 @@ Object_Template *Object_Template::Load(const char *path)
 
 	//great!
 	Object_Template *obj = new Object_Template(path);
-	obj->spawn_script = luaL_ref(tmp_lua_state, LUA_REGISTRYINDEX);
+	obj->spawn_script = luaL_ref(lua_sim, LUA_REGISTRYINDEX);
 	return obj;
 }
 
@@ -91,13 +91,13 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 {
 	printlog(2, "Spawning object at: %f %f %f", x,y,z);
 
-	lua_rawgeti(tmp_lua_state, LUA_REGISTRYINDEX, spawn_script);
+	lua_rawgeti(lua_sim, LUA_REGISTRYINDEX, spawn_script);
 
-	if (lua_pcall(tmp_lua_state, 0, 0, 0))
+	if (lua_pcall(lua_sim, 0, 0, 0))
 	{
 		printlog(0, "ERROR: \"%s\" while spawning object!",
-				lua_tostring(tmp_lua_state, -1));
-		lua_pop(tmp_lua_state, -1);
+				lua_tostring(lua_sim, -1));
+		lua_pop(lua_sim, -1);
 		//return false;
 	}
 }
