@@ -26,6 +26,7 @@
 
 extern "C" {
 #include <lua.h>
+#include <lauxlib.h>
 }
 
 //mutexes
@@ -41,6 +42,10 @@ extern SDL_cond  *sync_cond;
 extern lua_State *lua_sim; //simulation
 extern lua_State *lua_int; //interface
 //
+
+//lua libraries
+extern const luaL_Reg lua_interface[];
+extern const luaL_Reg lua_simulation[];
 
 //prototypes for communication/statistic variables
 //simulation:
@@ -62,7 +67,9 @@ void Simulation_Quit (void);
 bool Interface_Loop (void);
 int Simulation_Loop (void *d);
 
-
+//(tmp?) runlevel for simulation
+typedef enum {paused, running, done} runlevel_type;
+extern runlevel_type runlevel;
 
 //TMP: used for keeping track for objects spawning
 #include "object.hpp"

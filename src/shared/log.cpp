@@ -25,6 +25,15 @@
 #include "threads.hpp"
 
 
+//list of lua functions:
+int lua_log_print (lua_State *lua);
+const luaL_Reg lua_log[] =
+{
+	{"print", lua_log_print},
+	{NULL, NULL}
+};
+//
+
 //TODO: store all lines (can be rendered in an in-game terminal)
 
 //verbosity indicators
@@ -93,10 +102,4 @@ int lua_log_print (lua_State *lua)
 	return 0;
 }
 
-//list of lua functions:
-const luaL_Reg lua_log[] =
-{
-	{"print", lua_log_print},
-	{NULL, NULL}
-};
 

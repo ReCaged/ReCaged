@@ -30,7 +30,6 @@ extern "C" {
 
 #include "../shared/threads.hpp"
 #include "../shared/internal.hpp"
-#include "../shared/runlevel.hpp"
 #include "../shared/track.hpp"
 #include "../shared/log.hpp"
 #include "../shared/body.hpp"
@@ -45,6 +44,35 @@ extern "C" {
 
 #include "../interface/render_list.hpp"
 
+//list of lua functions:
+static int sim_TMP (lua_State *lua);
+//static int lua_simulation_start (lua_State *lua);
+//static int lua_simulation_stop (lua_State *lua);
+const luaL_Reg lua_simulation[] =
+{
+	{"tmp_runlevel", sim_TMP},
+	//{"start", lua_simulation_start},
+	//{"stop", lua_simulation_stop},
+	{NULL, NULL}
+};
+//
+
+//keep track of what to do
+runlevel_type runlevel = paused;
+
+int sim_TMP (lua_State *lua)
+{
+	if (runlevel != done)
+	{
+		lua_pushboolean(lua, true);
+	}
+	else
+	{
+		lua_pushboolean(lua, false);
+	}
+
+	return 1;
+}
 
 unsigned int simulation_lag = 0;
 unsigned int simulation_count = 0;

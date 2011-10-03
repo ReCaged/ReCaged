@@ -31,7 +31,6 @@ extern "C" {
 #include "../shared/internal.hpp"
 #include "../shared/info.hpp"
 #include "../shared/track.hpp"
-#include "../shared/runlevel.hpp"
 #include "../shared/threads.hpp"
 #include "../shared/log.hpp"
 #include "../shared/profile.hpp"
@@ -42,6 +41,15 @@ extern "C" {
 
 SDL_Surface *screen;
 const Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+
+//list of lua functions:
+int int_TMP (lua_State *lua);
+const luaL_Reg lua_interface[] =
+{
+	{"tmp_frame", int_TMP},
+	{NULL, NULL}
+};
+//
 
 //TMP: keep track of demo spawn stuff
 Object_Template *box = NULL;
@@ -131,6 +139,8 @@ bool Interface_Init(void)
 
 	//custom libraries:
 	luaL_register(lua_int, "log", lua_log);
+	luaL_register(lua_int, "interface", lua_interface);
+	luaL_register(lua_int, "simulation", lua_simulation);
 
 	//end of lua init (for now)
 
@@ -226,9 +236,9 @@ bool Interface_Loop ()
 
 	//all following will be moved to internal.lua!
 	//load file as chunk
-	if (luaL_loadfile(lua_int, "internal.lua"))
+	if (luaL_loadfile(lua_int, "interface.lua"))
 	{
-		printlog(0, "ERROR: could not load \"rc.lua\" script: \"%s\"!",
+		printlog(0, "ERROR: could not load \"interface.lua\" script: \"%s\"!",
 				lua_tostring(lua_int, -1));
 		lua_pop(lua_int, -1);
 		return false;
@@ -237,13 +247,18 @@ bool Interface_Loop ()
 	//execute chunk
 	if (lua_pcall(lua_int, 0, 0, 0))
 	{
-		printlog(0, "ERROR: \"%s\" while running \"rc.lua\"!",
+		printlog(0, "ERROR: \"%s\" while running \"interface.lua\"!",
 				lua_tostring(lua_int, -1));
 		lua_pop(lua_int, -1);
 		return false;
 	}
 	//end of lua script
 
+	return true; //if we got here, quit ok
+}
+
+int int_TMP(lua_State *lua)
+{
 	//just make sure not rendering geoms yet
 	geom_render_level = 0;
 
@@ -459,7 +474,7 @@ bool Interface_Loop ()
 	Geom_Render_Clear();
 	Render_List_Clear();
 
-	return true;
+	return 0;
 }
 
 void Interface_Quit(void)

@@ -293,6 +293,7 @@ class Car:public Object
 
 		//tmp: needs access to above pointers
 		friend bool Interface_Loop ();
+		friend int int_TMP (lua_State *lua);
 };
 
 #endif

@@ -46,5 +46,11 @@ rim Split
 position 8 0
 ]]
 
-log.print(0, "no loop in lua yet...");
+--simulation.start();
+
+while simulation.tmp_runlevel() do
+	interface.tmp_frame();
+end
+
+--simulation.stop();
 

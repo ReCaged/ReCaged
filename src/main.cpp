@@ -27,7 +27,6 @@
 #include "shared/internal.hpp"
 #include "shared/threads.hpp"
 #include "shared/log.hpp"
-#include "shared/runlevel.hpp"
 #include "shared/profile.hpp"
 #include "shared/track.hpp"
 #include "shared/trimesh.hpp"
@@ -68,6 +67,8 @@ void Run_Race(void)
 		//failure in interface, make sure simulation knows it needs to quit...
 		runlevel=done;
 	}
+
+	runlevel=done; //tmp if needed?
 
 	//wait for threads
 	SDL_WaitThread (simulation, NULL);
