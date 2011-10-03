@@ -48,12 +48,14 @@ extern "C" {
 static int lua_simulation_start (lua_State *lua);
 static int lua_simulation_stop (lua_State *lua);
 static int lua_simulation_run (lua_State *lua);
+static int lua_simulation_tmpload (lua_State *lua);
 
 const luaL_Reg lua_simulation[] =
 {
 	{"start", lua_simulation_start},
 	{"stop", lua_simulation_stop},
 	{"run", lua_simulation_run},
+	{"tmpload", lua_simulation_tmpload},
 	{NULL, NULL}
 };
 //
@@ -61,9 +63,15 @@ const luaL_Reg lua_simulation[] =
 //keep track of what to do
 runlevel_type runlevel = paused; //TODO: might be private in future!
 
+//
+//TODO: move the following to interface lua script!!!
+//
+
+Uint32 starttime = 0;
+Uint32 racetime = 0;
+Uint32 simtime = 0; 
 unsigned int simulation_lag = 0;
 unsigned int simulation_count = 0;
-Uint32 simulation_time = 0;
 
 bool Simulation_Init(void)
 {
@@ -118,7 +126,7 @@ int Simulation_Loop (void *d)
 {
 	printlog(1, "Starting simulation loop");
 
-	simulation_time = SDL_GetTicks(); //set simulated time to realtime
+	simtime = SDL_GetTicks(); //set simulated time to realtime
 	Uint32 realtime; //real time (with possible delay since last update)
 	Uint32 stepsize_ms = (Uint32) (internal.stepsize*1000.0+0.0001);
 	dReal divided_stepsize = internal.stepsize/internal.multiplier;
@@ -178,21 +186,21 @@ int Simulation_Loop (void *d)
 			SDL_mutexV(sync_mutex);
 		}
 
-		simulation_time += stepsize_ms;
+		simtime += stepsize_ms;
 
 		//sync simulation with realtime
 		if (internal.sync_simulation)
 		{
 			//get some time to while away?
 			realtime = SDL_GetTicks();
-			if (simulation_time > realtime)
+			if (simtime > realtime)
 			{
 				//busy-waiting:
 				if (internal.spinning)
-					while (simulation_time > SDL_GetTicks());
+					while (simtime > SDL_GetTicks());
 				//sleep:
 				else
-					SDL_Delay (simulation_time - realtime);
+					SDL_Delay (simtime - realtime);
 			}
 			else
 				++simulation_lag;
@@ -224,7 +232,7 @@ void Simulation_Quit (void)
 static int lua_simulation_start (lua_State *lua)
 {
 	simulation_thread = SDL_CreateThread (Simulation_Loop, NULL);
-	//starttime = SDL_GetTicks(); //TODO!
+	starttime = SDL_GetTicks();
 	return 0;
 }
 
@@ -252,6 +260,48 @@ static int lua_simulation_run (lua_State *lua)
 		lua_pushstring(lua, "simulation.run: expects single boolean value");
 		lua_error(lua);
 	}
+
+	return 0;
+}
+
+
+#include "../shared/profile.hpp"
+
+static int lua_simulation_tmpload (lua_State *lua)
+{
+	Profile *prof = Profile_Load ("profiles/default");
+	if (!prof)
+		return 0; //GOTO: profile menu
+
+	//TODO: probably Racetime_Data::Destroy_All() here
+	if (!load_track("worlds/Sandbox/tracks/Box"))
+		return 0; //GOTO: track selection menu
+
+	//TMP: load some objects for online spawning
+	if (	!(box = Object_Template::Load("objects/misc/box"))) //		||
+		//!(sphere = Object_Template::Load("objects/misc/beachball"))||
+		//!(funbox = Object_Template::Load("objects/misc/funbox"))	||
+		//!(molecule = Object_Template::Load("objects/misc/NH4"))	)
+		return 0;
+	//
+
+	Car_Template *car_template=Car_Template::Load("teams/Nemesis/cars/Venom");
+
+	if (!car_template)
+		return 0;
+
+	Trimesh_3D *tyre = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/tyres/diameter/2/Slick", "tyre.conf");
+	Trimesh_3D *rim = Trimesh_3D::Quick_Load_Conf("teams/Nemesis/rims/diameter/2/Split", "rim.conf");
+	//good, spawn
+	Car *car = car_template->Spawn(
+		track.start[0], //x
+		track.start[1], //y
+		track.start[2], //z
+		tyre, rim);
+
+	//this single player/profile controls all cars for now... and ladt one by default
+	prof->car = car;
+	camera.Set_Car(car);
 
 	return 0;
 }

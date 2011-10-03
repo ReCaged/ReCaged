@@ -52,7 +52,10 @@ extern const luaL_Reg lua_simulation[];
 //simulation:
 extern unsigned int simulation_lag;
 extern unsigned int simulation_count;
-extern Uint32 simulation_time;
+
+extern Uint32 starttime;
+extern Uint32 racetime;
+extern Uint32 simtime;
 
 //interface:
 extern unsigned int interface_count;

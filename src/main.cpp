@@ -31,16 +31,6 @@
 #include "shared/track.hpp"
 #include "shared/trimesh.hpp"
 
-//
-//TODO: move the following to interface lua script!!!
-//
-
-Uint32 starttime = 0;
-Uint32 racetime = 0;
-Uint32 simtime = 0; 
-
-Uint32 start_time = 0;
-
 
 //default options (paths)
 const char profiledefault[] = "profiles";
@@ -132,6 +122,15 @@ int main (int argc, char *argv[])
 
 	render_list_mutex = SDL_CreateMutex(); //prevent (unlikely) update/render collision
 
+
+
+
+
+
+
+	//internal conf (tmp)
+	load_conf ("internal.conf", (char *)&internal, internal_index);
+
 	//initiate interface
 	if (!Interface_Init())
 		return false;
@@ -141,52 +140,15 @@ int main (int argc, char *argv[])
 		return false;
 
 
-	//conf (tmp!)
-	load_conf ("internal.conf", (char *)&internal, internal_index);
-
-	Profile *prof = Profile_Load ("profiles/default");
-	if (!prof)
-		return false; //GOTO: profile menu
-
-	//TODO: probably Racetime_Data::Destroy_All() here
-	if (!load_track("worlds/Sandbox/tracks/Box"))
-		return false; //GOTO: track selection menu
-
-	//TMP: load some objects for online spawning
-	if (	!(box = Object_Template::Load("objects/misc/box"))) //		||
-		//!(sphere = Object_Template::Load("objects/misc/beachball"))||
-		//!(funbox = Object_Template::Load("objects/misc/funbox"))	||
-		//!(molecule = Object_Template::Load("objects/misc/NH4"))	)
-		return false;
-	//
-
-	Car_Template *car_template=Car_Template::Load("teams/Nemesis/cars/Venom");
-
-	if (!car_template)
-		return false;
-
-	Trimesh_3D *tyre = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/tyres/diameter/2/Slick", "tyre.conf");
-	Trimesh_3D *rim = Trimesh_3D::Quick_Load_Conf("teams/Nemesis/rims/diameter/2/Split", "rim.conf");
-	//good, spawn
-	Car *car = car_template->Spawn(
-		track.start[0], //x
-		track.start[1], //y
-		track.start[2], //z
-		tyre, rim);
-
-	//this single player/profile controls all cars for now... and ladt one by default
-	prof->car = car;
-	camera.Set_Car(car);
 
 
-	starttime = SDL_GetTicks(); //how long it took for race to start
 	Interface_Loop(); //we already got opengl context in main thread
 
 
 	//wait for threads
 	if (simulation_thread)
 	{
-		runlevel  = done;
+		runlevel = done;
 		SDL_WaitThread (simulation_thread, NULL);
 	}
 
@@ -222,9 +184,9 @@ int main (int argc, char *argv[])
 	//done!
 	printlog(0, "Race Done!");
 
-	racetime = SDL_GetTicks() - starttime;
-	simtime = simulation_time - starttime;
 
+	racetime = SDL_GetTicks() - starttime;
+	simtime = simtime - starttime;
 
 
 	//might be interesting

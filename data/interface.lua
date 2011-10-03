@@ -46,9 +46,10 @@ rim Split
 position 8 0
 ]]
 
-simulation.start();
+--interface.init(1280, 1024);
+simulation.tmpload();
+simulation.start(); --TODO: will start before loading in future
 simulation.run(true);
-i=0;
 
 while interface.tmp_running() do
 	interface.tmp_frame();
