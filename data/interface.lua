@@ -46,11 +46,13 @@ rim Split
 position 8 0
 ]]
 
---simulation.start();
+simulation.start();
+simulation.run(true);
+i=0;
 
-while simulation.tmp_runlevel() do
+while interface.tmp_running() do
 	interface.tmp_frame();
 end
 
---simulation.stop();
+simulation.stop();
 

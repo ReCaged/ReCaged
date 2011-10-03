@@ -44,12 +44,21 @@ const Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
 
 //list of lua functions:
 int int_TMP (lua_State *lua);
+int int_TMP_run (lua_State *lua);
 const luaL_Reg lua_interface[] =
 {
 	{"tmp_frame", int_TMP},
+	{"tmp_running", int_TMP_run},
 	{NULL, NULL}
 };
 //
+bool tmp_running=true;
+int int_TMP_run (lua_State *lua)
+{
+	lua_pushboolean(lua, tmp_running);
+	return 1;
+}
+
 
 //TMP: keep track of demo spawn stuff
 Object_Template *box = NULL;
@@ -257,17 +266,13 @@ bool Interface_Loop ()
 	return true; //if we got here, quit ok
 }
 
+//TODO:
+//just make sure not rendering geoms yet
+//geom_render_level = 0;
+Uint32 time_old = 0;
 int int_TMP(lua_State *lua)
 {
-	//just make sure not rendering geoms yet
-	geom_render_level = 0;
 
-	//store current time
-	Uint32 time_old = SDL_GetTicks();
-
-	//only stop render if done with race
-	while (runlevel != done)
-	{
 		//make sure only render frame after it's been simulated
 		//quckly lock mutex in order to listen to simulation broadcasts
 		//(but only if there is no new frame already)
@@ -304,7 +309,7 @@ int int_TMP(lua_State *lua)
 				break;
 
 				case SDL_QUIT:
-					runlevel = done;
+					tmp_running = false;
 				break;
 
 				case SDL_ACTIVEEVENT:
@@ -317,7 +322,7 @@ int int_TMP(lua_State *lua)
 					switch (event.key.keysym.sym)
 					{
 						case SDLK_ESCAPE:
-							runlevel = done;
+							tmp_running = false;
 						break;
 
 						//box spawning
@@ -424,7 +429,6 @@ int int_TMP(lua_State *lua)
 			Profile_Events_Step(delta);
 
 
-
 		//done with sdl
 		SDL_mutexV(sdl_mutex);
 
@@ -467,18 +471,20 @@ int int_TMP(lua_State *lua)
 
 		//keep track of how many rendered frames
 		++interface_count;
-	}
-
-	//during rendering, memory might be allocated
-	//(will quickly be reallocated in each race and can be removed)
-	Geom_Render_Clear();
-	Render_List_Clear();
 
 	return 0;
 }
 
 void Interface_Quit(void)
 {
+
+	//TODO: move somewhere else
+	//during rendering, memory might be allocated
+	//(will quickly be reallocated in each race and can be removed)
+	Geom_Render_Clear();
+	Render_List_Clear();
+	//
+
 	printlog(1, "Quit interface");
 	lua_close(lua_int);
 	SDL_Quit();

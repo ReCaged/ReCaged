@@ -570,4 +570,5 @@ void Wheel::Clear_List()
 	wheel_list_size=0;
 	wheel_list_usage=0; //should not be needed...
 	delete[] wheel_list;
+	wheel_list = NULL; //for allocating again
 }

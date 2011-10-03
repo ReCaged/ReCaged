@@ -23,6 +23,7 @@
 #define _RC_THREADS_H
 
 #include <SDL/SDL_mutex.h>
+#include <SDL/SDL_thread.h>
 
 extern "C" {
 #include <lua.h>
@@ -66,6 +67,7 @@ void Simulation_Quit (void);
 
 bool Interface_Loop (void);
 int Simulation_Loop (void *d);
+extern SDL_Thread *simulation_thread;
 
 //(tmp?) runlevel for simulation
 typedef enum {paused, running, done} runlevel_type;

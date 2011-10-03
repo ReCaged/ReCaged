@@ -21,6 +21,7 @@
 
 #include "threads.hpp"
 
+
 //mutexes/conditions:
 
 //prevent threads from switching buffers at the same
@@ -42,6 +43,11 @@ SDL_mutex *sync_mutex = NULL;
 //threads can sleep until synced
 SDL_cond  *sync_cond  = NULL;
 
+
+//threads
+
+//simulation
+SDL_Thread *simulation_thread = NULL;
 
 //lua states:
 

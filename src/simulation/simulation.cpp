@@ -45,34 +45,21 @@ extern "C" {
 #include "../interface/render_list.hpp"
 
 //list of lua functions:
-static int sim_TMP (lua_State *lua);
-//static int lua_simulation_start (lua_State *lua);
-//static int lua_simulation_stop (lua_State *lua);
+static int lua_simulation_start (lua_State *lua);
+static int lua_simulation_stop (lua_State *lua);
+static int lua_simulation_run (lua_State *lua);
+
 const luaL_Reg lua_simulation[] =
 {
-	{"tmp_runlevel", sim_TMP},
-	//{"start", lua_simulation_start},
-	//{"stop", lua_simulation_stop},
+	{"start", lua_simulation_start},
+	{"stop", lua_simulation_stop},
+	{"run", lua_simulation_run},
 	{NULL, NULL}
 };
 //
 
 //keep track of what to do
-runlevel_type runlevel = paused;
-
-int sim_TMP (lua_State *lua)
-{
-	if (runlevel != done)
-	{
-		lua_pushboolean(lua, true);
-	}
-	else
-	{
-		lua_pushboolean(lua, false);
-	}
-
-	return 1;
-}
+runlevel_type runlevel = paused; //TODO: might be private in future!
 
 unsigned int simulation_lag = 0;
 unsigned int simulation_count = 0;
@@ -221,6 +208,7 @@ int Simulation_Loop (void *d)
 	return 0;
 }
 
+//not lua
 void Simulation_Quit (void)
 {
 	printlog(1, "Quit simulation");
@@ -229,5 +217,42 @@ void Simulation_Quit (void)
 	dSpaceDestroy (space);
 	dWorldDestroy (world);
 	dCloseODE();
+}
+
+
+//for lua start/stop thread:
+static int lua_simulation_start (lua_State *lua)
+{
+	simulation_thread = SDL_CreateThread (Simulation_Loop, NULL);
+	//starttime = SDL_GetTicks(); //TODO!
+	return 0;
+}
+
+static int lua_simulation_stop (lua_State *lua)
+{
+	runlevel = done;
+	SDL_WaitThread (simulation_thread, NULL);
+	simulation_thread=NULL;
+	return 0;
+}
+
+static int lua_simulation_run (lua_State *lua)
+{
+	if (lua_gettop(lua)==1 && lua_isboolean(lua, 1))
+	{
+		bool run = lua_toboolean(lua, 1);
+		if (run)
+			runlevel = running;
+		else
+			runlevel = paused;
+
+	}
+	else
+	{
+		lua_pushstring(lua, "simulation.run: expects single boolean value");
+		lua_error(lua);
+	}
+
+	return 0;
 }
 
