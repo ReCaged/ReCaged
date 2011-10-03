@@ -224,9 +224,9 @@ bool Interface_Loop ()
 {
 	printlog(1, "Starting interface loop");
 
-	//all following will be moved to rc.lua!
+	//all following will be moved to internal.lua!
 	//load file as chunk
-	if (luaL_loadfile(lua_int, "rc.lua"))
+	if (luaL_loadfile(lua_int, "internal.lua"))
 	{
 		printlog(0, "ERROR: could not load \"rc.lua\" script: \"%s\"!",
 				lua_tostring(lua_int, -1));
