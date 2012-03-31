@@ -1,0 +1,11 @@
+ Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+
+ Copying and distribution of this file, with or without modification,
+ are permitted in any medium without royalty provided the copyright
+ notice and this notice are preserved.
+
+TODO: more info in header!
+
+ReCaged 0.7.1 (?/?/2012)
+	* Move to Autotools
+	* Inno Setup for w32 installer

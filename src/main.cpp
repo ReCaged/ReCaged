@@ -20,7 +20,7 @@
  */ 
 
 //Required stuff:
-#include <SDL.h>
+#include <SDL/SDL.h>
 
 //local stuff:
 #include "shared/info.hpp"
@@ -314,7 +314,7 @@ char *datadefault; //need to check path to rc before deciding this
 int main (int argc, char *argv[])
 {
 	//issue
-	printf("\n	-=[ Welcome to ReCaged version %s ]=-\n\n%s\n", VERSION, ISSUE);
+	printf("\n	-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n%s\n", VERSION, CODENAME, ISSUE);
 	//end
 
 	//attempt to generate default data path

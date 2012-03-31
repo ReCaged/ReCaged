@@ -21,6 +21,7 @@
 
 #include <SDL/SDL_timer.h>
 #include <SDL/SDL_mutex.h>
+#include <ode/ode.h>
 
 #include "../shared/threads.hpp"
 #include "../shared/internal.hpp"
