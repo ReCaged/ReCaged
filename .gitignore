@@ -1,3 +1,7 @@
+recaged
+recaged-*.tar.gz
+recaged-*.tar.gz.sig
+
 *.Po
 *.o
 .dirstamp
