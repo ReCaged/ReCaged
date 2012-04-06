@@ -289,7 +289,7 @@ class Car:public Object
 		Car *prev, *next;
 
 		//controls car
-		friend void Profile_Events_Step(Uint32 step);
+		friend void Profile_Input_Step(Uint32 step);
 
 		//tmp: needs access to above pointers
 		friend int Interface_Loop ();

@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -36,6 +36,8 @@
 
 SDL_Surface *screen;
 const Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+int joysticks=0;
+SDL_Joystick **joystick;
 
 //TMP: keep track of demo spawn stuff
 Object_Template *box = NULL;
@@ -111,7 +113,11 @@ bool Interface_Init(void)
 	printlog(0, "Initiating interface");
 
 	//initiate sdl
-	SDL_Init (SDL_INIT_VIDEO);
+	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK))
+	{
+		printlog(0, "Error: couldn't initiate SDL: %s", SDL_GetError());
+		return false;
+	}
 
 	//set title:
 	SDL_WM_SetCaption (TITLE, "ReCaged");
@@ -130,7 +136,7 @@ bool Interface_Init(void)
 
 	if (!screen)
 	{
-		printlog(0, "Error: couldn't set video mode");
+		printlog(0, "Error: couldn't set video mode: %s", SDL_GetError());
 		return false;
 	}
 
@@ -163,6 +169,21 @@ bool Interface_Init(void)
 	//set up window, as if resized
 	Resize (screen->w, screen->h);
 
+	//grab all joysticks/gamepads detected
+	joysticks=SDL_NumJoysticks();
+	if (joysticks != 0)
+	{
+		joystick = new SDL_Joystick*[joysticks];
+		printlog(1, "Detected %i joystick(s). Opening:", joysticks);
+
+		for (int i=0; i<joysticks; ++i)
+		{
+			printlog(1, "Device %i: \"%s\"", i, SDL_JoystickName(i));
+			joystick[i]= SDL_JoystickOpen(i);
+			if (!joystick[i])
+				printlog(0, "Failed to open joystick %i", i);
+		}
+	}
 	//
 	//options
 	//
@@ -252,7 +273,7 @@ int Interface_Loop ()
 						printlog(1, "(FIXME: pause when losing focus (or being iconified)!)");
 				break;
 
-				//check for special key presses (debug/demo keys)
+				//check for special key presses (tmp debug/demo keys)
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym)
 					{
@@ -338,6 +359,9 @@ int Interface_Loop ()
 				default:
 					break;
 			}
+
+			//and always send this to profiles
+			Profile_Input_Collect(&event);
 		}
 
 		//(tmp) camera movement keys:
@@ -361,7 +385,7 @@ int Interface_Loop ()
 
 		//car control
 		if (runlevel == running)
-			Profile_Events_Step(delta);
+			Profile_Input_Step(delta);
 
 
 
@@ -420,6 +444,13 @@ int Interface_Loop ()
 void Interface_Quit(void)
 {
 	printlog(1, "Quit interface");
+
+	//close all joysticks
+	for (int i=0; i<joysticks; ++i)
+		if (joystick[i])
+			SDL_JoystickClose(joystick[i]);
+	delete[] joystick;
+
 	SDL_Quit();
 }
 

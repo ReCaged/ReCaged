@@ -379,7 +379,7 @@ int main (int argc, char *argv[])
 	}
 
 	//not needed anymore (used or not, will not be needed any more)
-	delete[] datadefault;;
+	delete[] datadefault;
 
 
 	//ok, start loading
