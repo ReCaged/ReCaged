@@ -9,3 +9,4 @@ TODO: more info in header!
 ReCaged 0.7.1 (?/?/2012)
 	* Move to Autotools
 	* Inno Setup for w32 installer
+	* Joystick (gamepad) support
