@@ -201,22 +201,42 @@ to compile, just cd into the src directory and type "make".
 
 
 On windows things will be more difficult: since there is no package manager,
-you will have to install all requirements manually.
+you would have to install all requirements manually. There is however a script
+called "make_w32.sh" in the src directory to help automate this process.
 
 First of all, install MinGW (a minimal port of GNU for windows - it provides
-compilers and standard libraries for compilation), make sure to install make,
-autoconf and g++. Msys is also recommended (as it provides a user interface to
-MinGW).
+compilers and standard libraries for compilation). The latest version can be
+downloaded here:
+http://sourceforge.net/projects/mingw/files/latest/download?source=files
 
-Then you must compile and install the SDL, ODE and GLEW libraries. This
-process will not be covered in detail here. Once you have downloaded and
-extracted a tarball, cd into the appropriate directory and use:
-./configure && make && make install
-(exception for GLEW: it doesn't use autoconf, just "make" and make install").
+The only installation option recommended is the "MSYS Basic System", which
+provides a bash shell suitable for working with MinGW. It's not necessarily
+needed but working without it is much harder and you will not be able to use
+the automated script below.
 
-Then cd into the src directory of rc and use "make w32" to compile a static
-binary, called "recaged.exe", which includes the needed libraries (for easy
-redistribution).
+Now you can cd into the src directory of rc and run the provided script
+"make_w32.sh" to install necessary libraries and compile. Running
+"./make_w32.sh dependencies" will install necessary libraries and tools for
+compiling releases, but if you want to compile development versions run
+"./make_w32.sh extras" as well (or instead, as it will pull all dependencies if
+missing) to get autotools, git and the vim editor.
+
+Finally: running "./make_w32.sh installer" should configure and build ReCaged
+for w32 with the necessary libraries statically linked. Once done it will
+attempt to open the installer script file in Inno Setup Compiler.
+
+Alternatively you can compile and install the SDL, ODE and GLEW libraries
+manually, and install Inno Setup. This process will not be covered in detail
+here. But when it comes to compilation: Once you have downloaded and extracted
+a tarball, cd into the appropriate directory and use: ./configure && make &&
+make install (exception for GLEW: it doesn't use autoconf, just "make" and make
+install").
+
+Then cd into the src directory of rc and run "./configure && make" to compile.
+If you want to link the SDL, ODE and GLEW libraries statically (for easy
+redistribution), instead run "./configure --enable-static && make" to compile a
+static binary. Then compile the installer script in the Inno Setup Compiler. Or
+you could just use "./make_w32.sh installer".
 
 
 
