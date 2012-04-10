@@ -270,11 +270,11 @@ Car_Template *Car_Template::Load (const char *path)
 		target->conf.dist_motor[1] = true;
 	}
 
-	//breaking distribution
-	if (target->conf.dist_break>1.0 || target->conf.dist_break<0.0 )
+	//braking distribution
+	if (target->conf.dist_brake>1.0 || target->conf.dist_brake<0.0 )
 	{
-		printlog(0, "ERROR: front/rear breaking distribution should be range 0 to 1! (enabling rear)");
-		target->conf.dist_break = 0.0;
+		printlog(0, "ERROR: front/rear braking distribution should be range 0 to 1! (enabling rear)");
+		target->conf.dist_brake = 0.0;
 	}
 
 
@@ -325,16 +325,16 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 		car->gear_limit = conf.gear_limit;
 
 
-	car->max_break = conf.max_break;
+	car->max_brake = conf.max_brake;
 	car->max_steer = conf.max_steer;
 	car->steerdecr = conf.steer_decrease;
 	car->min_steer = conf.min_steer;
 	car->limit_speed = conf.limit_speed;
 	car->airtorque = conf.air_torque;
-	car->hinge2_dbreaks = conf.handbreak_lock;
+	car->hinge2_dbrakes = conf.handbrake_lock;
 
 	car->dsteer = conf.dist_steer;
-	car->dbreak = conf.dist_break;
+	car->dbrake = conf.dist_brake;
 	car->fwd = conf.dist_motor[0];
 	car->rwd = conf.dist_motor[1];
 	car->fwredist = conf.redist[0];

@@ -117,9 +117,9 @@ void Profile_Input_Step(Uint32 step)
 
 			//drift brakes: try digital, fallback to analog
 			if (digital[4]||prof->input[4].axis_state)
-				carp->drift_breaks = true;
+				carp->drift_brakes = true;
 			else
-				carp->drift_breaks = false;
+				carp->drift_brakes = false;
 
 			//check for explicit digital throttle, fallback to analog
 			//if all zeroed, keep centering with last speed

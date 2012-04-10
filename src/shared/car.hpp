@@ -47,10 +47,10 @@ struct Car_Conf
 	bool adapt_redist;
 	dReal redist_force;
 
-	//break
-	dReal max_break;
-	dReal dist_break;
-	bool handbreak_lock;
+	//brak
+	dReal max_brake;
+	dReal dist_brake;
+	bool handbrake_lock;
 
 	//steer
 	dReal max_steer;
@@ -133,9 +133,9 @@ const struct Conf_Index car_conf_index[] = {
 	{"adaptive_redistribution",'b',1, offsetof(struct Car_Conf, adapt_redist)},
 	{"redistribution_force",'R',1, offsetof(struct Car_Conf, redist_force)},
 
-	{"max_break",		'R',1, offsetof(struct Car_Conf, max_break)},
-	{"break_distribution",	'R',1, offsetof(struct Car_Conf, dist_break)},
-	{"handbreak_lock",	'b',1, offsetof(struct Car_Conf, handbreak_lock)},
+	{"max_brake",		'R',1, offsetof(struct Car_Conf, max_brake)},
+	{"brake_distribution",	'R',1, offsetof(struct Car_Conf, dist_brake)},
+	{"handbrake_lock",	'b',1, offsetof(struct Car_Conf, handbrake_lock)},
 
 	{"max_steer",		'R',1, offsetof(struct Car_Conf, max_steer)},
 	{"steer_distribution",	'R',1, offsetof(struct Car_Conf, dist_steer)},
@@ -248,15 +248,15 @@ class Car:public Object
 		dReal airtorque;
 
 		dReal max_steer, steerdecr, min_steer, limit_speed, oldsteerlimit;
-		dReal max_break;
-		bool hinge2_dbreaks;
+		dReal max_brake;
+		bool hinge2_dbrakes;
 
 		bool diff;
 		bool fwd, rwd;
 		bool fwredist, rwredist;
 		bool adapt_steer, adapt_redist;
 		dReal redist_force;
-		dReal dsteer, dbreak;
+		dReal dsteer, dbrake;
 		dReal fwtoe, rwtoe;
 
 		dReal offset;
@@ -273,7 +273,7 @@ class Car:public Object
 		dReal dir; //direction, 1 or -1
 
 		//controlling values
-		bool drift_breaks;
+		bool drift_brakes;
 		dReal throttle, steering; //-1.0 to +1.0
 		dReal velocity; //keep track of car velocity
 
