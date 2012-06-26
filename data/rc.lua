@@ -9,7 +9,9 @@ care of start/stop the simulation thread and instructs it what it should
 load. will eventually handle menu]]
 
 --TODO: arguments to recaged should be passed to this script...
-log.print(0, "hello, this is rc.lua providing the user interface");
+log.print(0, "hello, this is rc.lua providing the user interface")
+
+log.print(1, "This is a normal log input")
 
 --[[the following will be used to mimic menu selections
 
@@ -47,13 +49,13 @@ position 8 0
 ]]
 
 --interface.init(1280, 1024);
-simulation.tmpload();
-simulation.start(); --TODO: will start before loading in future
-simulation.run(true);
+simulation.tmpload()
+simulation.start() --TODO: will start before loading in future
+simulation.run(true)
 
 while interface.tmp_running() do
-	interface.tmp_frame();
+	interface.tmp_frame()
 end
 
-simulation.stop();
+simulation.stop()
 

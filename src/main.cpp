@@ -190,6 +190,7 @@ int main (int argc, char *argv[])
 
 
 	//might be interesting
+	//TODO: most will be removed!
 	printlog(1, "\n\n   <[ Info ]>");
 	printlog(1, "Race time:			%ums", racetime);
 

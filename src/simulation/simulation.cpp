@@ -64,7 +64,7 @@ const luaL_Reg lua_simulation[] =
 runlevel_type runlevel = paused; //TODO: might be private in future!
 
 //
-//TODO: move the following to interface lua script!!!
+//TODO: move the following to rc lua script!!!
 //
 
 Uint32 starttime = 0;

@@ -243,11 +243,11 @@ bool Interface_Loop ()
 {
 	printlog(1, "Starting interface loop");
 
-	//all following will be moved to internal.lua!
+	//all following will be moved to rc.lua!
 	//load file as chunk
-	if (luaL_loadfile(lua_int, "interface.lua"))
+	if (luaL_loadfile(lua_int, "rc.lua"))
 	{
-		printlog(0, "ERROR: could not load \"interface.lua\" script: \"%s\"!",
+		printlog(0, "ERROR: could not load \"rc.lua\" script: \"%s\"!",
 				lua_tostring(lua_int, -1));
 		lua_pop(lua_int, -1);
 		return false;
@@ -256,7 +256,7 @@ bool Interface_Loop ()
 	//execute chunk
 	if (lua_pcall(lua_int, 0, 0, 0))
 	{
-		printlog(0, "ERROR: \"%s\" while running \"interface.lua\"!",
+		printlog(0, "ERROR: \"%s\" while running \"rc.lua\"!",
 				lua_tostring(lua_int, -1));
 		lua_pop(lua_int, -1);
 		return false;
