@@ -313,8 +313,14 @@ char *datadefault; //need to check path to rc before deciding this
 //main function, will change a lot in future versions...
 int main (int argc, char *argv[])
 {
+	//Directories_Init();
+	//Log_Init();
+	//load_conf ("internal.conf", (char *)&internal, internal_index);
+
 	//issue
 	printf("\n	-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n%s\n", VERSION, CODENAME, ISSUE);
+	//printlog() instead
+
 	//end
 
 	//attempt to generate default data path

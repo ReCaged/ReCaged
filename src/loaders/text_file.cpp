@@ -66,7 +66,7 @@ bool Text_File::Open (const char *file)
 	printlog(2, "Text_File: opening file %s", file);
 
 	//open
-#ifndef windows
+#ifndef _WIN32
 	//proper version
 	fp = fopen(file, "r");
 #else

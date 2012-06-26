@@ -23,6 +23,7 @@
 
 AC_PREREQ([2.68]) #defaulted
 AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
+#codename?
 #AC_CONFIG_SRCDIR([src/main.cpp]) #only a safety check
 #AC_CONFIG_HEADERS([src/config.h]) #TODO: move to include dir...?
 
@@ -30,48 +31,8 @@ AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
 # Checks for programs.
+#AC_PROG_CC
 AC_PROG_CXX
-
-#TODO!
-AC_ARG_ENABLE(
-	[static],
-	[AS_HELP_STRING([--enable-static],
-			[Link SDL, ODE and GLEW libraries statically (default=no)])],
-	[STATIC="$enableval"],
-	[STATIC="no"]
-	)
-
-if test "$STATIC" = "yes"; then
-	AC_MSG_ERROR([TODO!])
-fi
-
-# Checks for libraries.
-#kanske PKG_CHECK_MODULES(........)
-#AC_CHECK_HEADER(GL/gl.h,, AC_MSG_ERROR([Can't find gl headers]))
-#AC_CHECK_LIB(GL, glPushMatrix,
-	     #..... more .... = ....
-	     #,AC_MSG_ERROR([Can't find gl library]))
-#AC_CHECK_HEADER(GL/glew.h,, AC_MSG_ERROR([Can't find glew headers]))
-#AC_CHECK_LIB(GLEW, glewInit,
-	     #..... more .... = ....
-	     #,AC_MSG_ERROR([Can't find glew library, check for libglew-dev]))
-#AC_CHECK_HEADER(ode/ode.h,, AC_MSG_ERROR([Can't find ode headers]))
-#AC_CHECK_LIB(ode, dInitODE2,
-	     #..... more .... = ....
-	     #,AC_MSG_ERROR([Can't find ode library, check for libode-dev]))
-#AC_CHECK_HEADER(SDL/SDL.h,, AC_MSG_ERROR([Can't find sdl headers]))
-#AC_CHECK_LIB(SDL, SDL_Init,
-	     #..... more .... = ....
-	     #,AC_MSG_ERROR([Can't find sdl library, check for libsdl-dev]))
-
-#tmp, should split and add fallbacks (sdl/ode config, plus default strings)
-PKG_CHECK_MODULES([DEPS], [sdl ode gl glew])
-
-# flags from above?
-#CXXFLAGS="$CXXFLAGS $DEPS_CXXFLAGS"
-#LDFLAGS="$LDFLAGS $DEPS_LDFLAGS"
-#AC_SUBST(CXXFLAGS)
-#AC_SUBST(LDFLAGS)
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stddef.h stdlib.h string.h])
@@ -84,6 +45,9 @@ AC_TYPE_SIZE_T
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor memset pow sqrt strcasecmp strrchr strtol])
+
+# Check for additional libraries (in acinclude.m4)
+RC_LIBS
 
 #TODO: add files from "data", generate ChangeLog from git log at "make dist*"
 AC_OUTPUT([Makefile src/Makefile])
