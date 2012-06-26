@@ -125,7 +125,7 @@ AC_DEFUN([RC_LIBS],
 AC_REQUIRE([RC_LIBS_CONFIG])
 
 #test if ON_W32 + W32_STATIC
-if test "ON_W32" != "no" && test "$W32_STATIC" = "yes"; then
+if test "ON_W32" != "no" && test "$W32_STATIC" != "no"; then
 	AC_MSG_ERROR([TODO!])
 fi
 

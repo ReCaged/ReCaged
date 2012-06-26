@@ -25,6 +25,11 @@
 # development. It will print a usage summary when run.
 #
 
+
+#start shell, creates home, run script...
+#recaged: sdl, ode, glew static, -mconsole
+
+
 mkdir /tmp/make_w32_tmp &>/dev/null
 
 
@@ -34,14 +39,28 @@ then
 	echo "Creating w32 installer..."
 	echo ""
 
-	./configure --enable-static
-	make
+	echo ""
+	echo "Compiling..."
+	echo ""
+
+	./configure --enable-w32static && make
+
+	#configure output
 	sed -e 's/logfile ""/logfile "log.txt"/' data/internal.conf tmpconf
 	mv tmpconf data/internal.con
 
-	echo "Now compile the installer! I assume you got Inno Setup installed?"
-	cmd //c start installer.iss
+	#remove debug symbols
+	strip recaged.exe
 
+	makensis = "$PROGRAMFILES/NSIS/makensis"
+	if [ $makensis ]
+	then
+		$makensis w32_installer.nsi
+	else
+		echo ""
+		echo "Please install NSIS..."
+		echo ""
+	fi
 
 
 elif [ "$1" = "dependencies" ]
@@ -121,15 +140,19 @@ then
 	#cd /tmp/make_w32_tmp#wget
 	#make install
 
-	#inno
-	cd /tmp/make_w32_tmp
-	wget 'http://www.jrsoftware.org/download.php/is.exe'
+	#nsis
+	if [ ! -e "$PROGRAMFILES/NSIS/makensis" ]
+	then
+		cd /tmp/make_w32_tmp
+		wget 'http://prdownloads.sourceforge.net/nsis/nsis-2.46-setup.exe?download'
+		echo ""
+		echo "Almost done! Now just install NSIS..."
+		echo ""
+		cmd //c /tmp/make_w32_tmp/nsis*exe
+	fi
+
 	echo ""
-	echo "Almost done! Now just install inno setup..."
-	echo ""
-	./isetup*exe
-	echo ""
-	echo "That should be it! Check if you got sdl, ode, glew, etc..."
+	echo "That should be it! Check if you got sdl, ode, glew, nsis, etc..."
 	echo ""
 
 
@@ -199,7 +222,8 @@ else
 	echo "	* installer	- compile and create w32 installer"
 	echo "	* dependencies	- install everything needed for compiling+packing"
 	echo "	* extras	- install other stuff (autoconf, automake, git, vim)"
-	echo "	* update	- update tools and libraries installed"
+	echo "	* update	- update everything"
+	#echo "	* crossinstaller	- cross-compile w32 installer"
 	echo "(see README for more details)"
 fi
 

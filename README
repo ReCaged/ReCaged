@@ -202,41 +202,36 @@ to compile, just cd into the src directory and type "make".
 
 On windows things will be more difficult: since there is no package manager,
 you would have to install all requirements manually. There is however a script
-called "make_w32.sh" in the src directory to help automate this process.
+called "make_w32.sh" included to help automate this process.
 
 First of all, install MinGW (a minimal port of GNU for windows - it provides
 compilers and standard libraries for compilation). The latest version can be
 downloaded here:
 http://sourceforge.net/projects/mingw/files/latest/download?source=files
 
-The only installation option recommended is the "MSYS Basic System", which
-provides a bash shell suitable for working with MinGW. It's not necessarily
-needed but working without it is much harder and you will not be able to use
-the automated script below.
+The only installation option really recommended to choose here is the "MSYS
+Basic System", which provides a bash shell suitable for working with MinGW. It's
+not necessarily needed but working without it is much harder and you will not be
+able to use the automated script.
 
-Now you can cd into the src directory of rc and run the provided script
-"make_w32.sh" to install necessary libraries and compile. Running
-"./make_w32.sh dependencies" will install necessary libraries and tools for
-compiling releases, but if you want to compile development versions run
-"./make_w32.sh extras" as well (or instead, as it will pull all dependencies if
-missing) to get autotools, git and the vim editor.
+Now you can run the provided script "make_w32.sh" with the wanted arguments to
+install the necessary libraries and compile (run "make_w32.sh help" for more
+details). Running "./make_w32.sh dependencies" will install the necessary
+libraries and tools for compiling releases. If you want to compile development
+versions run "./make_w32.sh extras" as well (or instead, as it will also pull
+all other dependencies if missing) to get autotools, git and the vim editor.
 
 Finally: running "./make_w32.sh installer" should configure and build ReCaged
-for w32 with the necessary libraries statically linked. Once done it will
-attempt to open the installer script file in Inno Setup Compiler.
+for w32 with the necessary libraries statically linked (and strip out debug
+symbols and 
 
 Alternatively you can compile and install the SDL, ODE and GLEW libraries
-manually, and install Inno Setup. This process will not be covered in detail
-here. But when it comes to compilation: Once you have downloaded and extracted
-a tarball, cd into the appropriate directory and use: ./configure && make &&
-make install (exception for GLEW: it doesn't use autoconf, just "make" and make
-install").
-
+manually, and install NSIS. This process will not be covered in detail here.
 Then cd into the src directory of rc and run "./configure && make" to compile.
 If you want to link the SDL, ODE and GLEW libraries statically (for easy
-redistribution), instead run "./configure --enable-static && make" to compile a
-static binary. Then compile the installer script in the Inno Setup Compiler. Or
-you could just use "./make_w32.sh installer".
+redistribution), instead run "./configure --enable-w32static && make" to compile
+a static binary. Then build the NSIS installer. Or just use "./make_w32.sh
+installer".
 
 
 
