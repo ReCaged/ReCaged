@@ -45,12 +45,25 @@ then
 
 	./configure --enable-w32static && make
 
-	#configure output
-	sed -e 's/logfile ""/logfile "log.txt"/' data/internal.conf tmpconf
-	mv tmpconf data/internal.con
+	echo ""
+	echo "Final tweaks..."
+	echo ""
 
 	#remove debug symbols
 	strip recaged.exe
+
+	#configure output
+	#TODO: might change!
+	sed -e 's/logfile ""/logfile "log.txt"/' data/internal.conf tmpconf
+	mv tmpconf data/internal.con
+
+	#unix
+	unix2dos README Readme.txt
+
+	#pack
+	echo ""
+	echo "Building installer..."
+	echo ""
 
 	makensis = "$PROGRAMFILES/NSIS/makensis"
 	if [ $makensis ]
