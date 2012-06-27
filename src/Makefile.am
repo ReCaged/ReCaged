@@ -23,9 +23,9 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-#TODO! add sdl/ode flags (+gl, +glew)
-AM_CPPFLAGS = $(DEPS_CFLAGS)
-recaged_LDADD = $(DEPS_LIBS)
+#ok?
+AM_CPPFLAGS = $(CPPFLAGS) $(RC_CFLAGS)
+AM_LDFLAGS = $(LDFLAGS) $(RC_LDFLAGS)
 
 bin_PROGRAMS = recaged
 

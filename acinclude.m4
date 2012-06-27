@@ -45,8 +45,8 @@ AC_ARG_ENABLE(
 	[w32static],
 	[AS_HELP_STRING([--enable-w32static],
 			[Link SDL, ODE, GLEW statically on W32 (default=no)])],
-	[W32_STATIC="$enableval"],
-	[W32_STATIC="no"] )
+	[STATIC="$enableval"],
+	[STATIC="no"] )
 
 #pkg-config might exist?
 AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
@@ -55,7 +55,7 @@ AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
 
 
 #
-# RC_LIBS_CHECK(PKG_NAME, CUSTOM_CONFIG, LIB_HEADER, LIB_NAME, LIB_FUNCTION)
+# RC_LIBS_CHECK(PKG_NAME, CUSTOM_CONFIG, LIB_HEADER, LIB_NAMES_LIST)
 # Check for specified library using pkg_config and other if possible
 #
 
@@ -66,13 +66,20 @@ FAILED="yes"
 
 if test "$PKG_CONFIG"; then
 	AC_MSG_CHECKING([for $1 usig pkg-config])
-	TMP_CXXFLAGS=$($PKG_CONFIG --cflags $1 2>/dev/null)
-	TMP_LDFLAGS=$($PKG_CONFIG --libs $1 2>/dev/null)
 
-	if test "$TMP_CFLAGS" || test "$TMP_LDFLAGS"; then
+	if test "$STATIC" = "no"; then
+		TMP_FLAGS=$($PKG_CONFIG --cflags $1 2>/dev/null)
+		TMP_LIBS=$($PKG_CONFIG --libs $1 2>/dev/null)
+	else
+		TMP_FLAGS=$($PKG_CONFIG --cflags --static $1 2>/dev/null)
+		TMP_LIBS=$($PKG_CONFIG --libs --static $1 2>/dev/null)
+	fi
+		
+
+	if test "$TMP_CPPFLAGS" || test "$TMP_LDFLAGS"; then
 		AC_MSG_RESULT([yes]);
-		CXXFLAGS="$CXXFLAGS $TMP_CXXFLAGS"
-		LDFLAGS="$LDFLAGS $TMP_LDFLAGS"
+		RC_CFLAGS="$RC_CFLAGS $TMP_FLAGS"
+		RC_LDFLAGS="$RC_LDFLAGS $TMP_LIBS"
 		FAILED="no"
 	else
 		AC_MSG_RESULT([no])
@@ -88,13 +95,19 @@ if test "$FAILED" = "yes" && test "$2"; then
 	if test TMP_CONFIG; then
 		AC_MSG_CHECKING([for $1 using fallback to $2])
 
-		TMP_CXXFLAGS=$($TMP_CONFIG --cflags $1 2>/dev/null)
-		TMP_LDFLAGS=$($TMP_CONFIG --libs $1 2>/dev/null)
+		if test "$STATIC" = "no"; then
+			TMP_FLAGS=$($TMP_CONFIG --cflags --static-libs 2>/dev/null)
+			TMP_LIBS=$($TMP_CONFIG --libs --static-libs 2>/dev/null)
+		else
+			TMP_FLAGS=$($TMP_CONFIG --cflags 2>/dev/null)
+			TMP_LIBS=$($TMP_CONFIG --libs 2>/dev/null)
+		fi
 
-		if test "$TMP_CFLAGS" || test "$TMP_LDFLAGS"; then
+
+		if test "$TMP_CPPFLAGS" || test "$TMP_LDFLAGS"; then
 			AC_MSG_RESULT([yes]);
-			CXXFLAGS="$CXXFLAGS $TMP_CXXFLAGS"
-			LDFLAGS="$LDFLAGS $TMP_LDFLAGS"
+			RC_CFLAGS="$RC_CFLAGS $TMP_FLAGS"
+			RC_LDFLAGS="$RC_LDFLAGS $TMP_LIBS"
 			FAILED="no"
 		else
 			AC_MSG_RESULT([no])
@@ -104,12 +117,31 @@ if test "$FAILED" = "yes" && test "$2"; then
 fi
 
 #final fallback
-#(quite critical if ode, since wont know if double precision... so chance of program compiling but not starting)
 if test "$FAILED" = "yes"; then
-	AC_MSG_WARN([Attempting to guess configuration for $1 using ac_check_* macros])
+	AC_MSG_WARN([Attempting to guess files for $1 using ac_check_* macros])
+	if test "$1" = "ode"; then
+		AC_MSG_WARN([Quite Critical (ODE): Don't know if using double or single precision!... Assuming single...])
+		RC_CFLAGS="$RC_CFLAGS -DdSINGLE"
+	fi
 
-	AC_CHECK_HEADER($3,, [ AC_MSG_ERROR([Headers for $1 appears to be missing, install lib$1 or similar]) ])
-	AC_SEARCH_LIBS($4, $5,, [ AC_MSG_ERROR([Development library $1 appears to be missing, install lib$1-dev or similar]) ])
+	AC_CHECK_HEADER([$3],, [ AC_MSG_ERROR([Headers for $1 appears to be missing, install lib$1-dev or similar]) ])
+
+	#the is magic!
+	#why not "ac_search_libs"? because can only test for "main" in gl on windows
+	#(for some reason). And -search- quits upon finding "main" that already exists
+	m4_foreach_w([LIBNAME], [$4], [
+		if test "$FAILED" = "yes"; then
+			TMP=LIBNAME #LIBNAME expands to actual name, store in var
+			AC_CHECK_LIB([$TMP], [main], [
+				FAILED="no"
+				RC_LDFLAGS="$RC_LDFLAGS -l$TMP" ])
+		fi ])
+
+	#still nothing?
+	if test "$FAILED" = "yes"; then
+		AC_MSG_ERROR([Library $1 appears to be missing, install lib$1 or similar])
+	fi
+
 fi
 
 ])
@@ -124,19 +156,29 @@ AC_DEFUN([RC_LIBS],
 [
 AC_REQUIRE([RC_LIBS_CONFIG])
 
-#test if ON_W32 + W32_STATIC
-if test "ON_W32" != "no" && test "$W32_STATIC" != "no"; then
-	AC_MSG_ERROR([TODO!])
+#make sure only enabling static linking on w32
+if test "$ON_W32" = "no"; then
+	STATIC="no"
 fi
 
-RC_LIBS_CHECK([ode], [ode-config], [ode/ode.h], [dInitODE2], [ode])
-RC_LIBS_CHECK([sdl], [sdl-config], [SDL/SDL.h], [SDL_Init], [SDL])
-RC_LIBS_CHECK([gl],, [GL/gl.h], [glEnable], [GL opengl32])
-RC_LIBS_CHECK([glew],, [GL/glew.h], [glewInit], [GLEW glew32])
+#static flag
+AC_MSG_CHECKING([if building static w32 binary])
+if test "$STATIC" != "no"; then
+	AC_MSG_RESULT([yes])
+	RC_LDFLAGS="$RC_LDFLAGS -Wl,-Bstatic"
+else
+	AC_MSG_RESULT([no])
+fi
+
+RC_LIBS_CHECK([ode], [ode-config], [ode/ode.h], [ode])
+RC_LIBS_CHECK([sdl], [sdl-config], [SDL/SDL.h], [SDL])
+RC_LIBS_CHECK([gl],, [GL/gl.h], [GL opengl32])
+RC_LIBS_CHECK([glew],, [GL/glew.h], [GLEW glew32])
 #lua5.2, 5.1, 5.0, ... best way to check?
 
-
-AC_SUBST(CXXFLAGS)
-AC_SUBST(LDFLAGS)
+#static stop flag
+if test "$STATIC" != "no"; then
+	RC_LDFLAGS="$RC_LDFLAGS -Wl,-Bdynamic"
+fi
 
 ])

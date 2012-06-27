@@ -191,13 +191,15 @@ needed libraries):
 
 First of all, you will need the libraries mentioned above (gl, glew, sdl and
 ode). Also check if your distro provides development libraries in separate
-packages and if so, install them too (look for packages and/or meta-packages
-named like lib<name>-dev). Also make sure you got at least a Make program and
-a C++ compiler (such as GNU Make and the GNU C++ Compiler, g++) and the usual
-libraries.
+packages and if so, install them too (look for packages named like
+lib<name>-dev). Also make sure you got the usual development tools (Make, C++
+compiler, Autotools, libraries etc).
 
-RC currently does not use autoconf, but only a custom makefile, so in order
-to compile, just cd into the src directory and type "make".
+The build process is the standard autoconf routine: run "./configure" and
+"make". "make install" will install (but it's not needed to run, you could just
+start "recaged" from the src directory). If you're building a development (git)
+version first run "autoreconf" to generate the configure script. Remember to
+set "CPPFLAGS" and "LDFLAGS" before running "./configure" if necessary.
 
 
 On windows things will be more difficult: since there is no package manager,

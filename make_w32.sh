@@ -43,6 +43,9 @@ then
 	echo "Compiling..."
 	echo ""
 
+	export CPPFLAGS=-I/usr/local/include
+	export LDFLAGS=-L/usr/local/lib
+
 	./configure --enable-w32static && make
 
 	echo ""
