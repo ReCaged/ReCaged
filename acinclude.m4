@@ -76,7 +76,7 @@ if test "$PKG_CONFIG"; then
 	fi
 		
 
-	if test "$TMP_CPPFLAGS" || test "$TMP_LDFLAGS"; then
+	if test "$TMP_FLAGS" || test "$TMP_LIBS"; then
 		AC_MSG_RESULT([yes]);
 		RC_CFLAGS="$RC_CFLAGS $TMP_FLAGS"
 		RC_LDFLAGS="$RC_LDFLAGS $TMP_LIBS"
@@ -96,15 +96,15 @@ if test "$FAILED" = "yes" && test "$2"; then
 		AC_MSG_CHECKING([for $1 using fallback to $2])
 
 		if test "$STATIC" = "no"; then
-			TMP_FLAGS=$($TMP_CONFIG --cflags --static-libs 2>/dev/null)
-			TMP_LIBS=$($TMP_CONFIG --libs --static-libs 2>/dev/null)
-		else
 			TMP_FLAGS=$($TMP_CONFIG --cflags 2>/dev/null)
 			TMP_LIBS=$($TMP_CONFIG --libs 2>/dev/null)
+		else
+			TMP_FLAGS=$($TMP_CONFIG --cflags --static-libs 2>/dev/null)
+			TMP_LIBS=$($TMP_CONFIG --libs --static-libs 2>/dev/null)
 		fi
 
 
-		if test "$TMP_CPPFLAGS" || test "$TMP_LDFLAGS"; then
+		if test "$TMP_FLAGS" || test "$TMP_LIBS"; then
 			AC_MSG_RESULT([yes]);
 			RC_CFLAGS="$RC_CFLAGS $TMP_FLAGS"
 			RC_LDFLAGS="$RC_LDFLAGS $TMP_LIBS"
@@ -180,5 +180,9 @@ RC_LIBS_CHECK([glew],, [GL/glew.h], [GLEW glew32])
 if test "$STATIC" != "no"; then
 	RC_LDFLAGS="$RC_LDFLAGS -Wl,-Bdynamic"
 fi
+
+#make available
+AC_SUBST(RC_CFLAGS)
+AC_SUBST(RC_LDFLAGS)
 
 ])
