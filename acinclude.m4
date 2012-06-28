@@ -103,12 +103,13 @@ if test "$FAILED" = "yes" && test "$2"; then
 	if test TMP_CONFIG; then
 		AC_MSG_CHECKING([for $1 using fallback to $2])
 
-		if test "$STATIC" = "no"; then
-			TMP_FLAGS=$($TMP_CONFIG --cflags 2>/dev/null)
-			TMP_LIBS=$($TMP_CONFIG --libs 2>/dev/null)
+		TMP_FLAGS=$($TMP_CONFIG --cflags 2>/dev/null)
+
+		#little exception: if sdl-config&static, use "--static-libs" instead
+		if test "$STATIC" != "no" && test "$1" = "sdl"; then
+			TMP_LIBS=$($TMP_CONFIG --static-libs 2>/dev/null)
 		else
-			TMP_FLAGS=$($TMP_CONFIG --cflags --static-libs 2>/dev/null)
-			TMP_LIBS=$($TMP_CONFIG --libs --static-libs 2>/dev/null)
+			TMP_LIBS=$($TMP_CONFIG --libs 2>/dev/null)
 		fi
 
 
@@ -174,6 +175,7 @@ fi
 AC_MSG_CHECKING([if building with w32 console enabled])
 if test "$CONSOLE" != "no"; then
 	AC_MSG_RESULT([yes])
+
 	RC_LIBS="$RC_LIBS -mconsole"
 else
 	AC_MSG_RESULT([no])
@@ -183,21 +185,30 @@ fi
 AC_MSG_CHECKING([if building static w32 binary])
 if test "$STATIC" != "no"; then
 	AC_MSG_RESULT([yes])
-	RC_LIBS="$RC_LIBS -Wl,-Bstatic"
+
+#TODO: consider:
+# -fno-exceptions #probably not
+# -Wl,--as-needed #seems sane
+#TODO: static-lib* to LDFLAGS?
+
+	RC_FLAGS="$RC_FLAGS -DGLEW_STATIC"
+	RC_LIBS="$RC_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
 else
 	AC_MSG_RESULT([no])
 fi
 
 RC_LIBS_CHECK([ode], [ode-config], [ode/ode.h], [ode])
 RC_LIBS_CHECK([sdl], [sdl-config], [SDL/SDL.h], [SDL])
-RC_LIBS_CHECK([gl],, [GL/gl.h], [GL opengl32])
 RC_LIBS_CHECK([glew],, [GL/glew.h], [GLEW glew32])
 #lua5.2, 5.1, 5.0, ... best way to check?
 
-#static stop flag
+#static stop
 if test "$STATIC" != "no"; then
 	RC_LIBS="$RC_LIBS -Wl,-Bdynamic"
 fi
+
+#gl never static
+RC_LIBS_CHECK([gl],, [GL/gl.h], [GL opengl32])
 
 #make available
 AC_SUBST(RC_FLAGS)
