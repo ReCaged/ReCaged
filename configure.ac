@@ -25,10 +25,10 @@ AC_PREREQ([2.68]) #defaulted
 AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
 
 #codename
-#RC_CODENAME="The Sky's the Limit"
-#AC_SUBST(RC_CODENAME)
+AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
+
 #AC_CONFIG_SRCDIR([src/main.cpp]) #only a safety check
-#AC_CONFIG_HEADERS([src/config.h]) #TODO: move to include dir...?
+#AC_CONFIG_HEADERS([src/shared/config.h]) #TODO: move to include dir...?
 
 #for automake
 AM_INIT_AUTOMAKE([-Wall -Werror])

@@ -23,7 +23,6 @@
 #include <GL/glew.h>
 
 #include "../shared/internal.hpp"
-#include "../shared/info.hpp"
 #include "../shared/track.hpp"
 #include "../shared/runlevel.hpp"
 #include "../shared/threads.hpp"
@@ -114,7 +113,14 @@ bool Interface_Init(void)
 	SDL_Init (SDL_INIT_VIDEO);
 
 	//set title:
-	SDL_WM_SetCaption (TITLE, "ReCaged");
+	std::string TITLE;
+	TITLE += PACKAGE_NAME;
+	TITLE += " ";
+	TITLE += PACKAGE_VERSION;
+	TITLE += " (\"";
+	TITLE += PACKAGE_CODENAME;
+	TITLE += "\")  (C) 2009, 2010, 2011, 2012 Mats Wahlberg";
+	SDL_WM_SetCaption (TITLE.c_str(), PACKAGE_NAME);
 
 	//TODO: set icon (SDL_WM_SetIcon, from embedded into the executable?)
 
