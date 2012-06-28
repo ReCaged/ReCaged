@@ -136,9 +136,10 @@ if test "$FAILED" = "yes"; then
 
 	#why not "ac_search_libs"? because can only test for "main" in gl on windows
 	#(for some reason). And -search- quits upon finding "main" that already exists
+	#(LIBNAME expands to actual name, store in variable TRYLIB)
 	m4_foreach_w([LIBNAME], [$4], [
 		if test "$FAILED" = "yes"; then
-			TRYLIB=LIBNAME #LIBNAME expands to actual name, store in var
+			TRYLIB="LIBNAME"
 			AC_CHECK_LIB([$TRYLIB], [main], [
 				FAILED="no"
 				RC_LIBS="$RC_LIBS -l$TRYLIB" ])
