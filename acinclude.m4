@@ -186,12 +186,8 @@ AC_MSG_CHECKING([if building static w32 binary])
 if test "$STATIC" != "no"; then
 	AC_MSG_RESULT([yes])
 
-#TODO: consider:
-# -fno-exceptions #probably not
-# -Wl,--as-needed #seems sane
-#TODO: static-lib* to LDFLAGS?
-
 	RC_FLAGS="$RC_FLAGS -DGLEW_STATIC"
+	#TODO: static-lib* to LDFLAGS?
 	RC_LIBS="$RC_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
 else
 	AC_MSG_RESULT([no])
