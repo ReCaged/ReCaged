@@ -46,7 +46,7 @@ then
 	export CPPFLAGS=-I/usr/local/include
 	export LDFLAGS=-L/usr/local/lib
 
-	./configure --enable-w32static && make
+	./configure --enable-w32static --enable-w32console && make
 
 	echo ""
 	echo "Final tweaks..."
@@ -55,12 +55,7 @@ then
 	#remove debug symbols
 	strip recaged.exe
 
-	#configure output
-	#TODO: might change!
-	sed -e 's/logfile ""/logfile "log.txt"/' data/internal.conf tmpconf
-	mv tmpconf data/internal.con
-
-	#unix
+	#translate (add CRLF)
 	unix2dos README Readme.txt
 
 	#pack
