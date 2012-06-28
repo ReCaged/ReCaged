@@ -23,7 +23,10 @@
 
 AC_PREREQ([2.68]) #defaulted
 AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
-#codename?
+
+#codename
+#RC_CODENAME="The Sky's the Limit"
+#AC_SUBST(RC_CODENAME)
 #AC_CONFIG_SRCDIR([src/main.cpp]) #only a safety check
 #AC_CONFIG_HEADERS([src/config.h]) #TODO: move to include dir...?
 
@@ -47,7 +50,7 @@ AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor memset pow sqrt strcasecmp strrchr strtol])
 
 # Check for additional libraries (in acinclude.m4)
-RC_LIBS
+RC_LIBS_CONFIG
 
 #TODO: add files from "data", generate ChangeLog from git log at "make dist*"
 AC_OUTPUT([Makefile src/Makefile])

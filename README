@@ -230,10 +230,12 @@ symbols and
 Alternatively you can compile and install the SDL, ODE and GLEW libraries
 manually, and install NSIS. This process will not be covered in detail here.
 Then cd into the src directory of rc and run "./configure && make" to compile.
-If you want to link the SDL, ODE and GLEW libraries statically (for easy
-redistribution), instead run "./configure --enable-w32static && make" to compile
-a static binary. Then build the NSIS installer. Or just use "./make_w32.sh
-installer".
+But if you want to create a complete installer, instead run "./configure
+--enable-w32static --enable-w32console && make" to compile and then build the
+NSIS installer. Or just use "./make_w32.sh installer". The "--enable-w32static"
+option makes sure all libraries that would normally have to be included as dlls
+are linked into the exe, and "--enable-w32console" enables console log output
+(requires SDL to have been built with "--disable-stdio-redirect").
 
 
 

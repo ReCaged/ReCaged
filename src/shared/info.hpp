@@ -23,8 +23,8 @@
 #define _RC_INFO_H
 
 //general info
-//const char CODENAME[] = "The Sky's the Limit";
-const char CODENAME[] = "TODO!!! USE DEFS!";
+const char CODENAME[] = "The Sky's the Limit";
+//const char CODENAME[] = RC_CODENAME;
 
 const char TITLE[] = "ReCaged 0.7.1 (\"The Sky's the Limit\") (C) 2009, 2010, 2011 Mats Wahlberg"; 
 

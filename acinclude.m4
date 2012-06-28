@@ -28,7 +28,7 @@
 # RC_LIBS_CONFIG()
 # Basic tests before starting
 #
-AC_DEFUN([RC_LIBS_CONFIG],
+AC_DEFUN([RC_LIBS_INIT],
 [
 
 #using... "w32"?
@@ -44,9 +44,17 @@ AC_MSG_RESULT($ON_W32)
 AC_ARG_ENABLE(
 	[w32static],
 	[AS_HELP_STRING([--enable-w32static],
-			[Link SDL, ODE, GLEW statically on W32 (default=no)])],
+			[Link libraries statically on W32 @<:@default=no@:>@])],
 	[STATIC="$enableval"],
 	[STATIC="no"] )
+
+#and console output?
+AC_ARG_ENABLE(
+	[w32console],
+	[AS_HELP_STRING([--enable-w32console],
+			[Enable console output on W32 @<:@default=no@:>@])],
+	[CONSOLE="$enableval"],
+	[CONSOLE="no"] )
 
 #pkg-config might exist?
 AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
@@ -78,8 +86,8 @@ if test "$PKG_CONFIG"; then
 
 	if test "$TMP_FLAGS" || test "$TMP_LIBS"; then
 		AC_MSG_RESULT([yes]);
-		RC_CFLAGS="$RC_CFLAGS $TMP_FLAGS"
-		RC_LDFLAGS="$RC_LDFLAGS $TMP_LIBS"
+		RC_FLAGS="$RC_FLAGS $TMP_FLAGS"
+		RC_LIBS="$RC_LIBS $TMP_LIBS"
 		FAILED="no"
 	else
 		AC_MSG_RESULT([no])
@@ -106,8 +114,8 @@ if test "$FAILED" = "yes" && test "$2"; then
 
 		if test "$TMP_FLAGS" || test "$TMP_LIBS"; then
 			AC_MSG_RESULT([yes]);
-			RC_CFLAGS="$RC_CFLAGS $TMP_FLAGS"
-			RC_LDFLAGS="$RC_LDFLAGS $TMP_LIBS"
+			RC_FLAGS="$RC_FLAGS $TMP_FLAGS"
+			RC_LIBS="$RC_LIBS $TMP_LIBS"
 			FAILED="no"
 		else
 			AC_MSG_RESULT([no])
@@ -121,20 +129,19 @@ if test "$FAILED" = "yes"; then
 	AC_MSG_WARN([Attempting to guess files for $1 using ac_check_* macros])
 	if test "$1" = "ode"; then
 		AC_MSG_WARN([Quite Critical (ODE): Don't know if using double or single precision!... Assuming single...])
-		RC_CFLAGS="$RC_CFLAGS -DdSINGLE"
+		CPPFLAGS="$CPPFLAGS -DdSINGLE" #hackish: append to user variable, but should be fine...?
 	fi
 
 	AC_CHECK_HEADER([$3],, [ AC_MSG_ERROR([Headers for $1 appears to be missing, install lib$1-dev or similar]) ])
 
-	#the is magic!
 	#why not "ac_search_libs"? because can only test for "main" in gl on windows
 	#(for some reason). And -search- quits upon finding "main" that already exists
 	m4_foreach_w([LIBNAME], [$4], [
 		if test "$FAILED" = "yes"; then
-			TMP=LIBNAME #LIBNAME expands to actual name, store in var
-			AC_CHECK_LIB([$TMP], [main], [
+			TRYLIB=LIBNAME #LIBNAME expands to actual name, store in var
+			AC_CHECK_LIB([$TRYLIB], [main], [
 				FAILED="no"
-				RC_LDFLAGS="$RC_LDFLAGS -l$TMP" ])
+				RC_LIBS="$RC_LIBS -l$TRYLIB" ])
 		fi ])
 
 	#still nothing?
@@ -152,20 +159,30 @@ fi
 # Check for needed libs
 #
 
-AC_DEFUN([RC_LIBS],
+AC_DEFUN([RC_LIBS_CONFIG],
 [
-AC_REQUIRE([RC_LIBS_CONFIG])
+AC_REQUIRE([RC_LIBS_INIT])
 
-#make sure only enabling static linking on w32
+#make sure only enabling w32 options on w32
 if test "$ON_W32" = "no"; then
 	STATIC="no"
+	CONSOLE="no"
+fi
+
+#console flag
+AC_MSG_CHECKING([if building with w32 console enabled])
+if test "$CONSOLE" != "no"; then
+	AC_MSG_RESULT([yes])
+	RC_LIBS="$RC_LIBS -mconsole"
+else
+	AC_MSG_RESULT([no])
 fi
 
 #static flag
 AC_MSG_CHECKING([if building static w32 binary])
 if test "$STATIC" != "no"; then
 	AC_MSG_RESULT([yes])
-	RC_LDFLAGS="$RC_LDFLAGS -Wl,-Bstatic"
+	RC_LIBS="$RC_LIBS -Wl,-Bstatic"
 else
 	AC_MSG_RESULT([no])
 fi
@@ -178,11 +195,11 @@ RC_LIBS_CHECK([glew],, [GL/glew.h], [GLEW glew32])
 
 #static stop flag
 if test "$STATIC" != "no"; then
-	RC_LDFLAGS="$RC_LDFLAGS -Wl,-Bdynamic"
+	RC_LIBS="$RC_LIBS -Wl,-Bdynamic"
 fi
 
 #make available
-AC_SUBST(RC_CFLAGS)
-AC_SUBST(RC_LDFLAGS)
+AC_SUBST(RC_FLAGS)
+AC_SUBST(RC_LIBS)
 
 ])
