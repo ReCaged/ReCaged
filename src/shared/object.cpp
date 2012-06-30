@@ -45,9 +45,10 @@ Object_Template::~Object_Template()
 }
 
 Object *Object::head = NULL;
+Object *Object::active = NULL;
 
 //allocate a new object, add it to the list and returns its pointer
-Object::Object ()
+Object::Object (dReal position[3], dReal rotation[9])
 {
 	printlog(1, "creating Object");
 
@@ -59,6 +60,10 @@ Object::Object ()
 		next->prev = this;
 	else
 		printlog(2, "(first registered object)");
+
+	//set position/rotation
+	memcpy(pos, position, sizeof(dReal)*3);
+	memcpy(rot, rotation, sizeof(dReal)*9);
 
 	//default values
 	components = NULL;
@@ -99,6 +104,15 @@ void Object::Decrease_Activity()
 {
 	if ((--activity) == 0)
 		Event_Buffer_Add_Inactive(this);
+}
+
+int Object::Run(int args, int results)
+{
+	Object *last=active;
+	active=this;
+	int ret=lua_pcall(lua_sim, args, results, 0);
+	active=last;
+	return ret;
 }
 
 //destroys all objects

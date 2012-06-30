@@ -86,19 +86,29 @@ Object_Template *Object_Template::Load(const char *path)
 }
 
 //spawn
-//TODO: rotation
-void Object_Template::Spawn (dReal x, dReal y, dReal z)
+//TODO: rotation. move both pos+rot to arrays
+Object *Object_Template::Spawn (dReal x, dReal y, dReal z)
 {
 	printlog(2, "Spawning object at: %f %f %f", x,y,z);
+	dReal pos[3]={x,y,z};
+	//default to no rotation....
+	dReal rot[9]={	1.0, 0.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 0.0, 1.0	};
+
+	Object *obj = new Object(pos, rot);
 
 	lua_rawgeti(lua_sim, LUA_REGISTRYINDEX, spawn_script);
 
-	if (lua_pcall(lua_sim, 0, 0, 0))
+	if (obj->Run(0, 0))
 	{
 		printlog(0, "ERROR: \"%s\" while spawning object!",
 				lua_tostring(lua_sim, -1));
 		lua_pop(lua_sim, -1);
-		//return false;
+		delete obj;
+		return NULL;
 	}
+
+	return obj;
 }
 

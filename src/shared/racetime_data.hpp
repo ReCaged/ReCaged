@@ -26,6 +26,8 @@
 #include <string.h>
 #include "log.hpp"
 
+//TODO: should be thread safe (no simultaneous loading of same data), support for
+//tracking which thread got access to data or something.
 class Racetime_Data
 {
 	public:

@@ -39,7 +39,7 @@ class Object_Template:public Racetime_Data
 {
 	public:
 		static Object_Template *Load(const char *path);
-		void Spawn(dReal x, dReal y, dReal z);
+		class Object *Spawn(dReal x, dReal y, dReal z);
 
 	private:
 		Object_Template(const char*); //just set some default values
@@ -59,8 +59,9 @@ class Object
 		//for increasing/decreasing activity counter
 		void Increase_Activity();
 		void Decrease_Activity();
+		int Run(int args, int results);
 	private:
-		Object();
+		Object(dReal pos[3], dReal rot[9]);
 		//the following are either using or inherited from this class
 		friend class Object_Template; //needs access to constructor
 		friend bool load_track (const char *);
@@ -69,8 +70,9 @@ class Object
 		//things to keep track of when cleaning out object
 		unsigned int activity; //counts geoms,bodies and future stuff (script timers, loops, etc)
 
+		dReal pos[3], rot[9];
 		Component *components;
-		dSpaceID selected_space;
+		dSpaceID selected_space; //TODO: remove!
 
 		//to allow acces to the two above pointers
 		friend class Component; //components
@@ -78,11 +80,16 @@ class Object
 		friend class Space; //selected space
 
 		//placeholder for more data
-			
+
+		//TODO: the list of objects and "selected" should be split into specific
+		//simulation threads. Only a problem when enabling multiple threads...
+
 		//used to find next/prev object in dynamically allocated chain
 		//set next to null in last object in chain
 		static Object *head;
 		Object *prev, *next;
+
+		static Object *selected;
 };
 
 #endif
