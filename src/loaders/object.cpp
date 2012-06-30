@@ -109,6 +109,10 @@ Object *Object_Template::Spawn (dReal x, dReal y, dReal z)
 		return NULL;
 	}
 
+	//hm... didn't do anything?
+	if (obj->activity == 0)
+		Event_Buffer_Add_Inactive(this);
+
 	return obj;
 }
 
