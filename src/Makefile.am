@@ -31,6 +31,7 @@ LDADD = $(RC_LIBS)
 bin_PROGRAMS = recaged
 
 recaged_SOURCES = \
+		./recaged.cpp \
 		./simulation/timers.cpp \
 		./simulation/wheel.cpp \
 		./simulation/event_buffers.cpp \
@@ -41,7 +42,6 @@ recaged_SOURCES = \
 		./simulation/joint.cpp \
 		./simulation/simulation.cpp \
 		./simulation/collision_feedback.cpp \
-		./main.cpp \
 		./interface/render_list.cpp \
 		./interface/camera.cpp \
 		./interface/geom_render.cpp \

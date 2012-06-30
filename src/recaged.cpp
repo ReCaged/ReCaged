@@ -316,9 +316,13 @@ int main (int argc, char *argv[])
 	//Log_Init();
 	//load_conf ("internal.conf", (char *)&internal, internal_index);
 
-	//issue TODO: printlog instead!
-	printf("\n	-=[ Welcome to %s version %s (\"%s\") ]=-\n\n%s\n", PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME,
-"   ReCaged  Copyright (C) 2009, 2010, 2011 Mats Wahlberg\n\
+	//TODO: printlog instead!
+	printf("\n\t-=[ Welcome to %s version %s (\"%s\") ]=-\n\n", PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME);
+
+	//TODO: printlog instead
+	//TODO: rotate credits/libraries order/descriptions
+	puts("\
+   Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg\n\
 \n\
    ReCaged is free software: you can redistribute it and/or modify\n\
    it under the terms of the GNU General Public License as published by\n\
@@ -391,8 +395,9 @@ int main (int argc, char *argv[])
 				break;
 
 			default: //print help output
-				puts(
-"   Usage: recaged [-d|-p]\n\
+				//TODO: print to log (like all other printf/puts)
+				puts("\
+   Usage: recaged [-d|-p]\n\
      -d <path to data>       override path to directory with data\n\
      -p <path to profile>    override path to directory with user data and settings\n");
 
