@@ -25,7 +25,7 @@
 #
 
 #
-# RC_LIBS_CONFIG()
+# RC_LIBS_INIT()
 # Basic tests before starting
 #
 AC_DEFUN([RC_LIBS_INIT],
@@ -63,7 +63,7 @@ AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
 
 
 #
-# RC_LIBS_CHECK(PKG_NAME, CUSTOM_CONFIG, LIB_HEADER, LIB_NAMES_LIST)
+# RC_LIBS_CHECK(PKG_NAME, CUSTOM_CONFIG, HEADER, LIB_NAMES_LIST)
 # Check for specified library using pkg_config and other if possible
 #
 
@@ -157,7 +157,7 @@ fi
 
 
 #
-# RC_LIBS()
+# RC_LIBS_CONFIG()
 # Check for needed libs
 #
 
