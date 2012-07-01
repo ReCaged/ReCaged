@@ -39,7 +39,7 @@ class VBO: public Racetime_Data
 		//find a vbo with enough room, if not create a new one
 		static VBO *Find_Enough_Room(unsigned int needed)
 		{
-			Log_printf(1, "Locating vbo to hold %u bytes of data", needed);
+			Log_Add(1, "Locating vbo to hold %u bytes of data", needed);
 
 			//in case creating
 			GLsizei size=DEFAULT_VBO_SIZE;
@@ -48,7 +48,7 @@ class VBO: public Racetime_Data
 			//check so enough space in even a new vbo:
 			if (needed > DEFAULT_VBO_SIZE)
 			{
-				Log_printf(1, "creating new vbo for single model, %u bytes of size", needed);
+				Log_Add(1, "creating new vbo for single model, %u bytes of size", needed);
 				dedicated=true;
 				size=needed;
 			}
@@ -58,12 +58,12 @@ class VBO: public Racetime_Data
 				for (VBO *p=head; p; p=p->next)
 					if ( !p->dedicated && (p->usage)+needed <= (unsigned int) DEFAULT_VBO_SIZE ) //not dedicated+enough to hold
 					{
-						Log_printf(1, "reusing already existing vbo for model");
+						Log_Add(1, "reusing already existing vbo for model");
 						return p;
 					}
 
 				//else, did not find enough room, create
-				Log_printf(1, "creating new vbo for multiple models, %u bytes of size", DEFAULT_VBO_SIZE);
+				Log_Add(1, "creating new vbo for multiple models, %u bytes of size", DEFAULT_VBO_SIZE);
 			}
 
 
@@ -79,9 +79,9 @@ class VBO: public Racetime_Data
 			{
 				//...should be a memory issue...
 				if (error == GL_OUT_OF_MEMORY)
-					Log_printf(0, "WARNING: insufficient graphics memory, can not store rendering models...");
+					Log_Add(0, "WARNING: insufficient graphics memory, can not store rendering models...");
 				else //...but might be a coding error
-					Log_printf(0, "ERROR: unexpected opengl error!!! Fix this!");
+					Log_Add(0, "ERROR: unexpected opengl error!!! Fix this!");
 
 				//anyway, we return NULL to indicate failure
 				return NULL;
@@ -134,7 +134,7 @@ Trimesh_3D::Trimesh_3D(const char *name, float r, GLuint vbo, Material *mpointer
 //only called together with all other racetime_data destruction (at end of race)
 Trimesh_3D::~Trimesh_3D()
 {
-	Log_printf(2, "Removing rendering trimesh");
+	Log_Add(2, "Removing rendering trimesh");
 
 	//remove local data:
 	delete[] materials;
@@ -215,7 +215,7 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 	//if we got no filename from the conf, nothing more to do
 	if (!modelconf.model)
 	{
-		Log_printf(1, "WARNING: could not find model filename in conf \"%s\"", conf);
+		Log_Add(1, "WARNING: could not find model filename in conf \"%s\"", conf);
 		return NULL;
 	}
 
@@ -234,7 +234,7 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 //method for creating a Trimesh_3D from Trimesh
 Trimesh_3D *Trimesh::Create_3D()
 {
-	Log_printf(2, "Creating rendering trimesh from class");
+	Log_Add(2, "Creating rendering trimesh from class");
 
 	//already uploaded?
 	if (Trimesh_3D *tmp = Racetime_Data::Find<Trimesh_3D>(name.c_str()))
@@ -258,7 +258,7 @@ Trimesh_3D *Trimesh::Create_3D()
 
 	if (!vcount)
 	{
-		Log_printf(0, "ERROR: trimesh is empty (at least no triangles)");
+		Log_Add(0, "ERROR: trimesh is empty (at least no triangles)");
 		return NULL;
 	}
 	//mcount is always secured
@@ -274,7 +274,7 @@ Trimesh_3D *Trimesh::Create_3D()
 	//ok, ready to go!
 	//
 	
-	Log_printf(2, "number of vertices: %u", vcount);
+	Log_Add(2, "number of vertices: %u", vcount);
 
 	//quickly find furthest vertex of obj, so can determine radius
 	float radius = Find_Longest_Distance();
@@ -394,7 +394,7 @@ Trimesh_3D *Trimesh::Create_3D()
 		}
 	}
 
-	Log_printf(2, "number of (used) materials: %u", mcount);
+	Log_Add(2, "number of (used) materials: %u", mcount);
 
 	//create Trimesh_3D class from this data:
 	//set the name. NOTE: both Trimesh_3D and Trimesh_Geom will have the same name

@@ -50,7 +50,7 @@ unsigned int Trimesh::Find_Material(const char *name)
 	}
 
 	//failure
-	Log_printf(0, "ERROR: could not find trimesh material %s", name);
+	Log_Add(0, "ERROR: could not find trimesh material %s", name);
 	return INDEX_ERROR;
 }
 
@@ -64,7 +64,7 @@ bool Trimesh::Compare_Name(const char *n)
 //makes sure all normals are unit
 void Trimesh::Normalize_Normals()
 {
-	Log_printf(2, "Making sure all normals are unit for trimesh");
+	Log_Add(2, "Making sure all normals are unit for trimesh");
 
 	size_t end = normals.size();
 	float l;
@@ -82,7 +82,7 @@ void Trimesh::Normalize_Normals()
 //counter-clockwise order of triangles assumed
 void Trimesh::Generate_Missing_Normals()
 {
-	Log_printf(2, "Generating missing normals for trimesh");
+	Log_Add(2, "Generating missing normals for trimesh");
 
 	unsigned int *nindex, *vindex;;
 	Vector_Float v1, v2, v3;
@@ -156,11 +156,11 @@ void Trimesh::Resize(float r)
 
 	if (r == 0.0) //easy mistake
 	{
-		Log_printf(0, "You've made a typo: resize is 1.0, not 0.0 - Ignoring...");
+		Log_Add(0, "You've made a typo: resize is 1.0, not 0.0 - Ignoring...");
 		return;
 	}
 
-	Log_printf(2, "Resizing trimesh");
+	Log_Add(2, "Resizing trimesh");
 
 	size_t end = vertices.size();
 	size_t i;
@@ -178,7 +178,7 @@ void Trimesh::Rotate(float x, float y, float z)
 	if (x==0 && y==0 && z==0)
 		return;
 
-	Log_printf(2, "Rotating trimesh");
+	Log_Add(2, "Rotating trimesh");
 
 	//rotation matrix:
 	dMatrix3 rot;
@@ -217,7 +217,7 @@ void Trimesh::Offset(float x, float y, float z)
 	if (x==0 && y==0 && z==0)
 		return;
 
-	Log_printf(2, "Changing offset of trimesh");
+	Log_Add(2, "Changing offset of trimesh");
 
 	size_t end = vertices.size();
 	size_t i;
@@ -232,7 +232,7 @@ void Trimesh::Offset(float x, float y, float z)
 
 float Trimesh::Find_Longest_Distance()
 {
-	Log_printf(2, "Finding longest distance vertex in trimesh (\"radius\")");
+	Log_Add(2, "Finding longest distance vertex in trimesh (\"radius\")");
 	size_t end = vertices.size();
 	size_t i;
 	float biggest=0.0, length;
@@ -246,7 +246,7 @@ float Trimesh::Find_Longest_Distance()
 			biggest=length;
 	}
 
-	Log_printf(2, "longest distance in trimesh: %f", biggest);
+	Log_Add(2, "longest distance in trimesh: %f", biggest);
 
 	return biggest;
 }

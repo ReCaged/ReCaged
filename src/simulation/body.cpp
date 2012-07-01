@@ -31,7 +31,7 @@
 
 void Body::Update_Mass()
 {
-	Log_printf(2, "storing body mass for drag calculations");
+	Log_Add(2, "storing body mass for drag calculations");
 
 	dMass dmass;
 
@@ -45,7 +45,7 @@ void Body::Update_Mass()
 //(this way the body mass doesn't need to be requested and used in every calculation)
 void Body::Set_Linear_Drag (dReal drag)
 {
-	Log_printf(2, "setting body linear drag");
+	Log_Add(2, "setting body linear drag");
 
 	linear_drag = drag;
 	use_advanced_linear_drag = false;
@@ -53,7 +53,7 @@ void Body::Set_Linear_Drag (dReal drag)
 
 void Body::Set_Advanced_Linear_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
 {
-	Log_printf(2, "setting body advanced linear drag");
+	Log_Add(2, "setting body advanced linear drag");
 
 	advanced_linear_drag[0] = drag_x;
 	advanced_linear_drag[1] = drag_y;
@@ -64,7 +64,7 @@ void Body::Set_Advanced_Linear_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
 
 void Body::Set_Angular_Drag (dReal drag)
 {
-	Log_printf(2, "setting body angular drag");
+	Log_Add(2, "setting body angular drag");
 	angular_drag = drag;
 }
 
@@ -161,7 +161,7 @@ void Body::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{
-		Log_printf(2, "setting Body event");
+		Log_Add(2, "setting Body event");
 
 		threshold=thres;
 		buffer=buff;
@@ -173,7 +173,7 @@ void Body::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 	}
 	else
 	{
-		Log_printf(2, "disabling Body event");
+		Log_Add(2, "disabling Body event");
 
 		Event_Buffer_Remove_All(this);
 

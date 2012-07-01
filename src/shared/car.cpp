@@ -33,7 +33,7 @@ Car *Car::head = NULL;
 //allocates car, add to list...
 Car::Car(void)
 {
-	Log_printf(2, "configuring Car class");
+	Log_Add(2, "configuring Car class");
 
 	//default values
 	dir = 1; //initiate to 1 for default
@@ -58,7 +58,7 @@ Car::Car(void)
 //run _before_ starting full erase of object/component lists (at race end)
 Car::~Car()
 {
-	Log_printf(2, "clearing Car class");
+	Log_Add(2, "clearing Car class");
 
 	//remove from list
 	if (!prev) //head

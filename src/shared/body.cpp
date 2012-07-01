@@ -29,7 +29,7 @@ Body *Body::head = NULL;
 
 Body::Body (dBodyID body, Object *obj): Component(obj)
 {
-	Log_printf(2, "configuring Body class");
+	Log_Add(2, "configuring Body class");
 
 	//increase object activity counter
 	object_parent->Increase_Activity();
@@ -42,7 +42,7 @@ Body::Body (dBodyID body, Object *obj): Component(obj)
 	if (next)
 		next->prev = this;
 	else
-		Log_printf(2, "(first registered)");
+		Log_Add(2, "(first registered)");
 
 	//add it to the body
 	dBodySetData (body, (void*)(this));
@@ -60,7 +60,7 @@ Body::Body (dBodyID body, Object *obj): Component(obj)
 Body::~Body()
 {
 	//lets just hope the given pointer is ok...
-	Log_printf(2, "clearing Body class");
+	Log_Add(2, "clearing Body class");
 
 	//remove all events
 	Event_Buffer_Remove_All(this);

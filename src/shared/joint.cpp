@@ -27,7 +27,7 @@ Joint *Joint::head = NULL;
 
 Joint::Joint (dJointID joint, Object *obj): Component(obj)
 {
-	Log_printf(2, "configuring Joint class");
+	Log_Add(2, "configuring Joint class");
 
 	//add it to the list
 	next = head;
@@ -37,7 +37,7 @@ Joint::Joint (dJointID joint, Object *obj): Component(obj)
 	if (next)
 		next->prev = this;
 	else
-		Log_printf(2, "(first registered)");
+		Log_Add(2, "(first registered)");
 
 	//add it to the joint
 	dJointSetData (joint, (void*)(this));
@@ -53,7 +53,7 @@ Joint::Joint (dJointID joint, Object *obj): Component(obj)
 Joint::~Joint ()
 {
 	//lets just hope the given pointer is ok...
-	Log_printf(2, "clearing Joint class");
+	Log_Add(2, "clearing Joint class");
 
 	//remove all events
 	Event_Buffer_Remove_All(this);

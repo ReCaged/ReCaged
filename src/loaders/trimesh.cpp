@@ -29,12 +29,12 @@
 //wrapper for loading
 bool Trimesh::Load(const char *file)
 {
-	Log_printf(1, "Loading trimesh from file \"%s\"", file);
-	Log_printf(2, "determining file type from suffix");
+	Log_Add(1, "Loading trimesh from file \"%s\"", file);
+	Log_Add(2, "determining file type from suffix");
 
 	if (file == NULL)
 	{
-		Log_printf(0, "WARNING: empty file path+name for trimesh");
+		Log_Add(0, "WARNING: empty file path+name for trimesh");
 		return false;
 	}
 
@@ -43,7 +43,7 @@ bool Trimesh::Load(const char *file)
 	//in case something really wrong
 	if (!suffix)
 	{
-		Log_printf(0, "ERROR: no suffix for file \"%s\"", file);
+		Log_Add(0, "ERROR: no suffix for file \"%s\"", file);
 		return false;
 	}
 
@@ -56,19 +56,19 @@ bool Trimesh::Load(const char *file)
 		//return Load_3DS(file);
 	
 	//else, no match
-	Log_printf(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
+	Log_Add(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
 	return false;
 }
 
 //for materials
 bool Trimesh::Load_Material(const char *file)
 {
-	Log_printf(1, "Loading material from file \"%s\"", file);
-	Log_printf(2, "determining file type from suffix");
+	Log_Add(1, "Loading material from file \"%s\"", file);
+	Log_Add(2, "determining file type from suffix");
 
 	if (file == NULL)
 	{
-		Log_printf(0, "WARNING: empty file path+name for material");
+		Log_Add(0, "WARNING: empty file path+name for material");
 		return false;
 	}
 
@@ -77,7 +77,7 @@ bool Trimesh::Load_Material(const char *file)
 	//in case something really wrong
 	if (!suffix)
 	{
-		Log_printf(0, "ERROR: no suffix for file \"%s\"", file);
+		Log_Add(0, "ERROR: no suffix for file \"%s\"", file);
 		return false;
 	}
 
@@ -86,6 +86,6 @@ bool Trimesh::Load_Material(const char *file)
 		return Load_MTL(file);
 
 	//else, no match
-	Log_printf(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
+	Log_Add(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
 	return false;
 }

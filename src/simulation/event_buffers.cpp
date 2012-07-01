@@ -100,31 +100,31 @@ void RemoveAll(Link **buffer, void *target)
 //adding functions
 void Event_Buffer_Add_Depleted(Geom *geom)
 {
-	Log_printf(2, "Geom depleted event registered");
+	Log_Add(2, "Geom depleted event registered");
 	Push(&geom_depleted, (void*)geom);
 }
 
 void Event_Buffer_Add_Triggered(Geom *geom)
 {
-	Log_printf(2, "Geom sensor event registered");
+	Log_Add(2, "Geom sensor event registered");
 	Push(&geom_triggered, (void*)geom);
 }
 
 void Event_Buffer_Add_Depleted(Body *body)
 {
-	Log_printf(2, "Body depleted event registered");
+	Log_Add(2, "Body depleted event registered");
 	Push(&body_depleted, (void*)body);
 }
 
 void Event_Buffer_Add_Depleted(Joint *joint)
 {
-	Log_printf(2, "Joint depleted event registered");
+	Log_Add(2, "Joint depleted event registered");
 	Push(&joint_depleted, (void*)joint);
 }
 
 void Event_Buffer_Add_Inactive(Object *object)
 {
-	Log_printf(2, "Object inactive event registered");
+	Log_Add(2, "Object inactive event registered");
 	Push(&object_inactive, (void*)object);
 }
 
@@ -260,7 +260,7 @@ void Event_Buffers_Process(dReal step)
 			}
 		}
 		else
-			Log_printf(0, "WARNING: tmp unidentified geom got configured as sensor?! - ignoring...");
+			Log_Add(0, "WARNING: tmp unidentified geom got configured as sensor?! - ignoring...");
 	}
 
 	//body buffer:

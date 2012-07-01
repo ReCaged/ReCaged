@@ -40,7 +40,7 @@ Uint32 start_time = 0;
 void Run_Race(void)
 {
 	//start
-	Log_printf (0, "Starting Race");
+	Log_Add (0, "Starting Race");
 
 	ode_mutex = SDL_CreateMutex(); //create mutex for ode locking
 	sdl_mutex = SDL_CreateMutex(); //only use sdl in 1 thread
@@ -69,7 +69,7 @@ void Run_Race(void)
 	SDL_DestroyCond(sync_cond);
 
 	//done!
-	Log_printf(0, "Race Done!");
+	Log_Add(0, "Race Done!");
 
 	racetime = SDL_GetTicks() - starttime;
 	simtime = simulation_time - starttime;
@@ -260,7 +260,7 @@ bool tmp_menus(const char *profiledir)
 		{
 			if (!car_template)
 			{
-				Log_printf(0, "ERROR in menu: specify car before position!");
+				Log_Add(0, "ERROR in menu: specify car before position!");
 				return false;
 			}
 
@@ -352,18 +352,18 @@ int main (int argc, char *argv[])
 		switch(c)
 		{
 			case 'd': //data directory
-				printf("Alternative path to data directory specified (\"%s\")\n", optarg);
+				Log_Add(1, "Alternative path to data directory specified (\"%s\")\n", optarg);
 				datadir = optarg;
 				break;
 
 			case 'p': //profile directory
-				printf("Alternative path to profile directory specified (\"%s\")\n", optarg);
+				Log_Add(1, "Alternative path to profile directory specified (\"%s\")\n", optarg);
 				profiledir = optarg;
 				break;
 
 			default: //print help output
-				//TODO: print to log (like all other printf/puts)
-				puts("\
+				//TODO: print to log (like all other
+				Log_puts(1, "\
 Usage: recaged [-d|-p]\n\
   -d <path to data>       override path to directory with data\n\
   -p <path to profile>    override path to directory with user data and settings\n");
@@ -376,13 +376,13 @@ Usage: recaged [-d|-p]\n\
 	//ok, try to get into the data directory
 	if (chdir (datadir))
 	{
-		printf("Failed to cd into data directory...\n");
+		Log_Add(0, "Failed to cd into data directory...\n");
 
 		//lets see if this was not the default (and the default works):
 		if ( (datadir != datadefault) && !chdir(datadefault) )
-			printf("Using default directory (\"%s\") instead\n", datadefault);
+			Log_Add(1, "Using default directory (\"%s\") instead\n", datadefault);
 		else
-			printf("Will try to load from current directory instead...\n");
+			Log_Add(1, "Will try to load from current directory instead...\n");
 	}
 
 	//not needed anymore (used or not, will not be needed any more)
@@ -392,8 +392,8 @@ Usage: recaged [-d|-p]\n\
 
 
 	//TODO: rotate credits/libraries order/descriptions
-	Log_puts(1, "\n\
-Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg\n\
+	Log_puts(1, "\
+ReCaged is copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg\n\
 \n\
 ReCaged is free software: you can redistribute it and/or modify\n\
 it under the terms of the GNU General Public License as published by\n\
@@ -419,13 +419,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
 * \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
 * \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\n\n\
 Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
-More keys exists for debug/testing/demo, see README if you are interested.\n\
-- See README for more info -");
+More keys exists for debug/testing/demo, see README if you are interested.\n\n\
+- See README for more info -\n\n");
 
 
 
 	//ok, start loading
-	Log_printf(1, "Loading...\n");
+	Log_Add(1, "Loading...");
 	runlevel = loading;
 
 	load_conf ("internal.conf", (char *)&internal, internal_index);
@@ -435,29 +435,29 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\
 	//on failure, rc should not just terminate but instead abort the race and warn the user
 	if (!tmp_menus(profiledir))
 	{
-		Log_printf(0, "One or more errors, can not start!");
+		Log_Add(0, "One or more errors, can not start!");
 		return -1; //just quit if failure
 	}
 	//
 
 	//might be interesting
-	Log_printf(1, "\n\n   <[ Info ]>");
-	Log_printf(1, "Startup time:		%ums", starttime);
-	Log_printf(1, "Race time:			%ums", racetime);
+	Log_puts(1, "\n\n   <[ Info ]>\n");
+	Log_Add(1, "Startup time:		%ums", starttime);
+	Log_Add(1, "Race time:			%ums", racetime);
 
-	Log_printf(1, "Simulated time:		%ums (%u%% of real time)",
+	Log_Add(1, "Simulated time:		%ums (%u%% of real time)",
 						simtime, (100*simtime)/racetime);
 
-	Log_printf(1, "Average simulations/second:	%u steps/second (%u in total)",
+	Log_Add(1, "Average simulations/second:	%u steps/second (%u in total)",
 						(1000*simulation_count)/racetime, simulation_count);
 
-	Log_printf(1, "Simulation lag:		%u%% of steps (%u in total)",
+	Log_Add(1, "Simulation lag:		%u%% of steps (%u in total)",
 						(100*simulation_lag)/simulation_count, simulation_lag);
 
-	Log_printf(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
+	Log_Add(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
 						(1000*interface_count)/racetime, (100*interface_count)/simulation_count);
 
-	printf("\nBye!\n\n");
+	Log_puts(1, "\n Bye!\n\n");
 
 	return 0;
 }

@@ -34,7 +34,7 @@
 //load data for spawning object (object data), hard-coded debug version
 Object_Template *Object_Template::Load(const char *path)
 {
-	Log_printf(1, "Loading object: %s", path);
+	Log_Add(1, "Loading object: %s", path);
 
 	//see if already loaded
 	if (Object_Template *tmp=Racetime_Data::Find<Object_Template>(path))
@@ -49,7 +49,7 @@ Object_Template *Object_Template::Load(const char *path)
 	if (!strcmp(path,"objects/misc/box"))
 	{
 		//"load" 3d box
-		Log_printf(2, "(hard-coded box)");
+		Log_Add(2, "(hard-coded box)");
 
 		obj = new Object_Template(path);
 		obj->box = true;
@@ -62,7 +62,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else if (!strcmp(path, "objects/misc/funbox"))
 	{
-		Log_printf(2, "(Mac's hard-coded funbox");
+		Log_Add(2, "(Mac's hard-coded funbox");
 
 		obj = new Object_Template(path);
 		obj->funbox = true; //id
@@ -74,7 +74,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else if (!strcmp(path, "objects/misc/flipper"))
 	{
-		Log_printf(2, "(hard-coded flipper)");
+		Log_Add(2, "(hard-coded flipper)");
 
 		obj = new Object_Template(path);
 		obj->flipper = true; //id
@@ -86,7 +86,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else if (!strcmp(path, "objects/misc/NH4"))
 	{
-		Log_printf(2, "(hard-coded \"molecule\")");
+		Log_Add(2, "(hard-coded \"molecule\")");
 
 		obj = new Object_Template(path);
 		obj->NH4 = true;
@@ -99,7 +99,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else if (!strcmp(path, "objects/misc/beachball"))
 	{
-		Log_printf(2, "(hard-coded beachball)");
+		Log_Add(2, "(hard-coded beachball)");
 
 		obj = new Object_Template(path);
 		obj->sphere = true;
@@ -108,7 +108,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else if (!strcmp(path, "objects/misc/building"))
 	{
-		Log_printf(2, "(hard-coded building)");
+		Log_Add(2, "(hard-coded building)");
 
 		obj = new Object_Template(path);
 		obj->building = true;
@@ -123,7 +123,7 @@ Object_Template *Object_Template::Load(const char *path)
 	else if (!strcmp(path,"objects/misc/pillar"))
 	{
 		//"load" 3d box
-		Log_printf(2, "(hard-coded pillar)");
+		Log_Add(2, "(hard-coded pillar)");
 
 		obj = new Object_Template(path);
 		obj->pillar = true;
@@ -137,7 +137,7 @@ Object_Template *Object_Template::Load(const char *path)
 	else if (!strcmp(path,"objects/misc/tetrahedron"))
 	{
 		//"load" 3d box
-		Log_printf(2, "(hard-coded tetrahedron)");
+		Log_Add(2, "(hard-coded tetrahedron)");
 
 		obj = new Object_Template(path);
 		obj->tetrahedron = true;
@@ -151,7 +151,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else
 	{
-		Log_printf(0, "ERROR: path didn't match any hard-coded object");
+		Log_Add(0, "ERROR: path didn't match any hard-coded object");
 		return NULL;
 	}
 
@@ -177,13 +177,13 @@ void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 //TODO: rotation
 void Object_Template::Spawn (dReal x, dReal y, dReal z)
 {
-	Log_printf(2, "Spawning object at: %f %f %f", x,y,z);
+	Log_Add(2, "Spawning object at: %f %f %f", x,y,z);
 	//prettend to be executing the script... just load debug values
 	//
 
 	if (box)
 	{
-	Log_printf(2, "(hard-coded box)");
+	Log_Add(2, "(hard-coded box)");
 	//
 	//
 	//
@@ -216,7 +216,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	else if (funbox)
 	{
-	Log_printf(2, "(Mac's hard-coded funbox)");
+	Log_Add(2, "(Mac's hard-coded funbox)");
 	
 	Object *obj = new Object();
 	new Space(obj);
@@ -307,7 +307,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	else if (flipper)
 	{
-	Log_printf(2, "(hard-coded flipper)");
+	Log_Add(2, "(hard-coded flipper)");
 	//
 	//
 	//
@@ -341,7 +341,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	else if (NH4)
 	{
-	Log_printf(2, "(hard-coded \"molecule\")");
+	Log_Add(2, "(hard-coded \"molecule\")");
 	//
 	//
 	//
@@ -417,7 +417,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	}
 	else if (sphere)
 	{
-	Log_printf(2, "(beachball)");
+	Log_Add(2, "(beachball)");
 	//
 	//
 	//
@@ -455,7 +455,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	else if (building)
 	{
-	Log_printf(2, "(hard-coded building)");
+	Log_Add(2, "(hard-coded building)");
 	//
 	//
 
@@ -652,7 +652,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	else if (pillar)
 	{
-		Log_printf(2, "(hard-coded pillar)");
+		Log_Add(2, "(hard-coded pillar)");
 
 		//just one geom in this object
 		Geom *g = new Geom(dCreateBox(0, 2,2,5), new Object());
@@ -675,7 +675,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	else if (tetrahedron)
 	{
-		Log_printf(2, "(hard-coded tetrahedron)");
+		Log_Add(2, "(hard-coded tetrahedron)");
 
 		Object *obj = new Object();
 
@@ -709,7 +709,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	//
 	else
-		Log_printf(0, "ERROR: trying to spawn unidentified object?!");
+		Log_Add(0, "ERROR: trying to spawn unidentified object?!");
 
 }
 

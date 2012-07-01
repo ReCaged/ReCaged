@@ -27,17 +27,17 @@
 
 Space::Space(Object *obj): Component(obj)
 {
-	Log_printf(2, "configuring Space class");
+	Log_Add(2, "configuring Space class");
 
 	space_id = dSimpleSpaceCreate(space);
 
-	Log_printf(2, "(autoselecting this as default space for object)");
+	Log_Add(2, "(autoselecting this as default space for object)");
 	obj->selected_space=space_id;
 }
 
 Space::~Space()
 {
-	Log_printf(2, "clearing Geom class");
+	Log_Add(2, "clearing Geom class");
 
 	Geom *g;
 

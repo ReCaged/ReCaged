@@ -47,7 +47,7 @@ Uint32 simulation_time = 0;
 
 bool Simulation_Init(void)
 {
-	Log_printf(0, "Initiating simulation");
+	Log_Add(0, "Initiating simulation");
 	dInitODE2(0);
 	dAllocateODEDataForThread(dAllocateFlagBasicData | dAllocateFlagCollisionData);
 
@@ -79,7 +79,7 @@ bool Simulation_Init(void)
 
 int Simulation_Loop (void *d)
 {
-	Log_printf(1, "Starting simulation loop");
+	Log_Add(1, "Starting simulation loop");
 
 	simulation_time = SDL_GetTicks(); //set simulated time to realtime
 	Uint32 realtime; //real time (with possible delay since last update)
@@ -173,7 +173,7 @@ int Simulation_Loop (void *d)
 
 void Simulation_Quit (void)
 {
-	Log_printf(1, "Quit simulation");
+	Log_Add(1, "Quit simulation");
 	dJointGroupDestroy (contactgroup);
 	dSpaceDestroy (space);
 	dWorldDestroy (world);

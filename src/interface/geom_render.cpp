@@ -81,7 +81,7 @@ void Assure_Memory(unsigned int vertex_needed, unsigned int index_needed)
 		else //no, needed even more memory...
 			vertex_size += v_lacking;
 		
-		Log_printf(1, "growing geom rendering vertex buffer to %u bytes", sizeof(geom_vertex)*vertex_size);
+		Log_Add(1, "growing geom rendering vertex buffer to %u bytes", sizeof(geom_vertex)*vertex_size);
 
 		geom_vertex *tmp = vertices;
 		vertices = new geom_vertex[vertex_size];
@@ -99,7 +99,7 @@ void Assure_Memory(unsigned int vertex_needed, unsigned int index_needed)
 		else
 			index_size += i_lacking;
 		
-		Log_printf(1, "growing geom rendering index buffer to %u bytes", sizeof(geom_index)*index_size);
+		Log_Add(1, "growing geom rendering index buffer to %u bytes", sizeof(geom_index)*index_size);
 
 		geom_index *tmp = indices;
 		indices = new geom_index[index_size];
@@ -113,7 +113,7 @@ void Assure_Memory(unsigned int vertex_needed, unsigned int index_needed)
 //creates vbo and allocates memory
 void Geom_Render_Create()
 {
-	Log_printf(1, "generating buffers for geom rendering");
+	Log_Add(1, "generating buffers for geom rendering");
 
 	//no allocation yet
 	vertices = NULL;
@@ -559,9 +559,9 @@ void Geom_Render()
 	{
 		//should be a memory issue, but lets take a look
 		if (error == GL_OUT_OF_MEMORY)
-			Log_printf(0, "WARNING: insufficient graphics memory, can not render geoms...");
+			Log_Add(0, "WARNING: insufficient graphics memory, can not render geoms...");
 		else
-			Log_printf(0, "ERROR: unexpected opengl error!!! Fix this!");
+			Log_Add(0, "ERROR: unexpected opengl error!!! Fix this!");
 
 		//disable rendering and quit before causing any harm (hope gl is still ok)...
 		geom_render_level = 0;

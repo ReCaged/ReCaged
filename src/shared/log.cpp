@@ -27,15 +27,18 @@
 const char *indicator[] = {"=> ", " > ", " * "};
 
 //print log message - if it's below or equal to the current verbosity level
-void Log_printf (int level, const char *text, ...)
+void Log_Add (int level, const char *text, ...)
 {
 	if (level <= internal.verbosity)
 	{
 		if (level==0)
 			putchar('\n');
 
-		//print verbosity indicator
-		fputs(indicator[level], stdout); //puts adds newline, fputs instead
+		//print verbosity indicator (if in normal range)
+		if (level >=0 && level <=2)
+			fputs(indicator[level], stdout); //puts adds newline, fputs instead
+		else
+			fputs(" ? ", stdout);
 
 		//print message
 		va_list list;
@@ -47,21 +50,22 @@ void Log_printf (int level, const char *text, ...)
 		putchar('\n');
 	}
 }
-void Log_puts (int level, const char *text)
+
+//just wrappers:
+void Log_printf (int level, const char *text, ...)
 {
 	if (level <= internal.verbosity)
 	{
-		if (level==0)
-			putchar('\n');
-
-		//print verbosity indicator
-		fputs(indicator[level], stdout); //puts adds newline, fputs instead
-
-		//print message
-		puts(text);
-
-		//put newline
-		putchar('\n');
+		va_list list;
+		va_start (list, text);
+		vprintf (text, list);
+		va_end (list);
 	}
+}
+
+void Log_puts (int level, const char *text)
+{
+	if (level <= internal.verbosity)
+		fputs(text, stdout);
 }
 

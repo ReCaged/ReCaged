@@ -25,7 +25,7 @@
 
 Component::Component(Object *obj)
 {
-	Log_printf(2, "creating Component class");
+	Log_Add(2, "creating Component class");
 
 	//rather simple: just add it to the top of obj list of components
 	next = obj->components;
@@ -38,7 +38,7 @@ Component::Component(Object *obj)
 	}
 	else
 	{
-		Log_printf(2, "(first for object)");
+		Log_Add(2, "(first for object)");
 	}
 
 	//keep track of owning object
@@ -48,7 +48,7 @@ Component::Component(Object *obj)
 Component::~Component()
 {
 	//just unlink...
-	Log_printf(2, "freeing Component");
+	Log_Add(2, "freeing Component");
 	if (prev)
 	{
 		prev->next = next;

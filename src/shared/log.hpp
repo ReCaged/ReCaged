@@ -24,6 +24,12 @@
 #ifndef _RC_PRINTLOG_H
 #define _RC_PRINTLOG_H
 //Log_Init();
+
+//normal append to log
+void Log_Add (int, const char*, ...);
+
+//wrappers for popular text output functions
 void Log_printf (int, const char*, ...);
 void Log_puts (int, const char*);
+
 #endif

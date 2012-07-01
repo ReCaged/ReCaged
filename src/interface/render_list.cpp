@@ -109,7 +109,7 @@ void Render_List_Update()
 			//if buffer full...
 			if (buffer_generate->count == buffer_generate->size)
 			{
-				Log_printf(2, "Render list was too small, resizing");
+				Log_Add(2, "Render list was too small, resizing");
 
 				//copy to new memory
 				list_element *oldlist = buffer_generate->list;
@@ -160,7 +160,7 @@ void Render_List_Update()
 			//if buffer full...
 			if (buffer_generate->count == buffer_generate->size)
 			{
-				Log_printf(2, "Render list was too small, resizing");
+				Log_Add(2, "Render list was too small, resizing");
 
 				//copy to new memory
 				list_element *oldlist = buffer_generate->list;
