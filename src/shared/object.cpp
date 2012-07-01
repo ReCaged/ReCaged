@@ -20,9 +20,9 @@
  */ 
 
 #include "object.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "track.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "../simulation/event_buffers.hpp"
 
 #include <stdlib.h>
@@ -56,7 +56,7 @@ Object *Object::head = NULL;
 //allocate a new object, add it to the list and returns its pointer
 Object::Object ()
 {
-	printlog(1, "creating Object");
+	Log_printf(1, "creating Object");
 
 	prev=NULL;
 	next=head;
@@ -65,7 +65,7 @@ Object::Object ()
 	if (next)
 		next->prev = this;
 	else
-		printlog(2, "(first registered object)");
+		Log_printf(2, "(first registered object)");
 
 	//default values
 	components = NULL;
@@ -77,7 +77,7 @@ Object::Object ()
 Object::~Object()
 {
 	//lets just hope the given pointer is ok...
-	printlog(1, "freeing Object");
+	Log_printf(1, "freeing Object");
 
 	//1: remove it from the list
 	if (prev == NULL) //first link

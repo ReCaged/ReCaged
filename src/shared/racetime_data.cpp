@@ -20,7 +20,7 @@
  */ 
 
 #include "racetime_data.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include <stdio.h>
 #include <string.h>
 
@@ -37,13 +37,13 @@ Racetime_Data::Racetime_Data(const char *n)
 
 Racetime_Data::~Racetime_Data()
 {
-	printlog(2, "removing racetime data called \"%s\"", name);
+	Log_printf(2, "removing racetime data called \"%s\"", name);
 	delete[] name;
 }
 
 void Racetime_Data::Destroy_All()
 {
-	printlog(2, "destroying all racetime data");
+	Log_printf(2, "destroying all racetime data");
 
 	Racetime_Data *tmp, *data = head;
 	while (data)

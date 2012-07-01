@@ -25,7 +25,7 @@ Profile *profile_head = NULL;
 
 void Profile_Remove (Profile *target)
 {
-	printlog(2, "removing profile");
+	Log_printf(2, "removing profile");
 
 	//remove from list
 	if (!target->prev) //head

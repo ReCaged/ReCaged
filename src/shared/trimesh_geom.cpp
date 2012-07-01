@@ -22,7 +22,7 @@
 #include "internal.hpp"
 #include "trimesh.hpp"
 #include "geom.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 
 //length of vector
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
@@ -135,7 +135,7 @@ Geom *Trimesh_Geom::Create_Geom(Object *obj)
 
 Trimesh_Geom::~Trimesh_Geom()
 {
-	printlog(2, "Removing collision trimesh");
+	Log_printf(2, "Removing collision trimesh");
 
 	delete[] vertices;
 	delete[] indices;
@@ -152,7 +152,7 @@ Trimesh_Geom::~Trimesh_Geom()
 //method Trimesh_Geom from Trimesh
 Trimesh_Geom *Trimesh::Create_Geom()
 {
-	printlog(2, "Creating collision trimesh from class");
+	Log_printf(2, "Creating collision trimesh from class");
 
 	//already created?
 	if (Trimesh_Geom *tmp = Racetime_Data::Find<Trimesh_Geom>(name.c_str()))
@@ -170,19 +170,19 @@ Trimesh_Geom *Trimesh::Create_Geom()
 
 	if (!tris)
 	{
-		printlog(0, "ERROR: trimesh is empty (at least no triangles)");
+		Log_printf(0, "ERROR: trimesh is empty (at least no triangles)");
 		return NULL;
 	}
 
 	//assumed to be non-empty
 	size_t verts = vertices.size();
 
-	printlog(2, "number of vertices: %u, number of triangles: %u", verts, tris);
+	Log_printf(2, "number of vertices: %u, number of triangles: %u", verts, tris);
 
 	//check (vertice and indix count can't exceed int limit)
 	if (verts>INT_MAX || (tris*3)>INT_MAX)
 	{
-		printlog(0, "ERROR: trimesh is too big for ode collision trimesh");
+		Log_printf(0, "ERROR: trimesh is too big for ode collision trimesh");
 		return NULL;
 	}
 

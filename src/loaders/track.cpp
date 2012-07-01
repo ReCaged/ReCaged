@@ -25,7 +25,7 @@
 #include "../shared/internal.hpp"
 #include "../shared/camera.hpp"
 #include "../shared/geom.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/object.hpp"
 
 #include "text_file.hpp"
@@ -50,7 +50,7 @@ Trimesh *FindOrLoadMesh(const char *path, const char *name)
 	for (size_t i=0; i!=trimeshes.size(); ++i)
 		if (trimeshes[i]->Compare_Name(file))
 		{
-			printlog(2, "model already loaded");
+			Log_printf(2, "model already loaded");
 			return trimeshes[i];
 		}
 
@@ -79,7 +79,7 @@ void RemoveMeshes()
 
 bool load_track (const char *path)
 {
-	printlog(1, "Loading track: %s", path);
+	Log_printf(1, "Loading track: %s", path);
 
 	//
 	//conf
@@ -119,7 +119,7 @@ bool load_track (const char *path)
 	strcpy (glist,path);
 	strcat (glist,"/geoms.lst");
 
-	printlog(1, "Loading track geom list: %s", glist);
+	Log_printf(1, "Loading track geom list: %s", glist);
 	Text_File file;
 
 	if (file.Open(glist))
@@ -137,7 +137,7 @@ bool load_track (const char *path)
 				//model manipulation
 				if (!strcmp(file.words[1], "modify"))
 				{
-					printlog(2, "overriding model properties");
+					Log_printf(2, "overriding model properties");
 
 					Trimesh *mesh = FindOrLoadMesh(path, file.words[2]);
 
@@ -178,7 +178,7 @@ bool load_track (const char *path)
 						}
 						else
 						{
-							printlog(0, "WARNING: trimesh loading option \"%s\" not known", file.words[pos]);
+							Log_printf(0, "WARNING: trimesh loading option \"%s\" not known", file.words[pos]);
 							++pos;
 						}
 					}
@@ -186,7 +186,7 @@ bool load_track (const char *path)
 				//surface manipulation (of latest geom)
 				else if (!strcmp(file.words[1], "surface") && file.word_count >= 3)
 				{
-					printlog(2, "changing surface properties");
+					Log_printf(2, "changing surface properties");
 					Surface *surface=NULL;
 					int pos=0;
 
@@ -202,11 +202,11 @@ bool load_track (const char *path)
 						pos = 4;
 					}
 					else
-						printlog(0, "WARNING: surface type must be either global or material");
+						Log_printf(0, "WARNING: surface type must be either global or material");
 
 					if (!surface)
 					{
-						printlog(0, "WARNING: could not find specified surface");
+						Log_printf(0, "WARNING: could not find specified surface");
 						continue;
 					}
 
@@ -232,7 +232,7 @@ bool load_track (const char *path)
 						else if (!strcmp(file.words[pos], "rollingres"))
 							surface->tyre_rollres_scale = atof(file.words[++pos]);
 						else
-							printlog(0, "WARNING: trimesh surface option \"%s\" unknown", file.words[pos]);
+							Log_printf(0, "WARNING: trimesh surface option \"%s\" unknown", file.words[pos]);
 
 						//one step forward
 						pos+=1;
@@ -240,7 +240,7 @@ bool load_track (const char *path)
 
 				}
 				else
-					printlog(0, "WARNING: optional line in geoms.lst malformed");
+					Log_printf(0, "WARNING: optional line in geoms.lst malformed");
 
 			}
 			//geom to create
@@ -306,14 +306,14 @@ bool load_track (const char *path)
 			}
 			else
 			{
-				printlog(0, "WARNING: did not understand line in geom list...");
+				Log_printf(0, "WARNING: did not understand line in geom list...");
 				continue;
 			}
 		}
 	}
 	else
 	{
-		printlog(0, "ERROR: no geom list for track! can not create any terrain...");
+		Log_printf(0, "ERROR: no geom list for track! can not create any terrain...");
 		RemoveMeshes();
 		delete track.object;
 		return false;
@@ -328,7 +328,7 @@ bool load_track (const char *path)
 	strcpy (olist,path);
 	strcat (olist,"/objects.lst");
 
-	printlog(1, "Loading track object list: %s", olist);
+	Log_printf(1, "Loading track object list: %s", olist);
 
 	//each object is loaded/selected at a time (NULL if none loaded so far)
 	Object_Template *obj = NULL;
@@ -341,14 +341,14 @@ bool load_track (const char *path)
 			//object load request
 			if (file.word_count==2 && !strcmp(file.words[0], ">"))
 			{
-				printlog(2, "object load request: %s", file.words[1]);
+				Log_printf(2, "object load request: %s", file.words[1]);
 				char obj_name[13+strlen(file.words[1])+1];
 				strcpy (obj_name, "objects/");
 				strcat (obj_name, file.words[1]);
 
 				if (!(obj = Object_Template::Load(obj_name))) //NULL if failure
 				{
-					printlog(0, "ERROR: could not load object \"%s\"", obj_name);
+					Log_printf(0, "ERROR: could not load object \"%s\"", obj_name);
 					delete track.object;
 					return false;
 				}
@@ -356,11 +356,11 @@ bool load_track (const char *path)
 			//three words (x, y and z coord for spawning): spawning
 			else if (file.word_count == 3)
 			{
-				printlog(2, "object spawn request");
+				Log_printf(2, "object spawn request");
 				//in case no object has been loaded yet
 				if (!obj)
 				{
-					printlog(0, "ERROR: trying to spawn object without specifying what object!");
+					Log_printf(0, "ERROR: trying to spawn object without specifying what object!");
 					continue; //go to next
 				}
 
@@ -376,13 +376,13 @@ bool load_track (const char *path)
 			}
 			else
 			{
-				printlog(0, "ERROR: unknown line in object list!");
+				Log_printf(0, "ERROR: unknown line in object list!");
 				break;
 			}
 		}
 	}
 	else
-		printlog(1, "WARNING: no object list for track, no default objects spawned");
+		Log_printf(1, "WARNING: no object list for track, no default objects spawned");
 
 	//that's it!
 	return true;

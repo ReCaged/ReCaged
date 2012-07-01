@@ -27,7 +27,7 @@
 #include "../shared/internal.hpp"
 #include "../shared/runlevel.hpp"
 #include "../shared/track.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/body.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/camera.hpp"
@@ -47,7 +47,7 @@ Uint32 simulation_time = 0;
 
 bool Simulation_Init(void)
 {
-	printlog(0, "Initiating simulation");
+	Log_printf(0, "Initiating simulation");
 	dInitODE2(0);
 	dAllocateODEDataForThread(dAllocateFlagBasicData | dAllocateFlagCollisionData);
 
@@ -79,7 +79,7 @@ bool Simulation_Init(void)
 
 int Simulation_Loop (void *d)
 {
-	printlog(1, "Starting simulation loop");
+	Log_printf(1, "Starting simulation loop");
 
 	simulation_time = SDL_GetTicks(); //set simulated time to realtime
 	Uint32 realtime; //real time (with possible delay since last update)
@@ -173,7 +173,7 @@ int Simulation_Loop (void *d)
 
 void Simulation_Quit (void)
 {
-	printlog(1, "Quit simulation");
+	Log_printf(1, "Quit simulation");
 	dJointGroupDestroy (contactgroup);
 	dSpaceDestroy (space);
 	dWorldDestroy (world);

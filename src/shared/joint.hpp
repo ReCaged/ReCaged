@@ -26,7 +26,6 @@
 #include "object.hpp"
 #include "component.hpp"
 #include "script.hpp"
-#include "printlog.hpp"
 
 //Joint: (meta)data for joint (connects bodies), is used for:
 //currently only for triggering event script (force threshold)

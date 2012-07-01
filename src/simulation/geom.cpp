@@ -23,7 +23,7 @@
 
 #include "../shared/internal.hpp"
 #include "../shared/track.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 #include "collision_feedback.hpp"
 #include "event_buffers.hpp"
@@ -238,7 +238,7 @@ void Geom::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{
-		printlog(2, "setting Geom event");
+		Log_printf(2, "setting Geom event");
 
 		threshold=thres;
 		buffer=buff;
@@ -251,7 +251,7 @@ void Geom::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 	}
 	else
 	{
-		printlog(2, "disabling Geom event");
+		Log_printf(2, "disabling Geom event");
 		buffer_event=false;
 		Event_Buffer_Remove_All(this);
 	}

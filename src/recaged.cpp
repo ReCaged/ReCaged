@@ -25,7 +25,7 @@
 //local stuff:
 #include "shared/internal.hpp"
 #include "shared/threads.hpp"
-#include "shared/printlog.hpp"
+#include "shared/log.hpp"
 #include "shared/runlevel.hpp"
 #include "shared/profile.hpp"
 #include "shared/track.hpp"
@@ -40,7 +40,7 @@ Uint32 start_time = 0;
 void Run_Race(void)
 {
 	//start
-	printlog (0, "Starting Race");
+	Log_printf (0, "Starting Race");
 
 	ode_mutex = SDL_CreateMutex(); //create mutex for ode locking
 	sdl_mutex = SDL_CreateMutex(); //only use sdl in 1 thread
@@ -69,7 +69,7 @@ void Run_Race(void)
 	SDL_DestroyCond(sync_cond);
 
 	//done!
-	printlog(0, "Race Done!");
+	Log_printf(0, "Race Done!");
 
 	racetime = SDL_GetTicks() - starttime;
 	simtime = simulation_time - starttime;
@@ -260,7 +260,7 @@ bool tmp_menus(const char *profiledir)
 		{
 			if (!car_template)
 			{
-				printlog(0, "ERROR in menu: specify car before position!");
+				Log_printf(0, "ERROR in menu: specify car before position!");
 				return false;
 			}
 
@@ -312,45 +312,12 @@ char *datadefault; //need to check path to rc before deciding this
 //main function, will change a lot in future versions...
 int main (int argc, char *argv[])
 {
+	printf("\n\t-=[ Welcome to %s version %s (\"%s\") ]=-\n\n", PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME);
+
 	//Directories_Init();
 	//Log_Init();
 	//load_conf ("internal.conf", (char *)&internal, internal_index);
 
-	//TODO: printlog instead!
-	printf("\n\t-=[ Welcome to %s version %s (\"%s\") ]=-\n\n", PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME);
-
-	//TODO: printlog instead
-	//TODO: rotate credits/libraries order/descriptions
-	puts("\
-   Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg\n\
-\n\
-   ReCaged is free software: you can redistribute it and/or modify\n\
-   it under the terms of the GNU General Public License as published by\n\
-   the Free Software Foundation, either version 3 of the License, or\n\
-   (at your option) any later version.\n\
-\n\
-   ReCaged is distributed in the hope that it will be useful,\n\
-   but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-   GNU General Public License for more details.\n\
-\n\
-   You should have received a copy of the GNU General Public License\n\
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
-\n\n\
-				-=[ Credits ]=-\n\n\
-   * Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
-   * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
-   * \"Spontificus\"			-	Testing, hacks and various fixes\n\n\
-\n		-=[ Other Projects that made RC possible ]=-\n\n\
-   * \"Free Software Foundation\"		-	\"Free Software, Free Society\", supporting the free software movement\n\
-   * \"The GNU Project\"			-	Developing a Free OS. Its work for freedom has changed the world\n\
-   * \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
-   * \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
-   * \"OpenGL Extension Wrangler\"	-	OpenGL version/extension loader\n\n\n\
-   Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
-   More keys exists for debug/testing/demo, see README if you are interested.\n\
-   - See README for more info -\n\n");
- 
 	//attempt to generate default data path
 	//check if program was called with another pwd (got '/' in "name")
 	if (char *s = strrchr(argv[0], '/'))
@@ -397,12 +364,12 @@ int main (int argc, char *argv[])
 			default: //print help output
 				//TODO: print to log (like all other printf/puts)
 				puts("\
-   Usage: recaged [-d|-p]\n\
-     -d <path to data>       override path to directory with data\n\
-     -p <path to profile>    override path to directory with user data and settings\n");
-
+Usage: recaged [-d|-p]\n\
+  -d <path to data>       override path to directory with data\n\
+  -p <path to profile>    override path to directory with user data and settings\n");
 
 				exit(-1); //stop execution
+				break;
 		}
 	}
 
@@ -422,8 +389,43 @@ int main (int argc, char *argv[])
 	delete[] datadefault;;
 
 
+
+
+	//TODO: rotate credits/libraries order/descriptions
+	Log_puts(1, "\n\
+Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg\n\
+\n\
+ReCaged is free software: you can redistribute it and/or modify\n\
+it under the terms of the GNU General Public License as published by\n\
+the Free Software Foundation, either version 3 of the License, or\n\
+(at your option) any later version.\n\
+\n\
+ReCaged is distributed in the hope that it will be useful,\n\
+but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+GNU General Public License for more details.\n\
+\n\
+You should have received a copy of the GNU General Public License\n\
+along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
+\n\n\
+				-=[ Credits ]=-\n\n\
+* Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
+* \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
+* \"Spontificus\"				-	Testing, hacks and various fixes\n\n\
+\n		-=[ Other Projects that made RC possible ]=-\n\n\
+* \"Free Software Foundation\"		-	\"Free Software, Free Society\", supporting the free software movement\n\
+* \"The GNU Project\"			-	Developing a Free OS. Its work for freedom has changed the world\n\
+* \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
+* \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
+* \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\n\n\
+Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
+More keys exists for debug/testing/demo, see README if you are interested.\n\
+- See README for more info -");
+
+
+
 	//ok, start loading
-	printlog(0, "Loading...\n");
+	Log_printf(1, "Loading...\n");
 	runlevel = loading;
 
 	load_conf ("internal.conf", (char *)&internal, internal_index);
@@ -433,26 +435,26 @@ int main (int argc, char *argv[])
 	//on failure, rc should not just terminate but instead abort the race and warn the user
 	if (!tmp_menus(profiledir))
 	{
-		printlog(0, "One or more errors, can not start!");
+		Log_printf(0, "One or more errors, can not start!");
 		return -1; //just quit if failure
 	}
 	//
 
 	//might be interesting
-	printlog(1, "\n\n   <[ Info ]>");
-	printlog(1, "Startup time:		%ums", starttime);
-	printlog(1, "Race time:			%ums", racetime);
+	Log_printf(1, "\n\n   <[ Info ]>");
+	Log_printf(1, "Startup time:		%ums", starttime);
+	Log_printf(1, "Race time:			%ums", racetime);
 
-	printlog(1, "Simulated time:		%ums (%u%% of real time)",
+	Log_printf(1, "Simulated time:		%ums (%u%% of real time)",
 						simtime, (100*simtime)/racetime);
 
-	printlog(1, "Average simulations/second:	%u steps/second (%u in total)",
+	Log_printf(1, "Average simulations/second:	%u steps/second (%u in total)",
 						(1000*simulation_count)/racetime, simulation_count);
 
-	printlog(1, "Simulation lag:		%u%% of steps (%u in total)",
+	Log_printf(1, "Simulation lag:		%u%% of steps (%u in total)",
 						(100*simulation_lag)/simulation_count, simulation_lag);
 
-	printlog(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
+	Log_printf(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
 						(1000*interface_count)/racetime, (100*interface_count)/simulation_count);
 
 	printf("\nBye!\n\n");

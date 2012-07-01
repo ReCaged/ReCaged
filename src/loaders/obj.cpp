@@ -21,14 +21,14 @@
 
 #include "../shared/trimesh.hpp"
 
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 #include "text_file.hpp"
 
 
 bool Trimesh::Load_OBJ(const char *f)
 {
-	printlog(2, "Loading trimesh from OBJ file %s", f);
+	Log_printf(2, "Loading trimesh from OBJ file %s", f);
 
 	Text_File file;
 
@@ -79,7 +79,7 @@ bool Trimesh::Load_OBJ(const char *f)
 			//no material right now, warn and create default:
 			if (matnr == INDEX_ERROR)
 			{
-				printlog(0, "ERROR: obj file did not specify material to use before index, using default\n");
+				Log_printf(0, "ERROR: obj file did not specify material to use before index, using default\n");
 				materials.push_back(Material_Default); //add new material (with defaults)
 				matnr = 0;
 			}
@@ -94,7 +94,7 @@ bool Trimesh::Load_OBJ(const char *f)
 
 				if (count == 0) //nothing read
 				{
-					printlog(0, "ERROR: obj file got malformed index, ignoring");
+					Log_printf(0, "ERROR: obj file got malformed index, ignoring");
 					break;
 				}
 				else //at least v read
@@ -145,7 +145,7 @@ bool Trimesh::Load_OBJ(const char *f)
 			tmpmatnr = Find_Material(file.words[1]);
 
 			if (tmpmatnr == INDEX_ERROR)
-				printlog(0, "WARNING: ignoring change of material (things will probably look wrong)");
+				Log_printf(0, "WARNING: ignoring change of material (things will probably look wrong)");
 			else
 				matnr = tmpmatnr;
 
@@ -174,7 +174,7 @@ bool Trimesh::Load_OBJ(const char *f)
 	//check that at least something got loaded:
 	if (materials.empty() || vertices.empty())
 	{
-		printlog(0, "ERROR: obj seems to exist, but empty?!");
+		Log_printf(0, "ERROR: obj seems to exist, but empty?!");
 		return false;
 	}
 
@@ -196,14 +196,14 @@ bool Trimesh::Load_OBJ(const char *f)
 
 			if (trip->vertex[0] >= vl || trip->vertex[1] >= vl || trip->vertex[2] >= vl)
 			{
-				printlog(0, "ERROR: vertex index out of range, trying to bypass problem (not rendering)");
+				Log_printf(0, "ERROR: vertex index out of range, trying to bypass problem (not rendering)");
 				trip->vertex[0] = trip->vertex[1] = trip->vertex[2] = 0; //set them all to 0
 			}
 			if (	(trip->normal[0] >= nl && trip->normal[0] != INDEX_ERROR) ||
 				(trip->normal[1] >= nl && trip->normal[1] != INDEX_ERROR) ||
 				(trip->normal[2] >= nl && trip->normal[2] != INDEX_ERROR)	)
 			{
-				printlog(0, "ERROR: normal index out of range, trying to bypass problem (generating new)");
+				Log_printf(0, "ERROR: normal index out of range, trying to bypass problem (generating new)");
 				trip->normal[0] = trip->normal[1] = trip->normal[2] = INDEX_ERROR; //set them all to 0
 			}
 		}
@@ -213,14 +213,14 @@ bool Trimesh::Load_OBJ(const char *f)
 	Normalize_Normals();
 	Generate_Missing_Normals(); //creates missing normals - unit, don't need normalizing
 
-	printlog(1, "OBJ info: %u triangles, %u materials", triangle_count, materials.size());
+	Log_printf(1, "OBJ info: %u triangles, %u materials", triangle_count, materials.size());
 
 	return true;
 }
 
 bool Trimesh::Load_MTL(const char *f)
 {
-	printlog(2, "Loading trimesh material(s) from MTL file %s", f);
+	Log_printf(2, "Loading trimesh material(s) from MTL file %s", f);
 
 	Text_File file;
 
@@ -243,7 +243,7 @@ bool Trimesh::Load_MTL(const char *f)
 		}
 		else if (mat_nr == INDEX_ERROR)
 		{
-			printlog(0, "ERROR: mtl wants to specify material properties for unnamed material?! ignoring");
+			Log_printf(0, "ERROR: mtl wants to specify material properties for unnamed material?! ignoring");
 		}
 		else
 		{
@@ -292,7 +292,7 @@ bool Trimesh::Load_MTL(const char *f)
 					if (materials[mat_nr].shininess > 128.0)
 					{
 						materials[mat_nr].shininess=128.0;
-						printlog(0, "ERROR: mtl file got Ns>128, please tell me (Mats) to fix the mtl loader!");
+						Log_printf(0, "ERROR: mtl file got Ns>128, please tell me (Mats) to fix the mtl loader!");
 					}
 				}
 			}
@@ -304,7 +304,7 @@ bool Trimesh::Load_MTL(const char *f)
 	//check if we got any data:
 	if (mat_nr == INDEX_ERROR)
 	{
-		printlog(0, "ERROR: mtl existed, but was empty?!");
+		Log_printf(0, "ERROR: mtl existed, but was empty?!");
 		return false;
 	}
 
@@ -315,7 +315,7 @@ bool Trimesh::Load_MTL(const char *f)
 			materials[i].ambient[1] == 0 &&	
 			materials[i].ambient[2] == 0	)
 		{
-			printlog(2, "NOTE: found material with ambient colour of 0, setting to diffuse instead");
+			Log_printf(2, "NOTE: found material with ambient colour of 0, setting to diffuse instead");
 			materials[i].ambient[0] = materials[i].diffuse[0];
 			materials[i].ambient[1] = materials[i].diffuse[1];
 			materials[i].ambient[2] = materials[i].diffuse[2];

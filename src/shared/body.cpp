@@ -22,14 +22,14 @@
 #include "body.hpp"
 #include "object.hpp"
 #include "internal.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "../simulation/event_buffers.hpp"
 
 Body *Body::head = NULL;
 
 Body::Body (dBodyID body, Object *obj): Component(obj)
 {
-	printlog(2, "configuring Body class");
+	Log_printf(2, "configuring Body class");
 
 	//increase object activity counter
 	object_parent->Increase_Activity();
@@ -42,7 +42,7 @@ Body::Body (dBodyID body, Object *obj): Component(obj)
 	if (next)
 		next->prev = this;
 	else
-		printlog(2, "(first registered)");
+		Log_printf(2, "(first registered)");
 
 	//add it to the body
 	dBodySetData (body, (void*)(this));
@@ -60,7 +60,7 @@ Body::Body (dBodyID body, Object *obj): Component(obj)
 Body::~Body()
 {
 	//lets just hope the given pointer is ok...
-	printlog(2, "clearing Body class");
+	Log_printf(2, "clearing Body class");
 
 	//remove all events
 	Event_Buffer_Remove_All(this);

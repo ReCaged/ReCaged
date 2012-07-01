@@ -24,7 +24,7 @@
 
 #include "../shared/threads.hpp"
 #include "../shared/internal.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/trimesh.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/body.hpp"
@@ -109,7 +109,7 @@ void Render_List_Update()
 			//if buffer full...
 			if (buffer_generate->count == buffer_generate->size)
 			{
-				printlog(2, "Render list was too small, resizing");
+				Log_printf(2, "Render list was too small, resizing");
 
 				//copy to new memory
 				list_element *oldlist = buffer_generate->list;
@@ -160,7 +160,7 @@ void Render_List_Update()
 			//if buffer full...
 			if (buffer_generate->count == buffer_generate->size)
 			{
-				printlog(2, "Render list was too small, resizing");
+				Log_printf(2, "Render list was too small, resizing");
 
 				//copy to new memory
 				list_element *oldlist = buffer_generate->list;

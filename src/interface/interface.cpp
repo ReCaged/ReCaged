@@ -26,7 +26,7 @@
 #include "../shared/track.hpp"
 #include "../shared/runlevel.hpp"
 #include "../shared/threads.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/profile.hpp"
 
 #include "../shared/camera.hpp"
@@ -76,11 +76,11 @@ void Resize (int new_w, int new_h)
 	{
 		//angle between w/2 (distance from center of screen to right edge) and players eye distance
 		angle = atan( (((GLfloat) w)/2.0)/internal.dist );
-		printlog(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
+		Log_printf(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
 	}
 	else //bad...
 	{
-		printlog(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
+		Log_printf(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
 		angle = ( (internal.angle/2.0) * M_PI/180);;
 	}
 
@@ -107,7 +107,7 @@ void Resize (int new_w, int new_h)
 
 bool Interface_Init(void)
 {
-	printlog(0, "Initiating interface");
+	Log_printf(0, "Initiating interface");
 
 	//initiate sdl
 	SDL_Init (SDL_INIT_VIDEO);
@@ -136,7 +136,7 @@ bool Interface_Init(void)
 
 	if (!screen)
 	{
-		printlog(0, "Error: couldn't set video mode");
+		Log_printf(0, "Error: couldn't set video mode");
 		return false;
 	}
 
@@ -148,13 +148,13 @@ bool Interface_Init(void)
 		{
 			//should check ARB extensions if GL<1.5, but since this only affects old
 			//systems (the 1.5 standard was released in 2003), I'll ignore it...
-			printlog(0, "Error: you need GL 1.5 or later");
+			Log_printf(0, "Error: you need GL 1.5 or later");
 			return false;
 		}
 	}
 	else
 	{
-		printlog(0, "Error: couldn't init glew");
+		Log_printf(0, "Error: couldn't init glew");
 		return false;
 	}
 
@@ -164,7 +164,7 @@ bool Interface_Init(void)
 	//toggle fullscreen (if requested)
 	if (internal.fullscreen)
 		if (!SDL_WM_ToggleFullScreen(screen))
-			printlog(0, "Error: unable to toggle fullscreen");
+			Log_printf(0, "Error: unable to toggle fullscreen");
 
 	//set up window, as if resized
 	Resize (screen->w, screen->h);
@@ -203,7 +203,7 @@ bool Interface_Init(void)
 
 int Interface_Loop ()
 {
-	printlog(1, "Starting interface loop");
+	Log_printf(1, "Starting interface loop");
 
 	//just make sure not rendering geoms yet
 	geom_render_level = 0;
@@ -246,7 +246,7 @@ int Interface_Loop ()
 					if (screen)
 						Resize (screen->w, screen->h);
 					else
-						printlog(0, "Warning: resizing failed");
+						Log_printf(0, "Warning: resizing failed");
 				break;
 
 				case SDL_QUIT:
@@ -255,7 +255,7 @@ int Interface_Loop ()
 
 				case SDL_ACTIVEEVENT:
 					if (event.active.gain == 0)
-						printlog(1, "(FIXME: pause when losing focus (or being iconified)!)");
+						Log_printf(1, "(FIXME: pause when losing focus (or being iconified)!)");
 				break;
 
 				//check for special key presses (debug/demo keys)
@@ -425,7 +425,7 @@ int Interface_Loop ()
 
 void Interface_Quit(void)
 {
-	printlog(1, "Quit interface");
+	Log_printf(1, "Quit interface");
 	SDL_Quit();
 }
 

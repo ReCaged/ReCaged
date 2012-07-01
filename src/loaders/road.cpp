@@ -20,7 +20,7 @@
  */ 
 
 #include "../shared/trimesh.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "text_file.hpp"
 #include <string.h>
 
@@ -65,7 +65,7 @@ class Bezier
 					return point;
 
 			//else
-			printlog(0, "WARNING: unable to find section of road named \"%s\"", name);
+			Log_printf(0, "WARNING: unable to find section of road named \"%s\"", name);
 			return NULL;
 		}
 		void GetPos(float t, float *pos)
@@ -152,7 +152,7 @@ class Bezier
 			//can not be derived correctly for t=0 and t=1. make safetycheck.
 			if (l == 0)
 			{
-				printlog(0, "WARNING: equal road section points exists, derivative not possible!");
+				Log_printf(0, "WARNING: equal road section points exists, derivative not possible!");
 				dir[0]=1.0;
 				dir[1]=0.0;
 			}
@@ -411,7 +411,7 @@ void Position(float *pos, float *p0, float *p1, float *p2, float *p3, float t)
 
 bool Trimesh::Load_Road(const char *f)
 {
-	printlog(2, "Loading trimesh from road file %s", f);
+	Log_printf(2, "Loading trimesh from road file %s", f);
 
 	Text_File file;
 
@@ -458,7 +458,7 @@ bool Trimesh::Load_Road(const char *f)
 			//check to see if something is wrong (no shape selected)
 			if (!section)
 			{
-				printlog(0, "WARNING: no road section selected!");
+				Log_printf(0, "WARNING: no road section selected!");
 				//reset and move on
 				oldend.active=false;
 				newend.active=false;
@@ -491,7 +491,7 @@ bool Trimesh::Load_Road(const char *f)
 			//check if got material:
 			if (!material)
 			{
-				printlog(0, "ERROR: road file did not specify material to use, using default\n");
+				Log_printf(0, "ERROR: road file did not specify material to use, using default\n");
 				materials.push_back(Material_Default); //add new material (with defaults)
 				material=&materials[0];
 			}
@@ -615,7 +615,7 @@ bool Trimesh::Load_Road(const char *f)
 			if (tmp)
 				section=tmp;
 			else
-				printlog(0, "WARNING: requested section not found");
+				Log_printf(0, "WARNING: requested section not found");
 		}
 		else if (!strcmp(file.words[0], "rotation") && file.word_count == 4)
 		{
@@ -635,13 +635,13 @@ bool Trimesh::Load_Road(const char *f)
 			if (tmp>0.0)
 				stiffness[0]=tmp;
 			else
-				printlog(0, "WARNING: stiffness values must be above 0");
+				Log_printf(0, "WARNING: stiffness values must be above 0");
 
 			tmp=atof(file.words[2]);
 			if (tmp>0.0)
 				stiffness[1]=tmp;
 			else
-				printlog(0, "WARNING: stiffness values must be above 0");
+				Log_printf(0, "WARNING: stiffness values must be above 0");
 		}
 		else if (!strcmp(file.words[0], "depth"))
 			depth=atof(file.words[1]);
@@ -652,20 +652,20 @@ bool Trimesh::Load_Road(const char *f)
 			if (tmp > 0)
 				xres=tmp;
 			else
-				printlog(0, "WARNING: x resolution value must be above 0");
+				Log_printf(0, "WARNING: x resolution value must be above 0");
 
 			tmp=atoi(file.words[2]);
 			if (tmp > 0)
 				yres=tmp;
 			else
-				printlog(0, "WARNING: y resolution value must be above 0");
+				Log_printf(0, "WARNING: y resolution value must be above 0");
 		}
 		else if (!strcmp(file.words[0], "material") && file.word_count == 2)
 		{
 			unsigned int tmp = Find_Material(file.words[1]);
 
 			if (tmp == INDEX_ERROR)
-				printlog(0, "WARNING: failed to change material (things will probably look wrong)");
+				Log_printf(0, "WARNING: failed to change material (things will probably look wrong)");
 			else
 				material=&materials[tmp];
 		}
@@ -696,7 +696,7 @@ bool Trimesh::Load_Road(const char *f)
 		else if (!strcmp(file.words[0], "nocapping"))
 			capping=false;
 		else
-			printlog(0, "WARNING: malformated line in road file, ignoring");
+			Log_printf(0, "WARNING: malformated line in road file, ignoring");
 	}
 
 	//at end, should cap?
@@ -709,14 +709,14 @@ bool Trimesh::Load_Road(const char *f)
 	//check that at least something got loaded:
 	if (materials.empty() || vertices.empty())
 	{
-		printlog(0, "ERROR: road file seems to exist, but empty?!");
+		Log_printf(0, "ERROR: road file seems to exist, but empty?!");
 		return false;
 	}
 
 	//make sure all normals are unit
 	Normalize_Normals();
 
-	printlog(1, "ROAD generation info: %u triangles, %u materials", triangle_count, materials.size());
+	Log_printf(1, "ROAD generation info: %u triangles, %u materials", triangle_count, materials.size());
 
 	return true;
 }

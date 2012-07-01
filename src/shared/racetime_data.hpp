@@ -24,7 +24,7 @@
 
 #include <typeinfo>
 #include <string.h>
-#include "printlog.hpp"
+#include "shared/log.hpp"
 
 class Racetime_Data
 {
@@ -45,7 +45,7 @@ class Racetime_Data
 				//type conversion+casting ok
 				if ((!strcmp(tmp->name, name)) && (casted=dynamic_cast<T*>(tmp)))
 				{
-					printlog(1, "racetime data already existed for \"%s\" (already loaded)", name);
+					Log_printf(1, "racetime data already existed for \"%s\" (already loaded)", name);
 					return casted;
 				}
 			}

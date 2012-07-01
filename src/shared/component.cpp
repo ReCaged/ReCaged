@@ -21,11 +21,11 @@
 
 #include "component.hpp"
 #include "object.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 
 Component::Component(Object *obj)
 {
-	printlog(2, "creating Component class");
+	Log_printf(2, "creating Component class");
 
 	//rather simple: just add it to the top of obj list of components
 	next = obj->components;
@@ -38,7 +38,7 @@ Component::Component(Object *obj)
 	}
 	else
 	{
-		printlog(2, "(first for object)");
+		Log_printf(2, "(first for object)");
 	}
 
 	//keep track of owning object
@@ -48,7 +48,7 @@ Component::Component(Object *obj)
 Component::~Component()
 {
 	//just unlink...
-	printlog(2, "freeing Component");
+	Log_printf(2, "freeing Component");
 	if (prev)
 	{
 		prev->next = next;

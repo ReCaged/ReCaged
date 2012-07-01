@@ -21,23 +21,23 @@
 
 #include "space.hpp"
 #include "geom.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "track.hpp"
 #include <ode/ode.h>
 
 Space::Space(Object *obj): Component(obj)
 {
-	printlog(2, "configuring Space class");
+	Log_printf(2, "configuring Space class");
 
 	space_id = dSimpleSpaceCreate(space);
 
-	printlog(2, "(autoselecting this as default space for object)");
+	Log_printf(2, "(autoselecting this as default space for object)");
 	obj->selected_space=space_id;
 }
 
 Space::~Space()
 {
-	printlog(2, "clearing Geom class");
+	Log_printf(2, "clearing Geom class");
 
 	Geom *g;
 

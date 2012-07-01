@@ -22,7 +22,7 @@
 //#include "../shared/shared.hpp"
 //#include "loaders.hpp"
 #include "text_file.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -45,7 +45,7 @@ Text_File::Text_File ()
 
 	if (!buffer || !words)
 	{
-		printlog(0, "lack of memory for initial Text_File allocation, will exit!");
+		Log_printf(0, "lack of memory for initial Text_File allocation, will exit!");
 		exit(-1);
 	}
 }
@@ -63,7 +63,7 @@ bool Text_File::Open (const char *file)
 	//close old
 	Close();
 
-	printlog(2, "Text_File: opening file %s", file);
+	Log_printf(2, "Text_File: opening file %s", file);
 
 	//open
 #ifndef _WIN32
@@ -82,7 +82,7 @@ bool Text_File::Open (const char *file)
 	}
 	else
 	{
-		printlog(0, "ERROR: Text_File could not open file %s!", file);
+		Log_printf(0, "ERROR: Text_File could not open file %s!", file);
 		return false;
 	}
 }
@@ -92,7 +92,7 @@ void Text_File::Close()
 	//make sure no old data is left
 	if (fp)
 	{
-		printlog(2, "Text_File: closing file");
+		Log_printf(2, "Text_File: closing file");
 		fclose (fp);
 		Clear_List();
 	}
@@ -103,7 +103,7 @@ bool Text_File::Read_Line ()
 	//first check if we got an open file...
 	if (!fp)
 	{
-		printlog(0, "ERROR: Text_File tried reading without an open file!");
+		Log_printf(0, "ERROR: Text_File tried reading without an open file!");
 		return false;
 	}
 
@@ -165,7 +165,7 @@ bool Text_File::Line_To_Buffer()
 			return true;
 		
 		//else: I guess the buffer was too small...
-		printlog(2, "Text_File line buffer was too small, resizing");
+		Log_printf(2, "Text_File line buffer was too small, resizing");
 		buffer_size += INITIAL_TEXT_FILE_BUFFER_SIZE;
 
 		//copy old vyffer content
@@ -203,7 +203,7 @@ bool Text_File::Buffer_To_List()
 			//wery unusual error (line ends after quotation mark)
 			if (*buffer_ptr == '\0')
 			{
-				printlog(0, "WARNING: Text_File line ended just after quotation mark (not counted)...");
+				Log_printf(0, "WARNING: Text_File line ended just after quotation mark (not counted)...");
 				break;
 			}
 
@@ -215,7 +215,7 @@ bool Text_File::Buffer_To_List()
 				++buffer_ptr;
 
 			if (*buffer_ptr=='\0') //end of line before end of quote
-				printlog(0, "WARNING: Text_File reached end of line before end of quote...");
+				Log_printf(0, "WARNING: Text_File reached end of line before end of quote...");
 			else
 			{
 				*buffer_ptr = '\0'; //make this end (instead of ")
@@ -266,7 +266,7 @@ void Text_File::Append_To_List(char *word)
 
 	if (word_count > list_size)
 	{
-		printlog(2, "Text_File word list was too small, resizing");
+		Log_printf(2, "Text_File word list was too small, resizing");
 		list_size+=INITIAL_TEXT_FILE_LIST_SIZE;
 
 		char **oldwords=words;
