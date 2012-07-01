@@ -166,44 +166,43 @@ AC_DEFUN([RC_LIBS_CONFIG],
 AC_REQUIRE([RC_LIBS_INIT])
 
 #make sure only enabling w32 options on w32
-if test "$ON_W32" = "no"; then
-	STATIC="no"
-	CONSOLE="no"
+if test "$ON_W32" != "no"; then
+
+	#console flag
+	AC_MSG_CHECKING([if building with w32 console enabled])
+	if test "$CONSOLE" != "no"; then
+		AC_MSG_RESULT([yes])
+
+		RC_LIBS="$RC_LIBS -mconsole"
+	else
+		AC_MSG_RESULT([no])
+	fi
+
+	#static flag
+	AC_MSG_CHECKING([if building static w32 binary])
+	if test "$STATIC" != "no"; then
+		AC_MSG_RESULT([yes])
+
+		RC_FLAGS="$RC_FLAGS -DGLEW_STATIC"
+		#TODO: static-lib* to LDFLAGS?
+		RC_LIBS="$RC_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
+	else
+		AC_MSG_RESULT([no])
+	fi
 fi
 
-#console flag
-AC_MSG_CHECKING([if building with w32 console enabled])
-if test "$CONSOLE" != "no"; then
-	AC_MSG_RESULT([yes])
-
-	RC_LIBS="$RC_LIBS -mconsole"
-else
-	AC_MSG_RESULT([no])
-fi
-
-#static flag
-AC_MSG_CHECKING([if building static w32 binary])
-if test "$STATIC" != "no"; then
-	AC_MSG_RESULT([yes])
-
-	RC_FLAGS="$RC_FLAGS -DGLEW_STATIC"
-	#TODO: static-lib* to LDFLAGS?
-	RC_LIBS="$RC_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
-else
-	AC_MSG_RESULT([no])
-fi
-
+#actual library checks:
 RC_LIBS_CHECK([ode], [ode-config], [ode/ode.h], [ode])
 RC_LIBS_CHECK([sdl], [sdl-config], [SDL/SDL.h], [SDL])
 RC_LIBS_CHECK([glew],, [GL/glew.h], [GLEW glew32])
 #lua5.2, 5.1, 5.0, ... best way to check?
 
-#static stop
-if test "$STATIC" != "no"; then
+#static stop (if enabled and on w32)
+if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
 	RC_LIBS="$RC_LIBS -Wl,-Bdynamic"
 fi
 
-#gl never static
+#gl never static anyway
 RC_LIBS_CHECK([gl],, [GL/gl.h], [GL opengl32])
 
 #make available
