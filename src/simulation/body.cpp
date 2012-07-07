@@ -79,10 +79,10 @@ void Body::Linear_Drag (dReal step)
 	dReal vel[3] = {abs_vel[0]-track.wind[0], abs_vel[1]-track.wind[1], abs_vel[2]-track.wind[2]}; //relative to wind
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
-	//how much of original velocity is left after breaking by air/liquid drag
+	//how much of original velocity is left after braking by air/liquid drag
 	dReal remain = 1-(total_vel*(track.density)*(linear_drag/mass)*(step));
 
-	if (remain < 0) //in case breaking is so extreme it will reverse movement, just change velocity to 0
+	if (remain < 0) //in case braking is so extreme it will reverse movement, just change velocity to 0
 		remain = 0;
 
 	//change velocity
@@ -111,7 +111,7 @@ void Body::Advanced_Linear_Drag (dReal step)
 	dBodyVectorFromWorld (body_id, (abs_vel[0]-track.wind[0]), (abs_vel[1]-track.wind[1]), (abs_vel[2]-track.wind[2]), vel);
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
-	//how much of original velocities is left after breaking by air/liquid drag
+	//how much of original velocities is left after braking by air/liquid drag
 	dReal remain;
 	int i;
 	for (i=0; i<3; ++i)
@@ -146,10 +146,10 @@ void Body::Angular_Drag (dReal step)
 	vel = dBodyGetAngularVel (body_id);
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
-	//how much of original velocity is left after breaking by air/liquid drag
+	//how much of original velocity is left after braking by air/liquid drag
 	dReal remain = 1-(total_vel*(track.density)*(angular_drag/mass)*(step));
 
-	if (remain < 0) //in case breaking is so extreme it will reverse movement, just change velocity to 0
+	if (remain < 0) //in case braking is so extreme it will reverse movement, just change velocity to 0
 		remain = 0;
 
 	//set velocity with change

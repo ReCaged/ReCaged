@@ -584,16 +584,16 @@ void Camera::Generate_Matrix()
 {
 	//rotation (right, up, forward)
 	//m0-m3
-	matrix[0]=camera.rotation[0]; matrix[1]=camera.rotation[2]; matrix[2]=-camera.rotation[1]; matrix[3]=0.0,
+	matrix[0]=camera.rotation[0]; matrix[1]=camera.rotation[2]; matrix[2]=-camera.rotation[1]; matrix[3]=0.0;
 	//m4-m7
-	matrix[4]=camera.rotation[3]; matrix[5]=camera.rotation[5]; matrix[6]=-camera.rotation[4]; matrix[7]=0.0,
+	matrix[4]=camera.rotation[3]; matrix[5]=camera.rotation[5]; matrix[6]=-camera.rotation[4]; matrix[7]=0.0;
 	//m4-m7
-	matrix[8]=camera.rotation[6]; matrix[9]=camera.rotation[8]; matrix[10]=-camera.rotation[7]; matrix[11]=0.0,
+	matrix[8]=camera.rotation[6]; matrix[9]=camera.rotation[8]; matrix[10]=-camera.rotation[7]; matrix[11]=0.0;
 
 	//m12-m14, translation
-	matrix[12]=-matrix[0]*camera.pos[0]-matrix[4]*camera.pos[1]-matrix[8]*camera.pos[2],
-	matrix[13]=-matrix[1]*camera.pos[0]-matrix[5]*camera.pos[1]-matrix[9]*camera.pos[2],
-	matrix[14]=-matrix[2]*camera.pos[0]-matrix[6]*camera.pos[1]-matrix[10]*camera.pos[2],
+	matrix[12]=-matrix[0]*camera.pos[0]-matrix[4]*camera.pos[1]-matrix[8]*camera.pos[2];
+	matrix[13]=-matrix[1]*camera.pos[0]-matrix[5]*camera.pos[1]-matrix[9]*camera.pos[2];
+	matrix[14]=-matrix[2]*camera.pos[0]-matrix[6]*camera.pos[1]-matrix[10]*camera.pos[2];
 
 	//m15
 	matrix[15]=1.0;
