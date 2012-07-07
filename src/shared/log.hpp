@@ -23,7 +23,13 @@
 
 #ifndef _RC_PRINTLOG_H
 #define _RC_PRINTLOG_H
-//Log_Init();
+
+//configuration
+void Log_Init();
+//set verbosity level
+void Log_Change_Verbosity(int);
+//Log_File();
+void Log_Quit();
 
 //normal append to log
 void Log_Add (int, const char*, ...);

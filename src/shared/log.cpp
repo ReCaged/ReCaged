@@ -23,13 +23,40 @@
 #include "internal.hpp"
 #include "log.hpp"
 
+//default
+int stdout_verbosity = 1;
+
+//set up logging
+void Log_Init()
+{
+	//probably pointless, but anyway
+	stdout_verbosity = 1;
+
+	//TODO: create mutex
+}
+
+void Log_Change_Verbosity(int v)
+{
+	stdout_verbosity+=v;
+
+	if (stdout_verbosity<-1)
+		stdout_verbosity=-1;
+	else if (stdout_verbosity>2)
+		stdout_verbosity=2;
+}
+
+void Log_Quit()
+{
+	//TODO: destroy mutex
+}
+
 //verbosity indicators
 const char *indicator[] = {"=> ", " > ", " * "};
 
 //print log message - if it's below or equal to the current verbosity level
 void Log_Add (int level, const char *text, ...)
 {
-	if (level <= internal.verbosity)
+	if (level <= stdout_verbosity)
 	{
 		if (level==0)
 			putchar('\n');
@@ -54,7 +81,7 @@ void Log_Add (int level, const char *text, ...)
 //just wrappers:
 void Log_printf (int level, const char *text, ...)
 {
-	if (level <= internal.verbosity)
+	if (level <= stdout_verbosity)
 	{
 		va_list list;
 		va_start (list, text);
@@ -65,7 +92,7 @@ void Log_printf (int level, const char *text, ...)
 
 void Log_puts (int level, const char *text)
 {
-	if (level <= internal.verbosity)
+	if (level <= stdout_verbosity)
 		fputs(text, stdout);
 }
 

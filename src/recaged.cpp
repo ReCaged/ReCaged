@@ -21,6 +21,7 @@
 
 //Required stuff:
 #include <SDL/SDL.h>
+#include <getopt.h>
 
 //local stuff:
 #include "shared/internal.hpp"
@@ -301,8 +302,31 @@ bool tmp_menus(const char *profiledir)
 }
 
 //
+// main()
 //
-//
+
+//arguments
+static const struct option options[] = 
+{
+	{ "help", no_argument, NULL, 'h' },
+	{ "version", no_argument, NULL, 'V' },
+	{ "config", required_argument, NULL, 'c' },
+	{ "verbose", no_argument, NULL, 'v' },
+	{ "window", no_argument, NULL, 'w' },
+	{ "fullscreen", no_argument, NULL, 'f' },
+	{ "quiet", no_argument, NULL, 'q' },
+	{ "width", required_argument, NULL, 'x' },
+	{ "height", required_argument, NULL, 'y' },
+	{ "installed", no_argument, NULL, 'i' },
+	{ "portable", required_argument, NULL, 'p' },
+	//
+	//TODO (for lua)
+	//run script.lua instead
+	//-- end of normal options, followed by lua args
+	//-- help for lua options
+	//
+	{ NULL, 0, NULL, 0 }
+};
 
 
 //default options (paths)
@@ -312,10 +336,95 @@ char *datadefault; //need to check path to rc before deciding this
 //main function, will change a lot in future versions...
 int main (int argc, char *argv[])
 {
-	printf("\n\t-=[ Welcome to %s version %s (\"%s\") ]=-\n\n", PACKAGE_NAME, PACKAGE_VERSION, PACKAGE_CODENAME);
+	//make sure we can print (just stdout for now)
+	Log_Init();
+
+	//set default values:
+	const char *datadir = datadefault;
+	const char *profiledir = profiledefault;
+
+	//use getopt to parse options to to allow overide defaults:
+	char c;
+	while ( (c = getopt_long(argc, argv, "hVc:vqwfx:y:ip:", options, NULL)) != -1 )
+	{
+		switch(c)
+		{
+			case 'V': //data directory
+				Log_printf(1, "ReCaged %s (codename \"%s\")\nCopyright (C) Mats Wahlberg\n", PACKAGE_VERSION, PACKAGE_CODENAME);
+				exit(0); //stop execution
+				break;
+
+			case 'c':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			case 'v':
+				Log_Change_Verbosity(+1);
+				break;
+
+			case 'q':
+				Log_Change_Verbosity(-1);
+				break;
+
+			case 'w':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			case 'f':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			case 'x':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			case 'y':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			case 'i':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			case 'p':
+				Log_Add(0, "TODO!");
+				exit(-1);
+				break;
+
+			default: //print help output
+				//TODO: "Usage: %s [OPTION]... -- [LUA OPTIONS]\n"
+				Log_puts(1, "\
+Usage: recaged [OPTION]...\n\
+  -h, --help		display help and exit\n\
+  -V, --version		display version and exit\n\
+  -c, --config=FILE	load setings from FILE\n\
+  -v, --verbose		increase stdout verbosity\n\
+  -q, --quiet		decrease stdout verbosity\n\
+  -w, --window		render in window\n\
+  -f, --fullscreen	render in fullscreen\n\
+  -x, --width=PIXELS	create window with PIXELS width\n\
+  -y, --height=PIXELS	create window with PIXELS height\n\
+\n\
+Options for overriding normal directory detection:\n\
+  -i, --installed	use files in system and home directories (opposite of -p)\n\
+  -p, --portable=DIR	use files in DIR for all read/writes (opposite of -i)\n");
+
+				exit(0); //stop execution
+				break;
+		}
+	}
+
+	//welcome message
+	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
 	//Directories_Init();
-	//Log_Init();
+	//Log_File(...);
 	//load_conf ("internal.conf", (char *)&internal, internal_index);
 
 	//attempt to generate default data path
@@ -340,39 +449,6 @@ int main (int argc, char *argv[])
 		datadefault=new char[5];
 		strcpy(datadefault, "data");
 	}
-
-	//set default values:
-	const char *datadir = datadefault;
-	const char *profiledir = profiledefault;
-
-	//use getopt to parse options to to allow overide defaults:
-	char c;
-	while ( (c = getopt(argc, argv, "d:p:")) != -1 )
-	{
-		switch(c)
-		{
-			case 'd': //data directory
-				Log_Add(1, "Alternative path to data directory specified (\"%s\")\n", optarg);
-				datadir = optarg;
-				break;
-
-			case 'p': //profile directory
-				Log_Add(1, "Alternative path to profile directory specified (\"%s\")\n", optarg);
-				profiledir = optarg;
-				break;
-
-			default: //print help output
-				//TODO: print to log (like all other
-				Log_puts(1, "\
-Usage: recaged [-d|-p]\n\
-  -d <path to data>       override path to directory with data\n\
-  -p <path to profile>    override path to directory with user data and settings\n");
-
-				exit(-1); //stop execution
-				break;
-		}
-	}
-
 	//ok, try to get into the data directory
 	if (chdir (datadir))
 	{
@@ -430,6 +506,9 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 
 	load_conf ("internal.conf", (char *)&internal, internal_index);
 
+	//update log verbosity according to settings in conf _and_ any arguments)
+	Log_Change_Verbosity((internal.verbosity-1));
+
 	//
 	//TODO: there should be menus here, but menu/osd system is not implemented yet... also:
 	//on failure, rc should not just terminate but instead abort the race and warn the user
@@ -458,6 +537,9 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 						(1000*interface_count)/racetime, (100*interface_count)/simulation_count);
 
 	Log_puts(1, "\n Bye!\n\n");
+
+	//close log output
+	Log_Quit();
 
 	return 0;
 }
