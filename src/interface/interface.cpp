@@ -119,13 +119,7 @@ bool Interface_Init(void)
 	}
 
 	//set title:
-	std::string TITLE;
-	TITLE += "ReCaged "; //+ " version " ?
-	TITLE += PACKAGE_VERSION;
-	TITLE += " (\"";
-	TITLE += PACKAGE_CODENAME;
-	TITLE += "\")  (C) 2009, 2010, 2011, 2012 Mats Wahlberg"; //remove list of years?
-	SDL_WM_SetCaption (TITLE.c_str(), PACKAGE_NAME);
+	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\")  (C) 2009, 2010, 2011, 2012 Mats Wahlberg", "ReCaged");
 
 	//TODO: set icon (SDL_WM_SetIcon, from embedded into the executable?)
 
