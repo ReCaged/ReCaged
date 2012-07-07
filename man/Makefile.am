@@ -19,23 +19,6 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-
-AUTOMAKE_OPTIONS = subdir-objects
-ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
-
 #TODO!
-SUBDIRS                 = conf data icons man src
-
-#TODO!
-EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog make_w32.sh
-
-dist-hook:
-	@echo "Generating ChangeLog from git log"
-	( echo "Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg"; \
-	echo "Copying and distribution of this file, with or without modification,"; \
-	echo "are permitted in any medium without royalty provided the copyright"; \
-	echo "notice and this notice are preserved."; \
-	echo ""; \
-	cd "$(top_srcdir)" && ./missing --run git log \
-	--stat --name-only --date=short --abbrev-commit ) \
-	> ${distdir}/ChangeLog
+#man_MANS = recaged.1
+#EXTRA_DIST = $(man_MANS)

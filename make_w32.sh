@@ -2,7 +2,7 @@
 #
 # ReCaged - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+# Copyright (C) 2012 Mats Wahlberg
 #
 # This file is part of ReCaged.
 #
@@ -52,7 +52,7 @@ then
 	echo "Final tweaks..."
 	echo ""
 
-	#remove debug symbols
+	#remove debug symbols (or: make install-strip?)
 	strip recaged.exe
 
 	#translate (add CRLF)

@@ -3,7 +3,7 @@
 #
 # ReCaged - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+# Copyright (C) 2012 Mats Wahlberg
 #
 # This file is part of ReCaged.
 #
@@ -27,15 +27,17 @@ AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
 #codename
 AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
 
-#AC_CONFIG_SRCDIR([src/main.cpp]) #only a safety check
+AC_CONFIG_SRCDIR([src/recaged.cpp]) #only a safety check
 #AC_CONFIG_HEADERS([src/shared/config.h]) #TODO: move to include dir...?
 
 #for automake
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
 # Checks for programs.
-#AC_PROG_CC
 AC_PROG_CXX
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stddef.h stdlib.h string.h])
@@ -53,4 +55,6 @@ AC_CHECK_FUNCS([floor memset pow sqrt strcasecmp strrchr strtol])
 RC_LIBS_CONFIG
 
 #TODO: add files from "data", generate ChangeLog from git log at "make dist*"
-AC_OUTPUT([Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile conf/Makefile data/Makefile icons/Makefile man/Makefile src/Makefile])
+
+AC_OUTPUT
