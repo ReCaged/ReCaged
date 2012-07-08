@@ -19,8 +19,6 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#TODO: check $XDG_CONFIG_DIRS. if set, use "{XDG_CONFIG_DIRS%%:*}/recaged"?
-#but would cause problems with different prefixes?
 confdir = $(sysconfdir)/xdg/recaged/
 nobase_dist_conf_DATA = \
 	profiles/default/keys.lst \
