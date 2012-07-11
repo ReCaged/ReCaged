@@ -119,7 +119,7 @@ bool Interface_Init(void)
 	}
 
 	//set title:
-	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\")  (C) 2009, 2010, 2011, 2012 Mats Wahlberg", "ReCaged");
+	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\") (C) " PACKAGE_YEAR " Mats Wahlberg", "ReCaged");
 
 	//TODO: set icon (SDL_WM_SetIcon, from embedded into the executable?)
 

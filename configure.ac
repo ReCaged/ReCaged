@@ -21,16 +21,21 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AC_PREREQ([2.68]) #defaulted
+AC_PREREQ([2.68]) #defaulted TODO: remove?
 AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
+#AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com], [recaged], [http://.....])
 
 #codename
 AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
 
-AC_CONFIG_SRCDIR([src/recaged.cpp]) #only a safety check
+#year (for title and version printout)
+AC_DEFINE([PACKAGE_YEAR], ["2012"])
+
+# only a safety check
+AC_CONFIG_SRCDIR([src/recaged.cpp])
 #AC_CONFIG_HEADERS([src/shared/config.h]) #TODO: move to include dir...?
 
-#for automake
+# for automake
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
 # Checks for programs.

@@ -350,7 +350,7 @@ int main (int argc, char *argv[])
 		switch(c)
 		{
 			case 'V': //data directory
-				Log_printf(1, "ReCaged %s (codename \"%s\")\nCopyright (C) Mats Wahlberg\n", PACKAGE_VERSION, PACKAGE_CODENAME);
+				Log_puts(1, "ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\")\nCopyright (C) " PACKAGE_YEAR " Mats Wahlberg\n");
 				exit(0); //stop execution
 				break;
 
