@@ -36,6 +36,7 @@ void Render_List_Update(); //create pos/rot list
 bool Render_List_Updated(); //check if new frame
 void Render_List_Prepare(); //switch rendering buffer+set camera matrix
 void Render_List_Render(); //render latest list
-void Render_List_Clear(); //free buffers
+void Render_List_Clear_Interface(); //free buffers ("render" and maybe "switch")
+void Render_List_Clear_Simulation(); //free buffers ("generate" and maybe "switch")
 
 #endif

@@ -360,9 +360,17 @@ int Interface_Loop ()
 					break;
 			}
 
+			//make sure not performing anything else
+			if (runlevel == done)
+				break;
+
 			//and always send this to profiles
 			Profile_Input_Collect(&event);
 		}
+
+		//again, not performing anything else
+		if (runlevel == done)
+			break;
 
 		//(tmp) camera movement keys:
 		Uint8 *keys = SDL_GetKeyState(NULL);
@@ -436,7 +444,7 @@ int Interface_Loop ()
 	//during rendering, memory might be allocated
 	//(will quickly be reallocated in each race and can be removed)
 	Geom_Render_Clear();
-	Render_List_Clear();
+	Render_List_Clear_Interface();
 
 	return 0;
 }

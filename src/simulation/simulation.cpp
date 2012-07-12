@@ -165,6 +165,9 @@ int Simulation_Loop (void *d)
 	//during simulation, memory might be allocated, remove
 	Wheel::Clear_List();
 
+	//remove buffers for building rendering list
+	Render_List_Clear_Simulation();
+
 	return 0;
 }
 

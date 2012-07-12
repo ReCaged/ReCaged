@@ -71,29 +71,61 @@ list_buffer buffer1 = {false, 0, 0, NULL, {0,0,0}, {0,0,0, 0,0,0, 0,0,0}, NULL};
 list_buffer buffer2 = {false, 0, 0, NULL, {0,0,0}, {0,0,0, 0,0,0, 0,0,0}, NULL};
 list_buffer buffer3 = {false, 0, 0, NULL, {0,0,0}, {0,0,0, 0,0,0, 0,0,0}, NULL};
 
-//remove allocated data in buffers
-void Render_List_Clear()
-{
-	buffer1.updated=false;
-	buffer1.size=0;
-	buffer1.count=0;
-	delete[] buffer1.list;
-
-	buffer2.updated=false;
-	buffer2.size=0;
-	buffer2.count=0;
-	delete[] buffer2.list;
-
-	buffer3.updated=false;
-	buffer3.size=0;
-	buffer3.count=0;
-	delete[] buffer3.list;
-}
-
 //pointers at buffers
 list_buffer *buffer_render = &buffer1;
 list_buffer *buffer_switch = &buffer2;
 list_buffer *buffer_generate = &buffer3;
+
+//remove allocated data in buffers
+void Render_List_Clear_Interface()
+{
+	if (buffer_render->size)
+	{
+		buffer_render->updated=false;
+		buffer_render->size=0;
+		buffer_render->count=0;
+		delete[] buffer_render->list;
+		buffer_render->list=NULL;
+	}
+
+	//don't know which thread will clear
+	SDL_mutexP(render_list_mutex);
+	if (buffer_switch->size)
+	{
+		buffer_switch->updated=false;
+		buffer_switch->size=0;
+		buffer_switch->count=0;
+		delete[] buffer_switch->list;
+		buffer_switch->list=NULL;
+	}
+	SDL_mutexV(render_list_mutex);
+}
+
+//remove allocated data in buffers
+void Render_List_Clear_Simulation()
+{
+	if (buffer_generate->size)
+	{
+		buffer_generate->updated=false;
+		buffer_generate->size=0;
+		buffer_generate->count=0;
+		delete[] buffer_generate->list;
+		buffer_generate->list=NULL;
+	}
+
+	//don't know which thread will clear
+	SDL_mutexP(render_list_mutex);
+	if (buffer_switch->size)
+	{
+		buffer_switch->updated=false;
+		buffer_switch->size=0;
+		buffer_switch->count=0;
+		delete[] buffer_switch->list;
+		buffer_switch->list=NULL;
+	}
+	SDL_mutexV(render_list_mutex);
+}
+
 
 //update
 void Render_List_Update()
