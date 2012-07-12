@@ -61,12 +61,15 @@ struct list_buffer
 	size_t count;
 	size_t size;
 	list_element *list;
+	float camera_pos[3];
+	float camera_rot[9];
+	Object *camera_hide;
 };
 
 //buffers
-list_buffer buffer1 = {false, 0, 0, NULL};
-list_buffer buffer2 = {false, 0, 0, NULL};
-list_buffer buffer3 = {false, 0, 0, NULL};
+list_buffer buffer1 = {false, 0, 0, NULL, {0,0,0}, {0,0,0, 0,0,0, 0,0,0}, NULL};
+list_buffer buffer2 = {false, 0, 0, NULL, {0,0,0}, {0,0,0, 0,0,0, 0,0,0}, NULL};
+list_buffer buffer3 = {false, 0, 0, NULL, {0,0,0}, {0,0,0, 0,0,0, 0,0,0}, NULL};
 
 //remove allocated data in buffers
 void Render_List_Clear()
@@ -95,6 +98,13 @@ list_buffer *buffer_generate = &buffer3;
 //update
 void Render_List_Update()
 {
+	//TMP: store "camera" in rendering list
+	memcpy(buffer_generate->camera_pos, camera.pos, sizeof(float)*3);
+	memcpy(buffer_generate->camera_rot, camera.rotation, sizeof(float)*9);
+	buffer_generate->camera_hide = camera.hide;
+
+	//add data as usual:
+
 	//pointers:
 	buffer_generate->count=0; //set to zero (empty)
 
@@ -203,27 +213,63 @@ void Render_List_Update()
 		}
 	}
 
-	//mark as updated
-	buffer_generate->updated=true;
-}
-
-//set generated buffer as read to switch
-void Render_List_Finish()
-{
+	//move...
 	SDL_mutexP(render_list_mutex);
 	list_buffer *p=buffer_switch;
 	buffer_switch=buffer_generate;
 	buffer_generate=p;
 	SDL_mutexV(render_list_mutex);
-}
 
-//check if new frame top render
-//(=if above function has been run since last render)
+
+	//mark as updated
+	buffer_generate->updated=true;
+}
+ 
+//just to make it possible to check from outside
 bool Render_List_Updated()
 {
+
 	if (buffer_switch->updated)
 		return true;
 	return false;
+}
+
+
+//check if new data+matrix
+void Render_List_Prepare()
+{
+	//only if anything to do
+	if (Render_List_Updated())
+	{
+		SDL_mutexP(render_list_mutex);
+		list_buffer *p=buffer_switch;
+		buffer_switch=buffer_render; //old buffer, not needed
+		buffer_render= p;
+		SDL_mutexV(render_list_mutex);
+
+		//build matrix for camera projection:
+		//rotation (right, up, forward)
+		float *pos = buffer_render->camera_pos;
+		float *rot = buffer_render->camera_rot;
+		float matrix[16];
+		//m0-m3
+		matrix[0]=rot[0]; matrix[1]=rot[2]; matrix[2]=-rot[1]; matrix[3]=0.0;
+		//m4-m7
+		matrix[4]=rot[3]; matrix[5]=rot[5]; matrix[6]=-rot[4]; matrix[7]=0.0;
+		//m4-m7
+		matrix[8]=rot[6]; matrix[9]=rot[8]; matrix[10]=-rot[7]; matrix[11]=0.0;
+
+		//m12-m14, translation
+		matrix[12]=-matrix[0]*pos[0]-matrix[4]*pos[1]-matrix[8]*pos[2];
+		matrix[13]=-matrix[1]*pos[0]-matrix[5]*pos[1]-matrix[9]*pos[2];
+		matrix[14]=-matrix[2]*pos[0]-matrix[6]*pos[1]-matrix[10]*pos[2];
+
+		//m15
+		matrix[15]=1.0;
+
+		//overwrite current matrix
+		glLoadMatrixf(matrix);
+	}
 }
 
 //updated on resizing, needed here:
@@ -231,20 +277,12 @@ extern float view_angle_rate_x, view_angle_rate_y;
 
 void Render_List_Render()
 {
-	//see if in buffer got new data, if so switch
-	//(always true if synced, but if not re-render old frame)
-	if (Render_List_Updated()) //got new stuff to render
-	{
-		SDL_mutexP(render_list_mutex);
-		list_buffer *p=buffer_switch;
-		buffer_switch=buffer_render; //old buffer, not needed
-		buffer_render= p;
-		SDL_mutexV(render_list_mutex);
-	}
-
-	//copy needed data
+	//pointers to data
 	size_t *count=&(buffer_render->count);
 	list_element *list=buffer_render->list;
+	float *camera_pos=buffer_render->camera_pos;
+	float *camera_rot=buffer_render->camera_rot;
+	Object *camera_hide=buffer_render->camera_hide;
 
 	//variables
 	unsigned int m_loop;
@@ -310,15 +348,15 @@ void Render_List_Render()
 
 		//check if object is not visible from current camera:
 		//model pos relative to camera
-		pos[0] = matrix[12]-camera.pos[0];
-		pos[1] = matrix[13]-camera.pos[1];
-		pos[2] = matrix[14]-camera.pos[2];
+		pos[0] = matrix[12]-camera_pos[0];
+		pos[1] = matrix[13]-camera_pos[1];
+		pos[2] = matrix[14]-camera_pos[2];
 
 		//position of camera relative to camera/screen
 		//this is really just a matrix multiplication, but we separate each line into a variable
-		right_proj = pos[0]*camera.rotation[0]+pos[1]*camera.rotation[3]+pos[2]*camera.rotation[6];
-		dir_proj = pos[0]*camera.rotation[1]+pos[1]*camera.rotation[4]+pos[2]*camera.rotation[7];
-		up_proj = pos[0]*camera.rotation[2]+pos[1]*camera.rotation[5]+pos[2]*camera.rotation[8];
+		right_proj = pos[0]*camera_rot[0]+pos[1]*camera_rot[3]+pos[2]*camera_rot[6];
+		dir_proj = pos[0]*camera_rot[1]+pos[1]*camera_rot[4]+pos[2]*camera_rot[7];
+		up_proj = pos[0]*camera_rot[2]+pos[1]*camera_rot[5]+pos[2]*camera_rot[8];
 
 		//limit of what range is rendered (compensates for "radius" of model that might still be seen)
 		dir_min = internal.clipping[0] - radius; //behind close clipping
@@ -327,7 +365,7 @@ void Render_List_Render()
 		up_max = view_angle_rate_y*(dir_proj+radius) + radius; //above/below
 
 		//check if visible (or hidden for this camera):
-		if (	(list[i].object == camera.hide)				||
+		if (	(list[i].object == camera_hide)				||
 			(dir_proj > dir_max)	|| (dir_proj < dir_min)		||
 			(right_proj > right_max)|| (-right_proj > right_max)	||
 			(up_proj > up_max)	|| (-up_proj > up_max)		)

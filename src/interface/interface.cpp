@@ -412,8 +412,8 @@ int Interface_Loop ()
 		//clear screen
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//move camera
-		camera.Graphics_Step();
+		//check/set updated scene+camera
+		Render_List_Prepare();
 
 		//place sun
 		glLightfv (GL_LIGHT0, GL_POSITION, track.position);
