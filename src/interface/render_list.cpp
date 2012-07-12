@@ -213,16 +213,15 @@ void Render_List_Update()
 		}
 	}
 
+	//mark as updated
+	buffer_generate->updated=true;
+
 	//move...
 	SDL_mutexP(render_list_mutex);
 	list_buffer *p=buffer_switch;
 	buffer_switch=buffer_generate;
 	buffer_generate=p;
 	SDL_mutexV(render_list_mutex);
-
-
-	//mark as updated
-	buffer_generate->updated=true;
 }
  
 //just to make it possible to check from outside
