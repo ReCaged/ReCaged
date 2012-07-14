@@ -61,8 +61,6 @@ class Camera
 
 		//these should probably be static (for using more cameras), but this will do for now
 		void Physics_Step(dReal step);
-		void Generate_Matrix();
-		void Graphics_Step();
 
 	private:
 		struct Camera_Settings *settings;
@@ -86,7 +84,7 @@ class Camera
 		bool in_air;
 
 		friend class Car;
-		friend void Render_List_Render();
+		friend void Render_List_Update();
 
 		//physics simulation functions
 		void Accelerate(dReal step);

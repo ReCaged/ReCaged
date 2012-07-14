@@ -127,11 +127,9 @@ int Simulation_Loop (void *d)
 
 			//opdate for interface:
 			Render_List_Update(); //make copy of position/rotation for rendering
-			camera.Generate_Matrix(); //matrix based on new position/rotation
-			Render_List_Finish(); //move new list to render
 		}
 		else
-			camera.Generate_Matrix(); //still update camera position (if manually moving)
+			Render_List_Update(); //still copy (in case camera updates or something)
 
 		//broadcast to wake up sleeping threads
 		if (internal.sync_interface)
@@ -167,6 +165,9 @@ int Simulation_Loop (void *d)
 
 	//during simulation, memory might be allocated, remove
 	Wheel::Clear_List();
+
+	//remove buffers for building rendering list
+	Render_List_Clear_Simulation();
 
 	return 0;
 }
