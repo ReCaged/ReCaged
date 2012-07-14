@@ -31,7 +31,6 @@ LDADD = $(RC_LIBS)
 bin_PROGRAMS = recaged
 
 recaged_SOURCES =	./recaged.cpp \
-			interface/camera.cpp \
 			interface/geom_render.cpp \
 			interface/geom_render.hpp \
 			interface/interface.cpp \
