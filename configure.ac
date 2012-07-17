@@ -21,21 +21,19 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-AC_PREREQ([2.68]) #defaulted TODO: remove?
-AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com]) #TODO: more here!
-#AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com], [recaged], [http://.....])
+AC_PREREQ([2.60]) #should work (and be old enough)
+AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com], [recaged], [http://www.nongnu.org/recaged])
 
-#codename
+# Define codename and year (for title and version printout)
 AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
-
-#year (for title and version printout)
 AC_DEFINE([PACKAGE_YEAR], ["2012"])
 
-# only a safety check
+# Only a safety check
 AC_CONFIG_SRCDIR([src/recaged.cpp])
-#AC_CONFIG_HEADERS([src/shared/config.h]) #TODO: move to include dir...?
 
-# for automake
+# No need for "AC_CONFIG_HEADERS" right now?
+
+# Arguments for automake
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
 # Checks for programs.
@@ -59,7 +57,7 @@ AC_CHECK_FUNCS([floor memset pow sqrt strcasecmp strrchr strtol])
 # Check for additional libraries (in acinclude.m4)
 RC_LIBS_CONFIG
 
-#TODO: add files from "data", generate ChangeLog from git log at "make dist*"
+# Finally: what to generate
 AC_CONFIG_FILES([Makefile conf/Makefile data/Makefile icons/Makefile man/Makefile src/Makefile])
 
 AC_OUTPUT
