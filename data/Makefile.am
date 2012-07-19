@@ -21,7 +21,7 @@
 
 #TODO: in future "teams" and "worlds" will be part of "objects" and a new dir
 #"shared" will be added. Then: one Makefile.am for each dir.
-objectsdir = $(sysconfdir)/
+objectsdir = $(pkgdatadir)/
 nobase_dist_objects_DATA = \
 	objects/misc/beachball/README \
 	objects/misc/beachball/sphere.mtl \
@@ -74,9 +74,9 @@ worldsdir = $(pkgdatadir)/
 nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
-	worlds/Sandbox/tracks/Box/figure\ 8.road \
+	worlds/Sandbox/tracks/Box/figure_8.road \
 	worlds/Sandbox/tracks/Box/geoms.lst \
-	worlds/Sandbox/tracks/Box/in\ a\ spin.road \
+	worlds/Sandbox/tracks/Box/in_a_spin.road \
 	worlds/Sandbox/tracks/Box/objects.lst \
 	worlds/Sandbox/tracks/Box/README \
 	worlds/Sandbox/tracks/Box/superbowl.road \
