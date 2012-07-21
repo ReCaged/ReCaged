@@ -24,7 +24,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
 #ok?
-AM_CPPFLAGS = $(RC_FLAGS)
+AM_CPPFLAGS = $(RC_FLAGS) -Wall -Werror
 #AM_LDFLAGS not used right now
 LDADD = $(RC_LIBS)
 
