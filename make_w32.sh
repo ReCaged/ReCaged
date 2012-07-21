@@ -116,7 +116,7 @@ then
 		tar xf ode-*
 
 		if ! (cd ode-*&&
-			./configure --prefix=/usr/local&& #TODO: consider "--enable-libccd" for cylinder collision support!
+			./configure --enable-libccd --prefix=/usr/local&&
 			make install)
 		then
 			echo ""
