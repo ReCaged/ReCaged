@@ -21,7 +21,7 @@
 
 #TODO: in future "teams" and "worlds" will be part of "objects" and a new dir
 #"shared" will be added. Then: one Makefile.am for each dir.
-objectsdir = $(pkgdatadir)/
+objectsdir = $(datadir)/recaged
 nobase_dist_objects_DATA = \
 	objects/misc/beachball/README \
 	objects/misc/beachball/sphere.mtl \
@@ -58,7 +58,7 @@ nobase_dist_objects_DATA = \
 	objects/misc/tetrahedron/README
 
 #TODO: remove in future (everything will be objects)
-teamsdir = $(pkgdatadir)/
+teamsdir = $(datadir)/recaged/
 nobase_dist_teams_DATA = \
 	teams/Nemesis/cars/Venom/car.conf \
 	teams/Nemesis/cars/Venom/geoms.lst \
@@ -70,7 +70,7 @@ nobase_dist_teams_DATA = \
 	teams/Nemesis/rims/diameter/2/Split/Split.mtl \
 	teams/Nemesis/rims/diameter/2/Split/Split.obj
 
-worldsdir = $(pkgdatadir)/
+worldsdir = $(datadir)/recaged/
 nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
@@ -89,6 +89,6 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tyres/diameter/2/Slick/tyre.conf
 
 #TODO: add in future (shared media)
-#objectsdir = $(pkgdatadir)/data
+#objectsdir = $(datadir)/recaged/data
 #nobase_dist_objects_DATA = 
 
