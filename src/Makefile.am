@@ -24,7 +24,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
 #compiler flags
-AM_CPPFLAGS =	$(RC_FLAGS) -Wall -Werror \
+AM_CPPFLAGS =	$(RC_FLAGS) -Wall \
 		-DDATADIR='"$(datadir)/recaged/"' \
 		-DCONFDIR='"$(sysconfdir)/xdg/recaged/"'
 #AM_LDFLAGS not used right now
