@@ -24,7 +24,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
 #TODO!
-SUBDIRS                 = conf data icons man src
+SUBDIRS                 = config data icons man src
 
 #TODO!
 EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog make_w32.sh

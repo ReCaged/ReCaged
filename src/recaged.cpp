@@ -27,6 +27,7 @@
 #include "shared/internal.hpp"
 #include "shared/threads.hpp"
 #include "shared/log.hpp"
+#include "shared/directories.hpp"
 #include "shared/runlevel.hpp"
 #include "shared/profile.hpp"
 #include "shared/track.hpp"
@@ -337,6 +338,12 @@ char *datadefault; //need to check path to rc before deciding this
 int main (int argc, char *argv[])
 {
 	//make sure we can print (just stdout for now)
+	//"Log" uses mutexes, so make sure sdl has initiated
+	//(also init timers when at it)
+	if (SDL_Init(SDL_INIT_TIMER))
+	{
+		printf("Error: couldn't initiate SDL: %s", SDL_GetError());
+	}
 	Log_Init();
 
 	//set default values:
@@ -414,6 +421,8 @@ Usage: recaged [OPTION]...\n\
 Options for overriding normal directory detection:\n\
   -i, --installed	use files in system and home directories (opposite of -p)\n\
   -p, --portable=DIR	use files in DIR for all read/writes (opposite of -i)\n");
+				//TODO: -i=[dir], -p=[dir], -u=dir
+				//TODO: override directories for installed
 
 				exit(0); //stop execution
 				break;
@@ -423,7 +432,10 @@ Options for overriding normal directory detection:\n\
 	//welcome message
 	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
-	//Directories_Init();
+	Directories::Init(argv[0], false, false, NULL, NULL);
+	Directories::debug();
+	Directories::Quit();
+	return 0;
 	//Log_File(...);
 	//load_conf ("internal.conf", (char *)&internal, internal_index);
 
@@ -540,6 +552,8 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 
 	//close log output
 	Log_Quit();
+	Directories::Quit();
+	SDL_Quit();
 
 	return 0;
 }

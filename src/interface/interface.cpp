@@ -112,9 +112,9 @@ bool Interface_Init(void)
 	Log_Add(0, "Initiating interface");
 
 	//initiate sdl
-	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK))
+	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
 	{
-		Log_Add(0, "Error: couldn't initiate SDL: %s", SDL_GetError());
+		Log_Add(0, "Error: couldn't initiate video or joystick: %s", SDL_GetError());
 		return false;
 	}
 
@@ -131,11 +131,12 @@ bool Interface_Init(void)
 	//try to create window
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
 	//SDL_CreateWindow and SDL_GL_CreateContext
+	//ALSO (sdl>1.2): try setting core context for gl 3.x. If possible: unlegacy rendering
 	screen = SDL_SetVideoMode (internal.res[0], internal.res[1], 0, flags);
 
 	if (!screen)
 	{
-		Log_Add(0, "Error: couldn't set video mode: %s", SDL_GetError);
+		Log_Add(0, "Error: couldn't set video mode: %s", SDL_GetError());
 		return false;
 	}
 
@@ -458,6 +459,6 @@ void Interface_Quit(void)
 			SDL_JoystickClose(joystick[i]);
 	delete[] joystick;
 
-	SDL_Quit();
+	SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 }
 

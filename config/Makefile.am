@@ -19,8 +19,8 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-confdir = $(sysconfdir)/xdg/recaged/
-nobase_dist_conf_DATA = \
+configdir = $(sysconfdir)/xdg/recaged/
+nobase_dist_config_DATA = \
 	profiles/default/keys.lst \
 	profiles/default/profile.conf \
 	tmp_menu_selections

@@ -58,6 +58,6 @@ AC_CHECK_FUNCS([floor memset pow sqrt strcasecmp strrchr strtol])
 RC_LIBS_CONFIG
 
 # Finally: what to generate
-AC_CONFIG_FILES([Makefile conf/Makefile data/Makefile icons/Makefile man/Makefile src/Makefile])
+AC_CONFIG_FILES([Makefile config/Makefile data/Makefile icons/Makefile man/Makefile src/Makefile])
 
 AC_OUTPUT

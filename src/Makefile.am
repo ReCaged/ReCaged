@@ -23,8 +23,10 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-#ok?
-AM_CPPFLAGS = $(RC_FLAGS) -Wall -Werror
+#compiler flags
+AM_CPPFLAGS =	$(RC_FLAGS) -Wall -Werror \
+		-DDATADIR='"$(datadir)/recaged/"' \
+		-DCONFDIR='"$(sysconfdir)/xdg/recaged/"'
 #AM_LDFLAGS not used right now
 LDADD = $(RC_LIBS)
 
@@ -56,6 +58,8 @@ recaged_SOURCES =	./recaged.cpp \
 			shared/car.hpp \
 			shared/component.cpp \
 			shared/component.hpp \
+			shared/directories.cpp \
+			shared/directories.hpp \
 			shared/geom.cpp \
 			shared/geom.hpp \
 			shared/internal.cpp \
