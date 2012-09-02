@@ -87,7 +87,7 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 
 #ifdef _WIN32
 		//W_OK not supported on the Antiposix
-		tmpfile[strlen(path)+9];
+		char tmpfile[strlen(path)+9];
 		strcpy(tmpfile, path);
 		strcat(tmpfile, "/tmpfile");
 		FILE *fp = fopen(tmpfile, "w");
@@ -267,7 +267,7 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 				Log_Add(0, "WARNING: found no suitable user cache directory, using \"/tmp\" instead!");
 #else
 			//w32 got variable for tmp dir (check TMP and TEMP)...
-			else if ( (var=getenv("TMP") || var=getenv("TEMP")) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
+			else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
 				Log_Add(0, "WARNING: found no suitable user cache directory, using temporary directory instead!");
 #endif
 			else
@@ -296,7 +296,7 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 #ifdef _WIN32
 		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_conf, WRITE, var, "recaged/config") )
 			Log_Add(2, "Fallback, \"native\", path to user config directory (USERPROFILE)");
-		else if ( (var=getenv("TMP") || var=getenv("TEMP")) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/config"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/config"))
 			Log_Add(0, "WARNING: found no suitable user config directory, using temporary directory instead!");
 #else
 		else if ( Try_Set_Path(&user_conf, WRITE, "/tmp/recaged/config", "") )
@@ -321,7 +321,7 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 #ifdef _WIN32
 		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_data, WRITE, var, "recaged/data") )
 			Log_Add(2, "Fallback, \"native\", path to user data directory (USERPROFILE)");
-		else if ( (var=getenv("TMP") || var=getenv("TEMP")) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/data"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/data"))
 			Log_Add(0, "WARNING: found no suitable user data directory, using temporary directory instead!");
 #else
 		else if ( Try_Set_Path(&user_data, WRITE, "/tmp/recaged/data", "") )
@@ -346,7 +346,7 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 #ifdef _WIN32
 		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_cache, WRITE, var, "recaged/cache") )
 			Log_Add(2, "Fallback, \"native\", path to user cache directory (USERPROFILE)");
-		else if ( (var=getenv("TMP") || var=getenv("TEMP")) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
 			Log_Add(0, "WARNING: found no suitable user cache directory, using temporary directory instead!");
 #else
 		else if ( Try_Set_Path(&user_cache, WRITE, "/tmp/recaged/cache", "") )
