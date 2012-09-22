@@ -36,7 +36,7 @@ class Directories
 		//What it's all about: "Find" returns (if possible) the path to the file
 		//depending on if reading/writing (if so also create necessary directories)
 		//and what type of file that will be used
-		typedef enum {READ, WRITE, TODO} operation;
+		typedef enum {READ, WRITE, TODO} operation; //TODO: APPEND, etc... If needed.
 		typedef enum {CONFIG, DATA, CACHE} type;
 		const char *Find(const char *path,
 				Directories::type type,
@@ -51,6 +51,8 @@ class Directories
 		static char *user_conf, *user_data, *user_cache;
 		static char *inst_conf, *inst_data;
 
+		bool Try_Set_File(Directories::operation op,
+				const char *path1, const char *path2);
 		char *file_path;
 };
 

@@ -29,12 +29,6 @@
 #include "directories.hpp"
 #include "../shared/log.hpp"
 
-#ifndef _WIN32
-#define SEPARATOR '/'
-#else
-#define SEPARATOR '\\'
-#endif
-
 char *Directories::user_conf=NULL, *Directories::user_data=NULL, *Directories::user_cache=NULL;
 char *Directories::inst_conf=NULL, *Directories::inst_data=NULL;
 
@@ -45,7 +39,8 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 		Log_Add(0, "WARNING: incorrect path for \"Check_Path\"!");
 		return false;
 	}
-	else if (op == READ)
+
+	if (op == READ)
 	{
 		if (!access(path, R_OK))
 			return true;
@@ -55,16 +50,20 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 	else if (op == WRITE)
 	{
 		char test[strlen(path)+1]; strcpy(test, path);
-		char tmp;
+		char tmp=0;
+		int i=0;
 
 		//just blindly try to create all missing directories...
-		int i=0;
 		do
 		{
 			++i;
 
-			//might still use normal slashes even on w32
-			if (path[i] == SEPARATOR || path[i] == '/' || path[i] == '\0')
+#ifndef _WIN32
+			if (path[i] == '/' || path[i] == '\0')
+#else
+			//w32: also check backslashes
+			if (path[i] == '\\' || path[i] == '/' || path[i] == '\0')
+#endif
 			{
 				tmp=path[i];
 				path[i]='\0';
@@ -81,6 +80,14 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 				}
 
 				path[i]=tmp;
+
+				//in case first of several slashes in a row:
+				if (path[i] != '\0')
+#ifndef _WIN32
+					for (; path[i+1]=='/'; ++i);
+#else
+					for (; path[i+1]=='/' || path[i+1]=='\\'; ++i);
+#endif
 			}
 		}
 		while (path[i]!='\0');
@@ -104,12 +111,10 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 		else
 			return false;
 	}
-	else //TODO: append, etc... probably like WRITE above
-	{
-		Log_Add(0, "TODO: more modes to check!");
-		return false;
-	}
 
+	//TODO: append, etc... probably like WRITE above
+	Log_Add(0, "TODO: more modes to check!");
+	return false;
 }
 
 //concatenate path1+path2, check if ok and copy to target string
@@ -117,7 +122,7 @@ bool Directories::Try_Set_Path(char **target, Directories::operation op,
 		const char *path1, const char *path2)
 {
 	//something is wrong
-	if (!path1 && !path2)
+	if (!path1 || !path2)
 		return false;
 
 	char path[strlen(path1) +1 + strlen(path2) +1];
@@ -136,6 +141,93 @@ bool Directories::Try_Set_Path(char **target, Directories::operation op,
 	}
 	else
 		return false;
+}
+
+//concatenate path1+path2 for file path, and check if file is possible
+bool Directories::Try_Set_File(Directories::operation op,
+				const char *path1, const char *path2)
+{
+	if (!path1 || !path2)
+		return false;
+
+	char file[strlen(path1) +1 +strlen(path2) +1];
+	strcpy(file, path1);
+	strcat(file, "/");
+	strcat(file, path2);
+
+	//this could require special testing/creation of path to file
+	if (op == WRITE)
+	{
+		//NOTE: path2 is not system-generated, so assume user
+		//specified with proper slashes instead of the w32 backslash
+		//crap. Also: if path2 got no slashes, the explicitly
+		//inserted one above will always provide a fallback
+
+		//(similar to Directories::Init(), find leftmost-rightmost slash)
+		int i;
+		for (i=strlen(file); (i>=0 && file[i]!='/'); --i);
+		for (; i>0 && file[i-1]=='/'; --i);
+
+		char path[i+1];
+		memcpy(path, file, sizeof(char)*i);
+		path[i]='\0';
+
+		if (!Check_Path(path, WRITE))
+		{
+			Log_Add(2, "Unable to write/create path \"%s\"", path);
+			return false;
+		}
+	}
+
+	//use fopen() instead of access() for write/append check (and everything on Antiposix)
+	int amode=0;
+	const char *fmode=NULL;
+
+	switch (op)
+	{
+		case READ:
+#ifndef _WIN32
+			amode=R_OK;
+#else
+			fmode="r";
+#endif
+			break;
+
+		case WRITE:
+			fmode="w";
+			break;
+
+		case TODO:
+			Log_Add(0, "TODO: more modes to check!"); //fopen(, "a") for APPEND
+			return false;
+			break;
+	}
+
+	bool viable=false;
+	if (amode && !access(file, amode))
+		viable=true;
+
+	if (fmode) //if fmode, knows that amode=0 for sure
+	{
+		FILE *fp = fopen(file, fmode);
+		if (fp)
+		{
+			//don't care about removing possibly created file (if "w")
+			fclose(fp);
+			viable=true;
+		}
+	}
+
+	if (!viable)
+	{
+		Log_Add(2, "File \"%s\" is not viable", file);
+		return false;
+	}
+
+	//else, we're ready to go!
+	file_path = new char[strlen(file)];
+	strcpy(file_path, file);
+	return true;
 }
 
 void Directories::Init(	const char *arg0, bool installed_force, bool portable_force,
@@ -162,45 +254,59 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			Log_Add(0, "WARNING: path to installed directories incorrect. Ignoring!");
 
 		int pos; //find from the right
-		for (pos=strlen(arg0); (pos>0 && arg0[pos]!=SEPARATOR); --pos);
-
 #ifndef _WIN32
-		if (pos!=0)
+		for (pos=strlen(arg0); (pos>=0 && arg0[pos]!='/'); --pos); //find from right
+		for (; pos>0 && arg0[pos-1]=='/'; --pos); //in case several slashes in a row
+		//pos should now be leftmost slash in rightmost group of slashes, or -1
+
+		if (pos==-1) //-1: passed through all without finding separator
+			found=false;
+		else //found
 		{
-			char path[pos+1]; //NOTE: skipping the slash
+			char path[pos+1]; //NOTE: skipping the slash, but adding '\0'
 			memcpy(path, arg0, sizeof(char)*pos);
 			path[pos]='\0';
 #else
-			//if w32: try GetModuleFileName, arg0, or "this dir"
-			const char *wstr;
-			//if (GetModuleFileName(...)) TODO!
-			/*else*/ if (pos!=0)
-				wstr=arg0; //TODO: add to log?
-			else
-			{
-				pos=1; //TODO: add to log?
-				wstr=".";
-			}
 
-			char path[pos+1];
-			memcpy(path, wstr, sizeof(char)*pos);
-			path[pos]='\0';
+		//TODO:
+		//should probably check GetModuleFileName... but as usual, documentation of w32
+		//functions is utter crap (to say nothing of the functions themselves)... might
+		//be compiled to some unicode version? which might not work on older w32 OSes...?
+		//just better not having to include any w32 headers/definitions!
+
+		for (pos=strlen(arg0); (pos>=0 && arg0[pos]!='\\' && arg0[pos]!='/'); --pos);
+		for (; pos>0 && (arg0[pos-1]=='/' || arg0[pos-1]=='\\'); --pos);
+
+		const char *wstr;
+		if (pos==-1)
+		{
+			Log_Add(0, "WARNING: unable to retrieve path to program (from arg0), trying PWD");
+			pos=1;
+			wstr=".";
+		}
+		else
+			wstr=arg0;
+
+		char path[pos+1];
+		memcpy(path, wstr, sizeof(char)*pos);
+		path[pos]='\0';
+
 #endif
-
 			if (	(Try_Set_Path(&inst_data, READ, path, "data") &&
 				Try_Set_Path(&inst_conf, READ, path, "config")) ||
 				(Try_Set_Path(&inst_data, READ, path, "../data") &&
 				Try_Set_Path(&inst_conf, READ, path, "../config")) )
 			{
 				Log_Add(2, "Installed directories located around the executable");
-				//TODO: ifdef w32: if (registry.path == path), w32_installed=true;
+				//TODO:
+				//if got here on w32, should compare with registry value (set by nsis)
+				//to determine if treat as installed, and ignore writeability test below.
+				//(w32 function, just as GetModuleFileName above)
 			}
 			else
 				found=false;
 #ifndef _WIN32
 		}
-		else
-			found=false;
 #endif
 	}
 
@@ -220,7 +326,8 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 		}
 	}
 
-	//TODO: ifdef w32: if (w32_installed): found=false; log: installed, not testing for write access.
+	//TODO: (w32) if compare with registry above showed found directories should be treated
+	//as read-only, only check for directories in user home dir (or tmp)
 
 	//NOTE: if found==true then both installed data+conf directories exists and aren't
 	//in an obvious installed path (as set during build configuration, or w32 installation)
@@ -383,18 +490,54 @@ const char *Directories::Find(const char *path,
 {
 	delete file_path; file_path=NULL;
 
-	//TODO!
+	const char *user=NULL, *inst=NULL;
+	switch (type)
+	{
+		case CONFIG:
+			Log_Add(2, "Locating config file \"%s\":", path);
+			user=user_conf;
+			inst=inst_conf;
+			break;
 
-	//always check user dirs first
-//	"dirs"/"file" = path
-//	Check_Path(dirs)
-//	access...
-	//file_path=....
+		case DATA:
+			Log_Add(2, "Locating data file \"%s\":", path);
+			user=user_data;
+			inst=inst_data;
+			break;
 
-	//if (!file_path)
-		//installed
+		case CACHE:
+			Log_Add(2, "Locating cache file \"%s\":", path);
+			user=user_cache;
+			break;
+	}
 
-	return NULL;
+	switch (op)
+	{
+		case READ: //try user, then installed
+			if ( Try_Set_File(op, user, path) )
+				Log_Add(2, "Readable in user directory: \"%s\"", file_path);
+			else if ( Try_Set_File(op, inst, path) )
+				Log_Add(2, "Readable in installation directory: \"%s\"", file_path);
+			else
+				Log_Add(0, "Unable to find file \"%s\" for reading!", path);
+			break;
+
+		case WRITE: //try user
+			if ( Try_Set_File(op, user, path) )
+				Log_Add(2, "Writeable in user directory: \"%s\"", file_path);
+			else
+				Log_Add(0, "Unable to find/create file \"%s\" for writing!", path);
+			break;
+
+		case TODO:
+			Log_Add(0, "TODO: more modes to check!");
+			//TODO: if APPEND: check if file exists in user or inst:
+			//if yes, (copy from inst to user if necessary), and check W_OK (w32: fopen(, "a"))
+			//if not, Try_Set_File(WRITE, path);
+			break;
+	}
+
+	return file_path;
 }
 
 const char *Directories::Path()
@@ -405,7 +548,13 @@ const char *Directories::Path()
 
 void Directories::debug()
 {
-	FILE *f=fopen("tmp.txt", "w");
+	FILE *f;
+	Directories dir;
+	if (dir.Find("tmp.txt", CACHE, WRITE))
+		f=fopen(dir.Path(), "w");
+	else
+		f=fopen("tmp.txt", "w");
+
 	fprintf(f, "uconf %s\nudata \%s\nucache %s\niconf %s\nidata %s\n", user_conf, user_data, user_cache, inst_conf, inst_data);
 	fclose(f);
 }
