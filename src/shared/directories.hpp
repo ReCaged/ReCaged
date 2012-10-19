@@ -22,6 +22,27 @@
 #ifndef _RC_DIRECTORIES_H
 #define _RC_DIRECTORIES_H
 
+//
+// Find() returns (if possible) a good path to a file (otherwise NULL), given the parameters:
+//
+// * path: path and file (relative to directory detected as usable)
+//
+// * type: one of:
+// CONFIG: user/global configuration
+// DATA: contents (like objects)
+// CACHE: temporary files (like logs)
+//
+// * operation: one of:
+// READ: check if file can be read (prefer user-created over installed)
+// WRITE: create any missing dirs and check if file can be written (in user dirs)
+// APPEND: like WRITE, but preserves existing file if it exists (otherwise copies installed, if exists)
+//
+// Init() must be run before creating classes, Path() returns latest path (or NULL on error)
+//
+// TODO: future functions:
+// * Remove(): remove file+any empty dirs caused (in user dirs)
+// * List(): lists union of files in path from both user+installed dirs
+//
 class Directories
 {
 	public:
@@ -33,16 +54,13 @@ class Directories
 		~Directories();
 
 		static void debug();
-		//What it's all about: "Find" returns (if possible) the path to the file
-		//depending on if reading/writing (if so also create necessary directories)
-		//and what type of file that will be used
-		typedef enum {READ, WRITE, TODO} operation; //TODO: APPEND, etc... If needed.
+
+		typedef enum {READ, WRITE, APPEND} operation;
 		typedef enum {CONFIG, DATA, CACHE} type;
 		const char *Find(const char *path,
 				Directories::type type,
 				Directories::operation op);
 		const char *Path(); //return again
-		//TODO: Remove(const char *path, DIrectories::type); //find, rm+removes all empty dirs
 
 	private:
 		static bool Check_Path(char*path, Directories::operation op); //NOTE: requires non-const string
@@ -53,6 +71,8 @@ class Directories
 
 		bool Try_Set_File(Directories::operation op,
 				const char *path1, const char *path2);
+		bool Try_Set_File_Append(const char *user, const char *inst,
+				const char *path);
 		char *file_path;
 };
 

@@ -112,8 +112,7 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 			return false;
 	}
 
-	//TODO: append, etc... probably like WRITE above
-	Log_Add(0, "TODO: more modes to check!");
+	Log_Add(0, "WARNING: request for appendable directory for \"Check_Path\"");
 	return false;
 }
 
@@ -123,7 +122,10 @@ bool Directories::Try_Set_Path(char **target, Directories::operation op,
 {
 	//something is wrong
 	if (!path1 || !path2)
+	{
+		Log_Add(2, "Discarded incomplete path testing");
 		return false;
+	}
 
 	char path[strlen(path1) +1 + strlen(path2) +1];
 	strcpy(path, path1);
@@ -148,7 +150,10 @@ bool Directories::Try_Set_File(Directories::operation op,
 				const char *path1, const char *path2)
 {
 	if (!path1 || !path2)
+	{
+		Log_Add(2, "Discarded incomplete file testing (read/write)");
 		return false;
+	}
 
 	char file[strlen(path1) +1 +strlen(path2) +1];
 	strcpy(file, path1);
@@ -165,7 +170,7 @@ bool Directories::Try_Set_File(Directories::operation op,
 
 		//(similar to Directories::Init(), find leftmost-rightmost slash)
 		int i;
-		for (i=strlen(file); (i>=0 && file[i]!='/'); --i);
+		for (i=strlen(file); (i>0 && file[i]!='/'); --i);
 		for (; i>0 && file[i-1]=='/'; --i);
 
 		char path[i+1];
@@ -174,7 +179,7 @@ bool Directories::Try_Set_File(Directories::operation op,
 
 		if (!Check_Path(path, WRITE))
 		{
-			Log_Add(2, "Unable to write/create path \"%s\"", path);
+			Log_Add(0, "Unable to write/create path \"%s\"", path);
 			return false;
 		}
 	}
@@ -197,9 +202,9 @@ bool Directories::Try_Set_File(Directories::operation op,
 			fmode="w";
 			break;
 
-		case TODO:
-			Log_Add(0, "TODO: more modes to check!"); //fopen(, "a") for APPEND
-			return false;
+		case APPEND:
+			Log_Add(0, "WARNING: request for appendable directory for \"Check_Path\"");
+			//amode, fmode are NULL, no checks will occur
 			break;
 	}
 
@@ -220,13 +225,83 @@ bool Directories::Try_Set_File(Directories::operation op,
 
 	if (!viable)
 	{
-		Log_Add(2, "File \"%s\" is not viable", file);
+		if (op == WRITE) Log_Add(0, "Warning: unable to open \"%s\" for writing!", file);
+		else Log_Add(2, "File \"%s\" did not exist", file);
 		return false;
 	}
 
 	//else, we're ready to go!
 	file_path = new char[strlen(file)];
 	strcpy(file_path, file);
+	return true;
+}
+
+//like above, but for appending (requires more quirks)
+bool Directories::Try_Set_File_Append(const char *user, const char *inst, const char *path)
+{
+	if (!(user && path))
+	{
+		Log_Add(2, "Discarded incomplete file testing (append)");
+		return false;
+	}
+
+	char upath[strlen(user)+1+strlen(path)+1];
+	strcpy(upath, user);
+	strcat(upath, "/");
+	strcat(upath, path);
+
+	int i;
+	for (i=strlen(upath); (i>0 && upath[i]!='/'); --i);
+	for (; i>0 && upath[i-1]=='/'; --i);
+
+	if (i > 0)
+	{
+		char fullpath[i+1];
+		memcpy(fullpath, upath, sizeof(char)*i);
+		fullpath[i]='\0';
+
+		if (!Check_Path(fullpath, WRITE))
+		{
+			Log_Add(0, "Unable to write/create path \"%s\"", path);
+			return false;
+		}
+	}
+
+	bool exists=access(upath, F_OK)? false: true;
+	FILE *fp=fopen(upath, "a");
+	if (!fp)
+	{
+		Log_Add(0, "Warning: Unable to open \"%s\" for appending!", upath);
+		return false;
+	}
+
+	//didn't exists in user dir before+got installed dir
+	if (!exists && inst)
+	{
+		//does exist as installed?
+		char ipath[strlen(inst)+1+strlen(path)+1];
+		strcpy(ipath, inst);
+		strcat(ipath, "/");
+		strcpy(ipath, path);
+
+		FILE *ifp=fopen(ipath, "r");
+		if (ifp)
+		{
+			printf("now\n");
+			Log_Add(2, "Copying \"%s\" to \"%s\" before appending", ipath, upath);
+
+			//TODO/NOTE: not the fastest way, but certainly simple and easy...
+			//faster alternative: posix open() with read()+write() and buffer
+			//(not needed often or for large files, so should be ok anyway)
+			int c;
+			while ((c = fgetc(ifp)) != EOF)
+				fputc(c, fp);
+		}
+	}
+
+	fclose(fp);
+	file_path = new char[strlen(upath)];
+	strcpy(file_path, upath);
 	return true;
 }
 
@@ -380,6 +455,9 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			else
 				Log_Add(0, "WARNING: found NO user cache directory!");
 
+			Log_Add(2, "User config directory: \"%s\"", user_conf);
+			Log_Add(2, "User data directory: \"%s\"", user_data);
+			if (user_cache) Log_Add(2, "User cache directory: \"%s\"", user_cache);
 			return;
 		}
 		else
@@ -462,6 +540,12 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 		else
 			Log_Add(0, "WARNING: found NO user cache directory!");
 	}
+
+	if (inst_conf) Log_Add(2, "Installed config directory: \"%s\"", inst_conf);
+	if (inst_data) Log_Add(2, "Installed data directory: \"%s\"", inst_data);
+	if (user_conf) Log_Add(2, "User config directory: \"%s\"", user_conf);
+	if (user_data) Log_Add(2, "User data directory: \"%s\"", user_data);
+	if (user_cache) Log_Add(2, "User cache directory: \"%s\"", user_cache);
 }
 
 void Directories::Quit()
@@ -526,14 +610,14 @@ const char *Directories::Find(const char *path,
 			if ( Try_Set_File(op, user, path) )
 				Log_Add(2, "Writeable in user directory: \"%s\"", file_path);
 			else
-				Log_Add(0, "Unable to find/create file \"%s\" for writing!", path);
+				Log_Add(0, "Unable to resolve/create file \"%s\" for writing!", path);
 			break;
 
-		case TODO:
-			Log_Add(0, "TODO: more modes to check!");
-			//TODO: if APPEND: check if file exists in user or inst:
-			//if yes, (copy from inst to user if necessary), and check W_OK (w32: fopen(, "a"))
-			//if not, Try_Set_File(WRITE, path);
+		case APPEND: //user, but copy from installed if needed/possible
+			if ( Try_Set_File_Append(user, inst, path) )
+				Log_Add(2, "Appendable in user directory: \"%s\"", file_path);
+			else
+				Log_Add(0, "Unable to resolve/create file \"%s\" for appending!", path);
 			break;
 	}
 
@@ -550,10 +634,10 @@ void Directories::debug()
 {
 	FILE *f;
 	Directories dir;
-	if (dir.Find("tmp.txt", CACHE, WRITE))
-		f=fopen(dir.Path(), "w");
+	if (dir.Find("tmp.txt", DATA, APPEND))
+		f=fopen(dir.Path(), "a");
 	else
-		f=fopen("tmp.txt", "w");
+		f=fopen("tmp.txt", "a");
 
 	fprintf(f, "uconf %s\nudata \%s\nucache %s\niconf %s\nidata %s\n", user_conf, user_data, user_cache, inst_conf, inst_data);
 	fclose(f);
