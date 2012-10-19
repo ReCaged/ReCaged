@@ -282,12 +282,11 @@ bool Directories::Try_Set_File_Append(const char *user, const char *inst, const 
 		char ipath[strlen(inst)+1+strlen(path)+1];
 		strcpy(ipath, inst);
 		strcat(ipath, "/");
-		strcpy(ipath, path);
+		strcat(ipath, path);
 
 		FILE *ifp=fopen(ipath, "r");
 		if (ifp)
 		{
-			printf("now\n");
 			Log_Add(2, "Copying \"%s\" to \"%s\" before appending", ipath, upath);
 
 			//TODO/NOTE: not the fastest way, but certainly simple and easy...
