@@ -295,7 +295,7 @@ bool Directories::Try_Set_File_Append(const char *user, const char *inst, const 
 			char *buf = new char[COPY_BUFFER_SIZE];
 			size_t s;
 			while ((s = fread(buf, 1, COPY_BUFFER_SIZE, ifp)))
-				fwrite(buf, 1, COPY_BUFFER_SIZE, fp);
+				fwrite(buf, 1, s, fp);
 
 			delete[] buf;
 			fclose (ifp);
