@@ -268,7 +268,7 @@ bool Directories::Try_Set_File_Append(const char *user, const char *inst, const 
 	}
 
 	bool exists=access(upath, F_OK)? false: true;
-	FILE *fp=fopen(upath, "a");
+	FILE *fp=fopen(upath, "ab");
 	if (!fp)
 	{
 		Log_Add(0, "Warning: Unable to open \"%s\" for appending!", upath);
@@ -284,17 +284,21 @@ bool Directories::Try_Set_File_Append(const char *user, const char *inst, const 
 		strcat(ipath, "/");
 		strcat(ipath, path);
 
-		FILE *ifp=fopen(ipath, "r");
+		FILE *ifp=fopen(ipath, "rb");
 		if (ifp)
 		{
 			Log_Add(2, "Copying \"%s\" to \"%s\" before appending", ipath, upath);
 
-			//TODO/NOTE: not the fastest way, but certainly simple and easy...
-			//faster alternative: posix open() with read()+write() and buffer
-			//(not needed often or for large files, so should be ok anyway)
-			int c;
-			while ((c = fgetc(ifp)) != EOF)
-				fputc(c, fp);
+			//TODO: move/copy to separate method (dedicated file copying)
+			//NOTE: fopen() not as fast as open() (which is low-level posix)
+			//(but - SURPRISE! - open() seems to cause problems on losedows...)
+			char *buf = new char[COPY_BUFFER_SIZE];
+			size_t s;
+			while ((s = fread(buf, 1, COPY_BUFFER_SIZE, ifp)))
+				fwrite(buf, 1, COPY_BUFFER_SIZE, fp);
+
+			delete[] buf;
+			fclose (ifp);
 		}
 	}
 

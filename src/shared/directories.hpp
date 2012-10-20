@@ -42,7 +42,11 @@
 // TODO: future functions:
 // * Remove(): remove file+any empty dirs caused (in user dirs)
 // * List(): lists union of files in path from both user+installed dirs
+// * Copy(): copy file (prefer user over installed) if possible to new dir
 //
+
+#define COPY_BUFFER_SIZE 4096 //should be good (plus covers common block/sectorsizes)
+
 class Directories
 {
 	public:
