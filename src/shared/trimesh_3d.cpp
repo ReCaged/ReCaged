@@ -27,6 +27,7 @@
 #include "trimesh.hpp"
 #include "../loaders/conf.hpp"
 #include "log.hpp"
+#include "directories.hpp"
 
 //length of vector
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
@@ -209,7 +210,8 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 	strcat(conf, file);
 
 	//load conf
-	if (!load_conf(conf, (char*)&modelconf, modelconfindex))
+	Directories dirs;
+	if (!(dirs.Find(conf, DATA, READ) && load_conf(dirs.Path(), (char*)&modelconf, modelconfindex)))
 		return NULL;
 
 	//if we got no filename from the conf, nothing more to do

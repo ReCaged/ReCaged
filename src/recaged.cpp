@@ -32,6 +32,7 @@
 #include "shared/profile.hpp"
 #include "shared/track.hpp"
 #include "shared/trimesh.hpp"
+#include "shared/directories.hpp"
 
 
 Uint32 starttime = 0;
@@ -86,19 +87,20 @@ void Run_Race(void)
 //try to load "tmp menu selections" for menu simulation
 //what we do is try to open this file, and then try to find menu selections in it
 //note: if selections are not found, will still fall back on safe defaults
-bool tmp_menus(const char *profiledir)
+bool tmp_menus()
 {
 	//initiate interface
 	if (!Interface_Init())
 		return false;
 
 	std::string sprofile, sworld, strack, steam, scar, sdiameter, styre, srim; //easy text manipulation...
+	Directories dirs; //for finding
 	Text_File file; //for parsing
-	file.Open("tmp menu selections"); //just assume it opens...
+	dirs.Find("tmp_menu_selections", CONFIG, READ);
+	file.Open(dirs.Path()); //just assume it opens (no harm if not)...
 
 	//MENU: welcome to rc, please select profile or create a new profile
-	sprofile = profiledir; //specified dir
-	sprofile += "/"; //and separator
+	sprofile = "profiles/";
 	if (file.Read_Line() && file.word_count == 2 && !strcmp(file.words[0], "profile"))
 		sprofile += file.words[1];
 	else
@@ -330,10 +332,6 @@ static const struct option options[] =
 };
 
 
-//default options (paths)
-const char profiledefault[] = "profiles";
-char *datadefault; //need to check path to rc before deciding this
-
 //main function, will change a lot in future versions...
 int main (int argc, char *argv[])
 {
@@ -345,10 +343,6 @@ int main (int argc, char *argv[])
 		printf("Error: couldn't initiate SDL: %s", SDL_GetError());
 	}
 	Log_Init();
-
-	//set default values:
-	const char *datadir = datadefault;
-	const char *profiledir = profiledefault;
 
 	//use getopt to parse options to to allow overide defaults:
 	char c;
@@ -433,51 +427,15 @@ Options for overriding normal directory detection:\n\
 	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
 	Directories::Init(argv[0], false, false, NULL, NULL);
-	Directories::debug();
-	Directories::Quit();
-	return 0;
-	//Log_File(...);
-	//load_conf ("internal.conf", (char *)&internal, internal_index);
+	//TODO: Log_File(...);
 
-	//attempt to generate default data path
-	//check if program was called with another pwd (got '/' in "name")
-	if (char *s = strrchr(argv[0], '/'))
-	{
-		//"<path to self - minus self>/data"
-		int length=strlen(argv[0])-strlen(s)+1;
+	Directories dirs;
 
-		datadefault=new char[length+5];
+	//load conf file if found
+	if (dirs.Find("internal.conf", CONFIG, READ)) load_conf (dirs.Path(), (char *)&internal, internal_index);
 
-		//copy the path to self (first part of argv0)
-		strncpy(datadefault, argv[0], length);
-		//add null termination (for strcat)
-		datadefault[length]='\0';
-		//append data instead of self
-		strcat(datadefault, "data");
-	}
-	else
-	{
-		//just change into "data"
-		datadefault=new char[5];
-		strcpy(datadefault, "data");
-	}
-	//ok, try to get into the data directory
-	if (chdir (datadir))
-	{
-		Log_Add(0, "Failed to cd into data directory...\n");
-
-		//lets see if this was not the default (and the default works):
-		if ( (datadir != datadefault) && !chdir(datadefault) )
-			Log_Add(1, "Using default directory (\"%s\") instead\n", datadefault);
-		else
-			Log_Add(1, "Will try to load from current directory instead...\n");
-	}
-
-	//not needed anymore (used or not, will not be needed any more)
-	delete[] datadefault;
-
-
-
+	//update log verbosity according to settings in conf _and_ any arguments)
+	Log_Change_Verbosity((internal.verbosity-1));
 
 	//TODO: rotate credits/libraries order/descriptions
 	Log_puts(1, "\
@@ -511,20 +469,14 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 - See README for more info -\n\n");
 
 
-
 	//ok, start loading
 	Log_Add(1, "Loading...");
 	runlevel = loading;
 
-	load_conf ("internal.conf", (char *)&internal, internal_index);
-
-	//update log verbosity according to settings in conf _and_ any arguments)
-	Log_Change_Verbosity((internal.verbosity-1));
-
 	//
 	//TODO: there should be menus here, but menu/osd system is not implemented yet... also:
 	//on failure, rc should not just terminate but instead abort the race and warn the user
-	if (!tmp_menus(profiledir))
+	if (!tmp_menus())
 	{
 		Log_Add(0, "One or more errors, can not start!");
 		return -1; //just quit if failure
@@ -550,10 +502,10 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 
 	Log_puts(1, "\n Bye!\n\n");
 
-	//close log output
+	//close
+	SDL_Quit();
 	Log_Quit();
 	Directories::Quit();
-	SDL_Quit();
 
 	return 0;
 }

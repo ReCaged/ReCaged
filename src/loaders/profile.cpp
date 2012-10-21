@@ -22,6 +22,7 @@
 //#include "../shared/shared.hpp"
 #include "../shared/profile.hpp"
 #include "../shared/log.hpp"
+#include "../shared/directories.hpp"
 #include "text_file.hpp"
 //#include "loaders.hpp"
 
@@ -85,12 +86,15 @@ Profile *Profile_Load (const char *path)
 
 	*prof = profile_defaults; //set all to defaults
 
+	//for finding
+	Directories dirs;
+
 	//load personal conf
 	char conf[strlen(path)+13+1];//+1 for \0
 	strcpy (conf,path);
 	strcat (conf,"/profile.conf");
 
-	load_conf(conf, (char *)prof, profile_index); //try to load conf
+	if (dirs.Find(conf, CONFIG, READ)) load_conf(dirs.Path(), (char *)prof, profile_index); //try to load conf
 
 	//set camera
 	if (prof->camera >0 && prof->camera <5)
@@ -106,7 +110,7 @@ Profile *Profile_Load (const char *path)
 	Log_Add(1, "Loading key list: %s", list);
 	Text_File file;
 
-	if (file.Open(list))
+	if (dirs.Find(list, CONFIG, READ), file.Open(dirs.Path()))
 	{
 		while (file.Read_Line())
 		{

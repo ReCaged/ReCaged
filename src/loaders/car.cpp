@@ -29,6 +29,7 @@
 #include "../shared/body.hpp"
 #include "../shared/joint.hpp"
 #include "text_file.hpp"
+#include "../shared/directories.hpp"
 
 
 Car_Template *Car_Template::Load (const char *path)
@@ -47,7 +48,8 @@ Car_Template *Car_Template::Load (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/car.conf");
 
-	if (!load_conf(conf, (char *)&target->conf, car_conf_index)) //try to load conf
+	Directories dirs;
+	if (!(dirs.Find(conf, DATA, READ) && load_conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
 		return NULL;
 
 	//geoms.lst
@@ -56,7 +58,7 @@ Car_Template *Car_Template::Load (const char *path)
 	strcat (lst, "/geoms.lst");
 
 	Text_File file;
-	if (file.Open(lst))
+	if (dirs.Find(lst, DATA, READ) && file.Open(dirs.Path()))
 	{
 		//default surface parameters
 		Surface surface;

@@ -32,7 +32,7 @@
 char *Directories::user_conf=NULL, *Directories::user_data=NULL, *Directories::user_cache=NULL;
 char *Directories::inst_conf=NULL, *Directories::inst_data=NULL;
 
-bool Directories::Check_Path(char *path, Directories::operation op)
+bool Directories::Check_Path(char *path, dir_operation op)
 {
 	if (!path || path[0]=='\0') //doubt this kind of stupidity, but...
 	{
@@ -117,7 +117,7 @@ bool Directories::Check_Path(char *path, Directories::operation op)
 }
 
 //concatenate path1+path2, check if ok and copy to target string
-bool Directories::Try_Set_Path(char **target, Directories::operation op,
+bool Directories::Try_Set_Path(char **target, dir_operation op,
 		const char *path1, const char *path2)
 {
 	//something is wrong
@@ -134,8 +134,7 @@ bool Directories::Try_Set_Path(char **target, Directories::operation op,
 
 	if (Check_Path(path, op))
 	{
-		if (*target)
-			delete *target;
+		if (*target) delete *target;
 		*target = new char[strlen(path)+1];
 		strcpy(*target, path);
 
@@ -146,7 +145,7 @@ bool Directories::Try_Set_Path(char **target, Directories::operation op,
 }
 
 //concatenate path1+path2 for file path, and check if file is possible
-bool Directories::Try_Set_File(Directories::operation op,
+bool Directories::Try_Set_File(dir_operation op,
 				const char *path1, const char *path2)
 {
 	if (!path1 || !path2)
@@ -231,7 +230,7 @@ bool Directories::Try_Set_File(Directories::operation op,
 	}
 
 	//else, we're ready to go!
-	file_path = new char[strlen(file)];
+	file_path = new char[strlen(file)+1];
 	strcpy(file_path, file);
 	return true;
 }
@@ -303,7 +302,7 @@ bool Directories::Try_Set_File_Append(const char *user, const char *inst, const 
 	}
 
 	fclose(fp);
-	file_path = new char[strlen(upath)];
+	file_path = new char[strlen(upath)+1];
 	strcpy(file_path, upath);
 	return true;
 }
@@ -573,7 +572,7 @@ Directories::~Directories()
 }
 
 const char *Directories::Find(const char *path,
-		Directories::type type, Directories::operation op)
+		dir_type type, dir_operation op)
 {
 	delete file_path; file_path=NULL;
 
@@ -632,16 +631,3 @@ const char *Directories::Path()
 	return file_path;
 }
 
-
-void Directories::debug()
-{
-	FILE *f;
-	Directories dir;
-	if (dir.Find("tmp.txt", DATA, APPEND))
-		f=fopen(dir.Path(), "a");
-	else
-		f=fopen("tmp.txt", "a");
-
-	fprintf(f, "uconf %s\nudata \%s\nucache %s\niconf %s\nidata %s\n", user_conf, user_data, user_cache, inst_conf, inst_data);
-	fclose(f);
-}

@@ -46,6 +46,8 @@
 //
 
 #define COPY_BUFFER_SIZE 4096 //should be good (plus covers common block/sectorsizes)
+typedef enum {READ, WRITE, APPEND} dir_operation;
+typedef enum {CONFIG, DATA, CACHE} dir_type;
 
 class Directories
 {
@@ -57,23 +59,17 @@ class Directories
 		Directories();
 		~Directories();
 
-		static void debug();
-
-		typedef enum {READ, WRITE, APPEND} operation;
-		typedef enum {CONFIG, DATA, CACHE} type;
-		const char *Find(const char *path,
-				Directories::type type,
-				Directories::operation op);
+		const char *Find(const char *path, dir_type type, dir_operation op);
 		const char *Path(); //return again
 
 	private:
-		static bool Check_Path(char*path, Directories::operation op); //NOTE: requires non-const string
-		static bool Try_Set_Path(char **target, Directories::operation op,
+		static bool Check_Path(char*path, dir_operation op); //NOTE: requires non-const string
+		static bool Try_Set_Path(char **target, dir_operation op,
 				const char *path1, const char *path2);
 		static char *user_conf, *user_data, *user_cache;
 		static char *inst_conf, *inst_data;
 
-		bool Try_Set_File(Directories::operation op,
+		bool Try_Set_File(dir_operation op,
 				const char *path1, const char *path2);
 		bool Try_Set_File_Append(const char *user, const char *inst,
 				const char *path);

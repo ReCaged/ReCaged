@@ -27,6 +27,7 @@
 #include "../shared/geom.hpp"
 #include "../shared/log.hpp"
 #include "../shared/object.hpp"
+#include "../shared/directories.hpp"
 
 #include "text_file.hpp"
 
@@ -80,6 +81,7 @@ void RemoveMeshes()
 bool load_track (const char *path)
 {
 	Log_Add(1, "Loading track: %s", path);
+	Directories dirs;
 
 	//
 	//conf
@@ -88,7 +90,7 @@ bool load_track (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/track.conf");
 
-	load_conf(conf, (char *)&track, track_index);
+	if (dirs.Find(conf, DATA, READ)) load_conf(dirs.Path(), (char *)&track, track_index);
 
 	//set camera default values, some from track specs
 	camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
@@ -122,7 +124,7 @@ bool load_track (const char *path)
 	Log_Add(1, "Loading track geom list: %s", glist);
 	Text_File file;
 
-	if (file.Open(glist))
+	if (dirs.Find(glist, DATA, READ) && file.Open(dirs.Path()))
 	{
 		//store default global surface properties for all geoms
 		Surface global;
@@ -334,7 +336,7 @@ bool load_track (const char *path)
 	Object_Template *obj = NULL;
 
 	//don't fail if can't find file, maybe there is no need for it anyway
-	if (file.Open(olist))
+	if (dirs.Find(olist, DATA, READ) && file.Open(dirs.Path()))
 	{
 		while (file.Read_Line())
 		{

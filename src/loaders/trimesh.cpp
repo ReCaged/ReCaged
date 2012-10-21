@@ -21,6 +21,7 @@
 
 #include "../shared/trimesh.hpp"
 #include "../shared/log.hpp"
+#include "../shared/directories.hpp"
 
 //
 //for trimesh file loading
@@ -47,13 +48,18 @@ bool Trimesh::Load(const char *file)
 		return false;
 	}
 
+	//find
+	Directories dirs;
+	if (!dirs.Find(file, DATA, READ))
+		return false;
+
 	//see if match:
 	if (!strcasecmp(suffix, ".obj"))
-		return Load_OBJ(file);
+		return Load_OBJ(dirs.Path());
 	else if (!strcasecmp(suffix, ".road"))
-		return Load_Road(file);
+		return Load_Road(dirs.Path());
 	//else if (!strcasecmp(suffix, ".3ds"))
-		//return Load_3DS(file);
+		//return Load_3DS(dirs.Path());
 	
 	//else, no match
 	Log_Add(0, "ERROR: unknown 3D file suffix for \"%s\"", file);

@@ -50,6 +50,7 @@ Text_File::Text_File ()
 	}
 }
 
+#include <unistd.h>
 Text_File::~Text_File ()
 {
 	Close();
