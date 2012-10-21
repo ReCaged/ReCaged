@@ -24,8 +24,15 @@
 #ifndef _RC_PRINTLOG_H
 #define _RC_PRINTLOG_H
 
+//max line size (should be enough...)
+#define LOG_BUFFER_SIZE 2048
+
+//TODO: should store copy of log in memory as well
+
 //configuration
 void Log_Init();
+//enable/disable log file
+bool Log_File(const char *file);
 //set verbosity level
 void Log_Change_Verbosity(int);
 //Log_File();

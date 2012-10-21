@@ -427,9 +427,10 @@ Options for overriding normal directory detection:\n\
 	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
 	Directories::Init(argv[0], false, false, NULL, NULL);
-	//TODO: Log_File(...);
 
+	//enable file logging (if possible)
 	Directories dirs;
+	if (dirs.Find("log.txt", CACHE, WRITE)) Log_File(dirs.Path());
 
 	//load conf file if found
 	if (dirs.Find("internal.conf", CONFIG, READ)) load_conf (dirs.Path(), (char *)&internal, internal_index);

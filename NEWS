@@ -9,5 +9,6 @@ TODO: more info in header!
 ReCaged 0.7.1 (?/?/2012)
 	* Move to Autotools (Automake, Autoconf) for building
 	* Detect if running in "installed" or "portable" mode
+	* Logging to file
 	* NSIS installer for w32
 	* Joystick (gamepad) support
