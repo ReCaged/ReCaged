@@ -20,33 +20,34 @@
  */ 
 
 #include <stdarg.h>
+#include <SDL/SDL_mutex.h>
 #include "internal.hpp"
 #include "log.hpp"
 
 //default
 int stdout_verbosity = 1;
 FILE *logfile = NULL;
-char *buffer = NULL;
+char *logbuffer = NULL;
+SDL_mutex *logmutex = NULL;
 
 //set up logging
 void Log_Init()
 {
-	//probably pointless, but anyway
-	stdout_verbosity = 1;
-	buffer = new char[LOG_BUFFER_SIZE];
-
-	//TODO: create mutex
+	stdout_verbosity = 1; //make sure
+	logbuffer = new char[LOG_BUFFER_SIZE];
+	logmutex = SDL_CreateMutex();
 }
 
 bool Log_File(const char *file)
 {
-	//TODO: use mutex!
+	SDL_mutexP(logmutex); //just make sure no logging while closing
 	if (logfile)
 	{
 		Log_Add(2, "Closing current log file");
 		fclose(logfile);
 		logfile=NULL;
 	}
+	SDL_mutexV(logmutex); //should be fine from now
 
 	if (file)
 	{
@@ -80,8 +81,8 @@ void Log_Change_Verbosity(int v)
 void Log_Quit()
 {
 	Log_Add(2, "Logging disabled");
-	delete[] buffer;
-	//TODO: destroy mutex
+	delete[] logbuffer;
+	SDL_DestroyMutex(logmutex);
 }
 
 //verbosity indicators (MUST have strlen 3!)
@@ -90,68 +91,77 @@ const char *indicator[] = {"=> ", " > ", " * "};
 //print log message - if it's below or equal to the current verbosity level
 void Log_Add (int level, const char *text, ...)
 {
-	//TODO: use mutex!
 	//TODO: should probably check for error from fputs, putc, puts
 	if (logfile || level <= stdout_verbosity)
 	{
-		if (level==0)
-			putchar('\n');
+		SDL_mutexP(logmutex); //make sure no conflicts
 
 		//begin with verbosity indicator (if in normal range)
 		if (level >=0 && level <=2)
-			strcpy(buffer, indicator[level]);
+			strcpy(logbuffer, indicator[level]);
 		else
 			fputs(" ? ", stdout);
 
 		//print message
 		va_list list;
 		va_start (list, text);
-		int i=vsnprintf (buffer+3, LOG_BUFFER_SIZE-3, text, list);
+		int i=vsnprintf (logbuffer+3, LOG_BUFFER_SIZE-3, text, list);
 		va_end (list);
 
 		//safety precaution...
 		if (i==-1)
 		{
 			puts("ERROR DURING LOG OUTPUT GENERATION!");
+			SDL_mutexV(logmutex);
 			return;
 		}
 
 		//write to targets (+add newling)
 		if (logfile)
 		{
-			fputs(buffer, logfile);
+			if (level==0) fputc('\n', logfile); //clear separation of text
+			fputs(logbuffer, logfile);
 			putc('\n', logfile); //should be faster than fputc...
 		}
-		if (level <=stdout_verbosity) puts(buffer);
+		if (level <=stdout_verbosity)
+		{
+			if (level==0) putchar('\n');
+			puts(logbuffer);
+		}
+
+		SDL_mutexV(logmutex); //ok
 	}
 }
 
 //just wrappers:
 void Log_printf (int level, const char *text, ...)
 {
-	//TODO: use mutex!
 	if (logfile || level <= stdout_verbosity)
 	{
+		SDL_mutexP(logmutex);
 		va_list list;
 		va_start (list, text);
-		int i=vsnprintf (buffer, LOG_BUFFER_SIZE, text, list);
+		int i=vsnprintf (logbuffer, LOG_BUFFER_SIZE, text, list);
 		va_end (list);
 
 		if (i==-1)
 		{
 			puts("ERROR DURING LOG OUTPUT GENERATION!");
+			SDL_mutexV(logmutex);
 			return;
 		}
 
-		if (logfile) fputs(buffer, logfile);
-		if (level <=stdout_verbosity) fputs(buffer, stdout);
+		if (logfile) fputs(logbuffer, logfile);
+		if (level <=stdout_verbosity) fputs(logbuffer, stdout);
+		SDL_mutexV(logmutex);
 	}
 }
 
 void Log_puts (int level, const char *text)
 {
-	//TODO: use mutex!
+	SDL_mutexP(logmutex);
 	if (logfile) fputs(text, logfile);
 	if (level <= stdout_verbosity) fputs(text, stdout);
+	SDL_mutexV(logmutex);
 }
 
