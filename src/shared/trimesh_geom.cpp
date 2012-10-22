@@ -135,8 +135,6 @@ Geom *Trimesh_Geom::Create_Geom(Object *obj)
 
 Trimesh_Geom::~Trimesh_Geom()
 {
-	Log_Add(2, "Removing collision trimesh");
-
 	delete[] vertices;
 	delete[] indices;
 	delete[] normals;
@@ -152,7 +150,7 @@ Trimesh_Geom::~Trimesh_Geom()
 //method Trimesh_Geom from Trimesh
 Trimesh_Geom *Trimesh::Create_Geom()
 {
-	Log_Add(2, "Creating collision trimesh from class");
+	Log_Add(2, "Creating collision trimesh");
 
 	//already created?
 	if (Trimesh_Geom *tmp = Racetime_Data::Find<Trimesh_Geom>(name.c_str()))

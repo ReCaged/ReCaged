@@ -213,7 +213,7 @@ bool Trimesh::Load_OBJ(const char *f)
 	Normalize_Normals();
 	Generate_Missing_Normals(); //creates missing normals - unit, don't need normalizing
 
-	Log_Add(1, "OBJ info: %u triangles, %u materials", triangle_count, materials.size());
+	Log_Add(2, "OBJ loading info: %u triangles, %u materials", triangle_count, materials.size());
 
 	return true;
 }

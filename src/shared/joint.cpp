@@ -27,17 +27,12 @@ Joint *Joint::head = NULL;
 
 Joint::Joint (dJointID joint, Object *obj): Component(obj)
 {
-	Log_Add(2, "configuring Joint class");
-
 	//add it to the list
 	next = head;
 	head = this;
 	prev = NULL;
 
-	if (next)
-		next->prev = this;
-	else
-		Log_Add(2, "(first registered)");
+	if (next) next->prev = this;
 
 	//add it to the joint
 	dJointSetData (joint, (void*)(this));
@@ -52,9 +47,6 @@ Joint::Joint (dJointID joint, Object *obj): Component(obj)
 //destroys a joint, and removes it from the list
 Joint::~Joint ()
 {
-	//lets just hope the given pointer is ok...
-	Log_Add(2, "clearing Joint class");
-
 	//remove all events
 	Event_Buffer_Remove_All(this);
 
@@ -68,8 +60,7 @@ Joint::~Joint ()
 		next->prev = prev;
 
 	//2: remove it from memory
-	if (feedback)
-		delete feedback;
+	if (feedback) delete feedback;
 
 	dJointDestroy(joint_id);
 }

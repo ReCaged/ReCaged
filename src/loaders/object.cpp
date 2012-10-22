@@ -177,8 +177,8 @@ void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 //TODO: rotation
 void Object_Template::Spawn (dReal x, dReal y, dReal z)
 {
-	Log_Add(2, "Spawning object at: %f %f %f", x,y,z);
-	//prettend to be executing the script... just load debug values
+	Log_Add(1, "Spawning object at: %f %f %f", x,y,z);
+	//pretend to be executing the script... just load debug values
 	//
 
 	if (box)

@@ -43,7 +43,9 @@ bool Log_File(const char *file)
 	SDL_mutexP(logmutex); //just make sure no logging while closing
 	if (logfile)
 	{
-		Log_Add(2, "Closing current log file");
+		if (file) Log_Add(2, "Closing current log file");
+		else Log_Add(2, "File logging disabled");
+
 		fclose(logfile);
 		logfile=NULL;
 	}
@@ -53,7 +55,7 @@ bool Log_File(const char *file)
 	{
 		if ((logfile=fopen(file, "w")))
 		{
-			Log_Add(2, "Using file \"%s\" for logging", file);
+			Log_Add(2, "Using \"%s\" for logging", file);
 			return true;
 		}
 		else
@@ -63,8 +65,6 @@ bool Log_File(const char *file)
 		}
 	}
 
-	//if got here
-	Log_Add(2, "File logging disabled");
 	return true;
 }
 
@@ -80,7 +80,7 @@ void Log_Change_Verbosity(int v)
 
 void Log_Quit()
 {
-	Log_Add(2, "Logging disabled");
+	Log_File(NULL); //make sure is closed
 	delete[] logbuffer;
 	SDL_DestroyMutex(logmutex);
 }

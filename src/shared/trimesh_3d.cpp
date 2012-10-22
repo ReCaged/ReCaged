@@ -40,7 +40,7 @@ class VBO: public Racetime_Data
 		//find a vbo with enough room, if not create a new one
 		static VBO *Find_Enough_Room(unsigned int needed)
 		{
-			Log_Add(1, "Locating vbo to hold %u bytes of data", needed);
+			Log_Add(2, "Locating vbo to hold %u bytes of data", needed);
 
 			//in case creating
 			GLsizei size=DEFAULT_VBO_SIZE;
@@ -49,7 +49,7 @@ class VBO: public Racetime_Data
 			//check so enough space in even a new vbo:
 			if (needed > DEFAULT_VBO_SIZE)
 			{
-				Log_Add(1, "creating new vbo for single model, %u bytes of size", needed);
+				Log_Add(2, "creating new vbo for single model, %u bytes of size", needed);
 				dedicated=true;
 				size=needed;
 			}
@@ -59,12 +59,12 @@ class VBO: public Racetime_Data
 				for (VBO *p=head; p; p=p->next)
 					if ( !p->dedicated && (p->usage)+needed <= (unsigned int) DEFAULT_VBO_SIZE ) //not dedicated+enough to hold
 					{
-						Log_Add(1, "reusing already existing vbo for model");
+						Log_Add(2, "reusing already existing vbo for model");
 						return p;
 					}
 
 				//else, did not find enough room, create
-				Log_Add(1, "creating new vbo for multiple models, %u bytes of size", DEFAULT_VBO_SIZE);
+				Log_Add(2, "creating new vbo for multiple models, %u bytes of size", DEFAULT_VBO_SIZE);
 			}
 
 
@@ -135,8 +135,6 @@ Trimesh_3D::Trimesh_3D(const char *name, float r, GLuint vbo, Material *mpointer
 //only called together with all other racetime_data destruction (at end of race)
 Trimesh_3D::~Trimesh_3D()
 {
-	Log_Add(2, "Removing rendering trimesh");
-
 	//remove local data:
 	delete[] materials;
 }
@@ -211,13 +209,13 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 
 	//load conf
 	Directories dirs;
-	if (!(dirs.Find(conf, DATA, READ) && load_conf(dirs.Path(), (char*)&modelconf, modelconfindex)))
+	if (!(dirs.Find(conf, DATA, READ) && Load_Conf(dirs.Path(), (char*)&modelconf, modelconfindex)))
 		return NULL;
 
 	//if we got no filename from the conf, nothing more to do
 	if (!modelconf.model)
 	{
-		Log_Add(1, "WARNING: could not find model filename in conf \"%s\"", conf);
+		Log_Add(2, "WARNING: could not find model filename in conf \"%s\"", conf);
 		return NULL;
 	}
 
@@ -236,8 +234,6 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 //method for creating a Trimesh_3D from Trimesh
 Trimesh_3D *Trimesh::Create_3D()
 {
-	Log_Add(2, "Creating rendering trimesh from class");
-
 	//already uploaded?
 	if (Trimesh_3D *tmp = Racetime_Data::Find<Trimesh_3D>(name.c_str()))
 		return tmp;

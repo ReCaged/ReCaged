@@ -32,9 +32,9 @@
 #include <ode/ode.h>
 
 //loads configuration file to memory (using index)
-bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
+bool Load_Conf (const char *name, char *memory, const struct Conf_Index index[])
 {
-	Log_Add(1, "Loading conf file: %s", name);
+	Log_Add(2, "Loading conf file: %s", name);
 
 	Text_File file;
 	if (!file.Open(name))

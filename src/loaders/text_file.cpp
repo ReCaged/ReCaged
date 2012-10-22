@@ -42,12 +42,6 @@ Text_File::Text_File ()
 	list_size = INITIAL_TEXT_FILE_LIST_SIZE;
 	buffer = new char[buffer_size];
 	words = new char*[list_size];
-
-	if (!buffer || !words)
-	{
-		Log_Add(0, "lack of memory for initial Text_File allocation, will exit!");
-		exit(-1);
-	}
 }
 
 #include <unistd.h>
@@ -63,8 +57,6 @@ bool Text_File::Open (const char *file)
 {
 	//close old
 	Close();
-
-	Log_Add(2, "Text_File: opening file %s", file);
 
 	//open
 #ifndef _WIN32
@@ -93,7 +85,6 @@ void Text_File::Close()
 	//make sure no old data is left
 	if (fp)
 	{
-		Log_Add(2, "Text_File: closing file");
 		fclose (fp);
 		Clear_List();
 	}
@@ -204,7 +195,7 @@ bool Text_File::Buffer_To_List()
 			//wery unusual error (line ends after quotation mark)
 			if (*buffer_ptr == '\0')
 			{
-				Log_Add(0, "WARNING: Text_File line ended just after quotation mark (not counted)...");
+				Log_Add(0, "WARNING: Text_File line ended just after quotation mark (ignored)...");
 				break;
 			}
 
@@ -216,7 +207,7 @@ bool Text_File::Buffer_To_List()
 				++buffer_ptr;
 
 			if (*buffer_ptr=='\0') //end of line before end of quote
-				Log_Add(0, "WARNING: Text_File reached end of line before end of quote...");
+				Log_Add(0, "WARNING: Text_File reached end of line before end of quote (ignored)...");
 			else
 			{
 				*buffer_ptr = '\0'; //make this end (instead of ")

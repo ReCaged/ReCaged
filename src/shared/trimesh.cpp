@@ -160,8 +160,6 @@ void Trimesh::Resize(float r)
 		return;
 	}
 
-	Log_Add(2, "Resizing trimesh");
-
 	size_t end = vertices.size();
 	size_t i;
 
@@ -177,8 +175,6 @@ void Trimesh::Rotate(float x, float y, float z)
 {
 	if (x==0 && y==0 && z==0)
 		return;
-
-	Log_Add(2, "Rotating trimesh");
 
 	//rotation matrix:
 	dMatrix3 rot;
@@ -217,8 +213,6 @@ void Trimesh::Offset(float x, float y, float z)
 	if (x==0 && y==0 && z==0)
 		return;
 
-	Log_Add(2, "Changing offset of trimesh");
-
 	size_t end = vertices.size();
 	size_t i;
 
@@ -232,7 +226,6 @@ void Trimesh::Offset(float x, float y, float z)
 
 float Trimesh::Find_Longest_Distance()
 {
-	Log_Add(2, "Finding longest distance vertex in trimesh (\"radius\")");
 	size_t end = vertices.size();
 	size_t i;
 	float biggest=0.0, length;
@@ -246,7 +239,7 @@ float Trimesh::Find_Longest_Distance()
 			biggest=length;
 	}
 
-	Log_Add(2, "longest distance in trimesh: %f", biggest);
+	Log_Add(2, "Furthest vertex distance in trimesh (\"radius\"): %f", biggest);
 
 	return biggest;
 }

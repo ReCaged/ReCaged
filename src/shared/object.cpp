@@ -56,16 +56,11 @@ Object *Object::head = NULL;
 //allocate a new object, add it to the list and returns its pointer
 Object::Object ()
 {
-	Log_Add(1, "creating Object");
-
 	prev=NULL;
 	next=head;
 	head=this;
 
-	if (next)
-		next->prev = this;
-	else
-		Log_Add(2, "(first registered object)");
+	if (next) next->prev = this;
 
 	//default values
 	components = NULL;
@@ -76,9 +71,7 @@ Object::Object ()
 //destroys an object
 Object::~Object()
 {
-	//lets just hope the given pointer is ok...
-	Log_Add(1, "freeing Object");
-
+	Log_Add(1, "Object removed");
 	//1: remove it from the list
 	if (prev == NULL) //first link
 		head = next;

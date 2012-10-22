@@ -90,7 +90,7 @@ bool load_track (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/track.conf");
 
-	if (dirs.Find(conf, DATA, READ)) load_conf(dirs.Path(), (char *)&track, track_index);
+	if (dirs.Find(conf, DATA, READ)) Load_Conf(dirs.Path(), (char *)&track, track_index);
 
 	//set camera default values, some from track specs
 	camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
@@ -121,7 +121,7 @@ bool load_track (const char *path)
 	strcpy (glist,path);
 	strcat (glist,"/geoms.lst");
 
-	Log_Add(1, "Loading track geom list: %s", glist);
+	Log_Add(2, "Loading track geom list: %s", glist);
 	Text_File file;
 
 	if (dirs.Find(glist, DATA, READ) && file.Open(dirs.Path()))
@@ -330,7 +330,7 @@ bool load_track (const char *path)
 	strcpy (olist,path);
 	strcat (olist,"/objects.lst");
 
-	Log_Add(1, "Loading track object list: %s", olist);
+	Log_Add(2, "Loading track object list: %s", olist);
 
 	//each object is loaded/selected at a time (NULL if none loaded so far)
 	Object_Template *obj = NULL;

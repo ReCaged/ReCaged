@@ -433,7 +433,11 @@ Options for overriding normal directory detection:\n\
 	if (dirs.Find("log.txt", CACHE, WRITE)) Log_File(dirs.Path());
 
 	//load conf file if found
-	if (dirs.Find("internal.conf", CONFIG, READ)) load_conf (dirs.Path(), (char *)&internal, internal_index);
+	if (dirs.Find("internal.conf", CONFIG, READ)) Load_Conf (dirs.Path(), (char *)&internal, internal_index);
+
+	//disable file logging is requested
+	if (!internal.logfile)
+		Log_File(NULL);
 
 	//update log verbosity according to settings in conf _and_ any arguments)
 	Log_Change_Verbosity((internal.verbosity-1));

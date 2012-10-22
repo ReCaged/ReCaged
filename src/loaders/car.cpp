@@ -49,7 +49,7 @@ Car_Template *Car_Template::Load (const char *path)
 	strcat (conf,"/car.conf");
 
 	Directories dirs;
-	if (!(dirs.Find(conf, DATA, READ) && load_conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
+	if (!(dirs.Find(conf, DATA, READ) && Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
 		return NULL;
 
 	//geoms.lst
@@ -308,9 +308,9 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
-	Log_Add(1, "NOTE: wheels will not collide to other wheels - OPCODE lacks cylinder*cylinder collision");
+	Log_Add(1, "NOTE: wheels will not collide with each others unless ODE was built with \"--enable-libccd\"");
 
-	Log_Add(1, "TODO: proper antigravity and downforce (only debug implementation right now!)");
+	Log_Add(1, "TODO: proper antigravity and downforce (only test implementation right now!)");
 
 
 	//begin copying of needed configuration data

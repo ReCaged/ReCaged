@@ -411,7 +411,7 @@ void Position(float *pos, float *p0, float *p1, float *p2, float *p3, float t)
 
 bool Trimesh::Load_Road(const char *f)
 {
-	Log_Add(2, "Loading trimesh from road file %s", f);
+	Log_Add(2, "Loading trimesh from ROAD file %s", f);
 
 	Text_File file;
 
@@ -716,7 +716,7 @@ bool Trimesh::Load_Road(const char *f)
 	//make sure all normals are unit
 	Normalize_Normals();
 
-	Log_Add(1, "ROAD generation info: %u triangles, %u materials", triangle_count, materials.size());
+	Log_Add(2, "ROAD generation info: %u triangles, %u materials", triangle_count, materials.size());
 
 	return true;
 }

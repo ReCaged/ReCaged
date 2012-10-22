@@ -30,8 +30,7 @@
 //wrapper for loading
 bool Trimesh::Load(const char *file)
 {
-	Log_Add(1, "Loading trimesh from file \"%s\"", file);
-	Log_Add(2, "determining file type from suffix");
+	Log_Add(2, "Loading trimesh from file \"%s\" (identifying suffix)", file);
 
 	if (file == NULL)
 	{
@@ -69,8 +68,7 @@ bool Trimesh::Load(const char *file)
 //for materials
 bool Trimesh::Load_Material(const char *file)
 {
-	Log_Add(1, "Loading material from file \"%s\"", file);
-	Log_Add(2, "determining file type from suffix");
+	Log_Add(2, "Loading material from file \"%s\" (identifying suffix)", file);
 
 	if (file == NULL)
 	{

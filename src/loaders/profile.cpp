@@ -56,15 +56,11 @@ SDLKey & operator++ (SDLKey & key)
 //translate button name to key number
 SDLKey get_key (char *name)
 {
-	Log_Add(2, "translating key name");
 	SDLKey key;
 
 	for (key=SDLK_FIRST; key<SDLK_LAST; ++key)
 		if (strcmp(SDL_GetKeyName(key), name) == 0)
-		{
-			Log_Add(2, "name match found");
 			return key;
-		}
 
 	//we only get here if no match found
 	Log_Add(0, "ERROR: Key name %s didn't match any known key!", name);
@@ -94,7 +90,7 @@ Profile *Profile_Load (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/profile.conf");
 
-	if (dirs.Find(conf, CONFIG, READ)) load_conf(dirs.Path(), (char *)prof, profile_index); //try to load conf
+	if (dirs.Find(conf, CONFIG, READ)) Load_Conf(dirs.Path(), (char *)prof, profile_index); //try to load conf
 
 	//set camera
 	if (prof->camera >0 && prof->camera <5)
@@ -107,14 +103,13 @@ Profile *Profile_Load (const char *path)
 	strcpy (list,path);
 	strcat (list,"/keys.lst");
 
-	Log_Add(1, "Loading key list: %s", list);
+	Log_Add(2, "Loading key list: %s", list);
 	Text_File file;
 
 	if (dirs.Find(list, CONFIG, READ), file.Open(dirs.Path()))
 	{
 		while (file.Read_Line())
 		{
-			Log_Add(2, "action: %s", file.words[0]);
 
 			//find match
 			for (int i=0; i<9; ++i)
@@ -124,7 +119,6 @@ Profile *Profile_Load (const char *path)
 				{
 					//these are rather crude, but doesn't matter:
 					//they're safe and will be replaced when moving to lua
-					Log_Add(2, "match found");
 					if (file.word_count == 3 && !strcmp(file.words[1], "key")) //keyboard
 					{
 						prof->input[i].key = get_key(file.words[2]);
