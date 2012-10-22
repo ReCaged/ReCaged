@@ -26,10 +26,6 @@
 #
 
 
-#start shell, creates home, run script...
-#recaged: sdl, ode, glew static, -mconsole
-
-
 mkdir /tmp/make_w32_tmp &>/dev/null
 
 
