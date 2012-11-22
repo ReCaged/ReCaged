@@ -89,10 +89,6 @@ void Run_Race(void)
 //note: if selections are not found, will still fall back on safe defaults
 bool tmp_menus()
 {
-	//initiate interface
-	if (!Interface_Init())
-		return false;
-
 	std::string sprofile, sworld, strack, steam, scar, sdiameter, styre, srim; //easy text manipulation...
 	Directories dirs; //for finding
 	Text_File file; //for parsing
@@ -347,6 +343,8 @@ int main (int argc, char *argv[])
 
 	//use getopt_long to parse options to override defaults:
 	char c;
+	bool window=false, fullscreen=false;
+	int xres=0, yres=0;
 	char *port_overr=NULL, *inst_overr=NULL, *user_overr=NULL, *conf_overr=NULL;
 	bool inst_force=false, port_force=false;
 
@@ -373,23 +371,31 @@ int main (int argc, char *argv[])
 				break;
 
 			case 'w':
-				Log_Add(0, "TODO!");
-				exit(-1);
+				window=true;
+				fullscreen=false;
 				break;
 
 			case 'f':
-				Log_Add(0, "TODO!");
-				exit(-1);
+				fullscreen=true;
+				window=false;
 				break;
 
 			case 'x':
-				Log_Add(0, "TODO!");
-				exit(-1);
+				xres=atoi(optarg);
+				if (xres <= 0)
+				{
+					Log_Add(0, "ERROR: window width requires a positive integer");
+					exit(-1);
+				}
 				break;
 
 			case 'y':
-				Log_Add(0, "TODO!");
-				exit(-1);
+				yres=atoi(optarg);
+				if (yres <= 0)
+				{
+					Log_Add(0, "ERROR: window height requires a positive integer");
+					exit(-1);
+				}
 				break;
 
 			case 'p':
@@ -507,6 +513,10 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 	//ok, start loading
 	Log_Add(1, "Loading...");
 	runlevel = loading;
+
+	//initiate interface
+	if (!Interface_Init(window, fullscreen, xres, yres))
+		return -1;
 
 	//
 	//TODO: there should be menus here, but menu/osd system is not implemented yet... also:

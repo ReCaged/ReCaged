@@ -107,7 +107,7 @@ void Resize (int new_w, int new_h)
 	glLoadIdentity();
 }
 
-bool Interface_Init(void)
+bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 {
 	Log_Add(0, "Initiating interface");
 
@@ -132,7 +132,10 @@ bool Interface_Init(void)
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
 	//SDL_CreateWindow and SDL_GL_CreateContext
 	//ALSO (sdl>1.2): try setting core context for gl 3.x. If possible: unlegacy rendering
-	screen = SDL_SetVideoMode (internal.res[0], internal.res[1], 0, flags);
+	int x, y;
+	if (xres > 0) x=xres; else x=internal.res[0];
+	if (yres > 0) y=yres; else y=internal.res[1];
+	screen = SDL_SetVideoMode (x, y, 0, flags); //TODO: SDL_GetVideoInfo() provides much needed info for fallbacks here
 
 	if (!screen)
 	{
@@ -161,10 +164,14 @@ bool Interface_Init(void)
 	//hide cursor
 	SDL_ShowCursor (SDL_DISABLE);
 
-	//toggle fullscreen (if requested)
-	if (internal.fullscreen)
-		if (!SDL_WM_ToggleFullScreen(screen))
+	//toggle or prevent fullscreen (if requested/disabled in either conf or args)
+	if (!window && (fullscreen || internal.fullscreen))
+	{
+		if (SDL_WM_ToggleFullScreen(screen))
+			Log_Add(1, "Enabled fullscreen mode");
+		else
 			Log_Add(0, "Error: unable to toggle fullscreen");
+	}
 
 	//set up window, as if resized
 	Resize (screen->w, screen->h);
