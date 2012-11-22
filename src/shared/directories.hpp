@@ -40,9 +40,10 @@
 // Init() must be run before creating classes, Path() returns latest path (or NULL on error)
 //
 // TODO: future functions:
-// * Remove(): remove file+any empty dirs caused (in user dirs)
 // * List(): lists union of files in path from both user+installed dirs
 // * Copy(): copy file (prefer user over installed) if possible to new dir
+// * Remove(): if no read-only version exists, remove file+any empty dirs (from writeable dirs)
+// * Clear/Reset(): if a read-only version exists, remove file+any empty dirs (from writeable dirs)
 //
 
 #define COPY_BUFFER_SIZE 4096 //should be good (plus covers common block/sectorsizes)
@@ -52,8 +53,8 @@ typedef enum {CONFIG, DATA, CACHE} dir_type;
 class Directories
 {
 	public:
-		static void Init(const char *arg0, bool installed_force, bool portable_force,
-				const char *installed_override, const char *user_override);
+		static bool Init(const char *arg0, bool installed_force, bool portable_force,
+				const char *installed_override, const char *user_override, const char *portable_override);
 		static void Quit();
 
 		Directories();

@@ -307,8 +307,9 @@ bool Directories::Try_Set_File_Append(const char *user, const char *inst, const 
 	return true;
 }
 
-void Directories::Init(	const char *arg0, bool installed_force, bool portable_force,
-			const char *installed_override, const char *user_override )
+//will only fail if user tries to override detection with weird paths (instead of ignoring them)
+bool Directories::Init(	const char *arg0, bool installed_force, bool portable_force,
+			const char *installed_override, const char *user_override, const char *portable_override)
 {
 	//safe
 	user_conf = NULL;
@@ -317,19 +318,36 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	inst_conf = NULL;
 	inst_data = NULL;
 
+	//avoid contradiction... should never occur anyway...
+	if (	(installed_force || installed_override || user_override) &&
+		(portable_force || portable_override)	)
+	{
+		Log_Add(0, "ERROR: contradicting installed/portable overrides");
+		return false;
+	}
+
 	//
 	//installed data/conf dirs:
 	//
-	bool found=true; //tru if found both data+conf, assumed true until otherwise
-	if (	installed_override &&
-		Try_Set_Path(&inst_data, READ, installed_override, "data") &&
-		Try_Set_Path(&inst_conf, READ, installed_override, "config") )
-		Log_Add(1, "Alternate path to installed directories specified");
-	else
-	{
-		if (installed_override)
-			Log_Add(0, "WARNING: path to installed directories incorrect. Ignoring!");
+	bool found=true; //true if found both data+conf, assumed true until otherwise
 
+	if (installed_override || portable_override) //no need to search, user provided
+	{
+		const char *override=NULL; //figure out which one
+		if (installed_override) override=installed_override;
+		else override=portable_override;
+
+		if (	Try_Set_Path(&inst_data, READ, override, "data") &&
+			Try_Set_Path(&inst_conf, READ, override, "config") )
+			Log_Add(1, "Alternate path to installed directory specified");
+		else
+		{
+			Log_Add(0, "ERROR: overriding path to installed directory (\"%s\") is incorrect", override);
+			return false;
+		}
+	}
+	else //figure out from arg[0], or getmodulefilename (on windows)
+	{
 		int pos; //find from the right
 #ifndef _WIN32
 		for (pos=strlen(arg0); (pos>=0 && arg0[pos]!='/'); --pos); //find from right
@@ -416,66 +434,62 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	//check if going installed or portable
 	const char *var;
 
-	//avoid contradiction...
-	if (installed_force && portable_force)
-	{
-		Log_Add(0, "WARNING: ignoring contradicting installed/portable overrides");
-		installed_force=false;
-		portable_force=false;
-	}
-
-	//must be threated read only?
+	//must be treated read only?
 	if (installed_force)
-		Log_Add(1, "Forced to treat installed directories as read-only");
+		Log_Add(1, "Installed mode forced: treating installed directories as read-only");
 	//no. if found both installation paths, check if writeable (or forced portable)
-	else if (	( found && Try_Set_Path(&user_conf, WRITE, inst_conf, "") &&
-			Try_Set_Path(&user_data, WRITE, inst_data, "") ) || portable_force)
+	else if (	found && Try_Set_Path(&user_conf, WRITE, inst_conf, "") &&
+			Try_Set_Path(&user_data, WRITE, inst_data, "") )
 	{
-		if (portable_force)
-			Log_Add(1, "Forced to ignore any read-only, installed, directory");
-
 		//don't need these anymore
 		delete inst_conf; inst_conf=NULL;
 		delete inst_data; inst_data=NULL;
 
-		if (user_conf && user_data) //these should be okay for user access
-		{
-			Log_Add(2, "Installed data and config directories are writeable, using as user directories");
-			//find good path for cache. not checking in user home, since would just confuse
-			//try: relative to found conf and data, then /tmp.
-			if (	(Try_Set_Path(&user_cache, WRITE, user_conf, "../cache")) ||
-				(Try_Set_Path(&user_cache, WRITE, user_data, "../cache")) )
-				Log_Add(2, "Found suitable cache directory next to the others");
+		Log_Add(2, "Installed data and config directories are writeable, using as user directories (portable mode)");
+		//find good path for cache. not checking in user home, since would just confuse
+		//try: relative to found conf and data, then /tmp.
+		if (	(Try_Set_Path(&user_cache, WRITE, user_conf, "../cache")) ||
+			(Try_Set_Path(&user_cache, WRITE, user_data, "../cache")) )
+			Log_Add(2, "Found suitable cache directory next to the others");
 #ifndef _WIN32
-			else if (Try_Set_Path(&user_cache, WRITE, "/tmp/recaged/cache", ""))
-				Log_Add(0, "WARNING: found no suitable user cache directory, using \"/tmp\" instead!");
+		else if (Try_Set_Path(&user_cache, WRITE, "/tmp/recaged/cache", ""))
+			Log_Add(0, "WARNING: found no suitable user cache directory, using \"/tmp\" instead!");
 #else
-			//w32 got variable for tmp dir (check TMP and TEMP)...
-			else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
-				Log_Add(0, "WARNING: found no suitable user cache directory, using temporary directory instead!");
+		//w32 got variable for tmp dir (check TMP and TEMP)...
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
+			Log_Add(0, "WARNING: found no suitable user cache directory, using temporary directory instead!");
 #endif
-			else
-				Log_Add(0, "WARNING: found NO user cache directory!");
-
-			Log_Add(2, "User config directory: \"%s\"", user_conf);
-			Log_Add(2, "User data directory: \"%s\"", user_data);
-			if (user_cache) Log_Add(2, "User cache directory: \"%s\"", user_cache);
-			return;
-		}
 		else
-			Log_Add(2, "ignoring installed directories and using user directories for all read/write");
+			Log_Add(0, "WARNING: found NO user cache directory!");
+
+		Log_Add(2, "User config directory: \"%s\"", user_conf);
+		Log_Add(2, "User data directory: \"%s\"", user_data);
+		if (user_cache) Log_Add(2, "User cache directory: \"%s\"", user_cache);
+
+		return true; //great
+	}
+	//did exist in not obvious read-only location, but no write access: was required for portable mode...
+	else if (found && portable_force)
+	{
+		Log_Add(0, "ERROR: portable mode forced, but no write access to directories around executable");
+		return false;
 	}
 	else
 		Log_Add(2, "Installed directories are read-only, finding user directories");
 
 	//user config
-	if (user_override && Try_Set_Path(&user_conf, WRITE, user_override, "config") )
-		Log_Add(1, "Alternate path to user config directory specified");
+	if (user_override)
+	{
+		if (Try_Set_Path(&user_conf, WRITE, user_override, "config"))
+			Log_Add(1, "Alternate path to user directory specified (for config)");
+		else
+		{
+			Log_Add(0, "ERROR: overriding path to user directory (\"%s\") is incorrect (for config)", user_override);
+			return false;
+		}
+	}
 	else
 	{
-		if (user_override)
-			Log_Add(0, "WARNING: path to user files is incorrect (for config). Ignoring!");
-
 		if ( (var=getenv("XDG_CONFIG_HOME")) && Try_Set_Path(&user_conf, WRITE, var, "recaged") )
 			Log_Add(2, "XDG path to user config directory");
 		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_conf, WRITE, var, ".config/recaged") )
@@ -494,13 +508,18 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	}
 
 	//user data
-	if (user_override && Try_Set_Path(&user_data, WRITE, user_override, "data") )
-		Log_Add(1, "Alternate path to user data directory specified");
+	if (user_override)
+	{
+		if (Try_Set_Path(&user_data, WRITE, user_override, "data"))
+			Log_Add(1, "Alternate path to user directory specified (for data)");
+		else
+		{
+			Log_Add(0, "ERROR: overriding path to user directory (\"%s\") is incorrect (for data)", user_override);
+			return false;
+		}
+	}
 	else
 	{
-		if (user_override)
-			Log_Add(0, "WARNING: path to user files is incorrect (for data). Ignoring!");
-
 		if ( (var=getenv("XDG_DATA_HOME")) && Try_Set_Path(&user_data, WRITE, var, "recaged") )
 			Log_Add(2, "XDG path to user data directory");
 		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_data, WRITE, var, ".local/share/recaged") )
@@ -519,8 +538,16 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	}
 
 	//user cache
-	if (user_override && Try_Set_Path(&user_cache, WRITE, user_override, "cache") )
-		Log_Add(1, "Alternate path to user cache directory specified");
+	if (user_override)
+	{
+		if (Try_Set_Path(&user_cache, WRITE, user_override, "cache"))
+			Log_Add(1, "Alternate path to user directory specified (for cache)");
+		else
+		{
+			Log_Add(0, "ERROR: overriding path to user directory (\"%s\") is incorrect (for cache)", user_override);
+			return false;
+		}
+	}
 	else
 	{
 		if (user_override)
@@ -548,6 +575,8 @@ void Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	if (user_conf) Log_Add(2, "User config directory: \"%s\"", user_conf);
 	if (user_data) Log_Add(2, "User data directory: \"%s\"", user_data);
 	if (user_cache) Log_Add(2, "User cache directory: \"%s\"", user_cache);
+
+	return true; //all good, I think...
 }
 
 void Directories::Quit()

@@ -79,6 +79,9 @@ directory the user has read/write access to (in home):
 > recaged -d /opt/recaged/data -p /home/slinger/recaged
 
 
+TODO: running as installed, portable. explanation (longer than --help), examples
+
+
 
 4) [DEFAULT CONTROLS]
 

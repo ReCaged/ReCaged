@@ -320,8 +320,9 @@ static const struct option options[] =
 	{ "quiet", no_argument, NULL, 'q' },
 	{ "width", required_argument, NULL, 'x' },
 	{ "height", required_argument, NULL, 'y' },
-	{ "installed", no_argument, NULL, 'i' },
-	{ "portable", required_argument, NULL, 'p' },
+	{ "portable", optional_argument, NULL, 'p' },
+	{ "user", optional_argument, NULL, 'u' },
+	{ "installed", optional_argument, NULL, 'i' },
 	//
 	//TODO (for lua)
 	//run script.lua instead
@@ -344,9 +345,13 @@ int main (int argc, char *argv[])
 	}
 	Log_Init();
 
-	//use getopt to parse options to to allow overide defaults:
+	//use getopt_long to parse options to override defaults:
 	char c;
-	while ( (c = getopt_long(argc, argv, "hVc:vqwfx:y:ip:", options, NULL)) != -1 )
+	char *port_overr=NULL, *inst_overr=NULL, *user_overr=NULL, *conf_overr=NULL;
+	bool inst_force=false, port_force=false;
+
+	//TODO: might want to compare optind and argc afterwards to detect missing or extra arguments (like file)
+	while ( (c = getopt_long(argc, argv, "hVc:vqwfx:y:p::u::i::", options, NULL)) != -1 )
 	{
 		switch(c)
 		{
@@ -356,8 +361,7 @@ int main (int argc, char *argv[])
 				break;
 
 			case 'c':
-				Log_Add(0, "TODO!");
-				exit(-1);
+				conf_overr=optarg;
 				break;
 
 			case 'v':
@@ -388,14 +392,28 @@ int main (int argc, char *argv[])
 				exit(-1);
 				break;
 
-			case 'i':
-				Log_Add(0, "TODO!");
-				exit(-1);
+			case 'p':
+				port_force=true;
+				inst_force=false;
+				port_overr=optarg;
+				user_overr=NULL;
+				inst_overr=NULL;
 				break;
 
-			case 'p':
-				Log_Add(0, "TODO!");
-				exit(-1);
+			case 'u':
+				port_force=false;
+				inst_force=true;
+				port_overr=NULL;
+				user_overr=optarg;
+				inst_overr=NULL;
+				break;
+
+			case 'i':
+				port_force=false;
+				inst_force=true;
+				port_overr=NULL;
+				user_overr=NULL;
+				inst_overr=optarg;
 				break;
 
 			default: //print help output
@@ -404,19 +422,26 @@ int main (int argc, char *argv[])
 Usage: recaged [OPTION]...\n\
   -h, --help		display help and exit\n\
   -V, --version		display version and exit\n\
-  -c, --config=FILE	load setings from FILE\n\
+  -c, --config FILE	load settings from FILE\n\
   -v, --verbose		increase stdout verbosity\n\
   -q, --quiet		decrease stdout verbosity\n\
+\n\
+Options for overriding window creation:\n\
   -w, --window		render in window\n\
   -f, --fullscreen	render in fullscreen\n\
-  -x, --width=PIXELS	create window with PIXELS width\n\
-  -y, --height=PIXELS	create window with PIXELS height\n\
+  -x, --width PIXELS	render with PIXELS width\n\
+  -y, --height PIXELS	render with PIXELS height\n\
 \n\
-Options for overriding normal directory detection:\n\
-  -i, --installed	use files in system and home directories (opposite of -p)\n\
-  -p, --portable=DIR	use files in DIR for all read/writes (opposite of -i)\n");
-				//TODO: -i=[dir], -p=[dir], -u=dir
-				//TODO: override directories for installed
+Options for overriding normal (automatic) directory detection:\n\
+  -p[DIR], --portable[=DIR] Force \"portable\" mode: read/write all files in a\n\
+			single directory, located around the executable if not\n\
+			specified. Overrides any earlier -u and -i\n\n\
+  -u[DIR], --user[=DIR]	Force \"installed\" mode: write files in home directory\n\
+			and read from home and global directories. Optionally\n\
+			overrides the user directory. Overrides any earlier -p\n\n\
+  -i[DIR], --installed[=DIR] Force \"installed\" mode: just like -u above, but\n\
+  			optionally overrides the installed (global) directory.\n\
+			Both can be combined in order to specify both paths\n");
 
 				exit(0); //stop execution
 				break;
@@ -426,14 +451,19 @@ Options for overriding normal directory detection:\n\
 	//welcome message
 	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
-	Directories::Init(argv[0], false, false, NULL, NULL);
+	//unlikely to fail, but still possible (if incorrect path overriding or something)
+	if (!Directories::Init(argv[0], inst_force, port_force, inst_overr, user_overr, port_overr))
+		return -1;
 
 	//enable file logging (if possible)
 	Directories dirs;
 	if (dirs.Find("log.txt", CACHE, WRITE)) Log_File(dirs.Path());
 
 	//load conf file if found
-	if (dirs.Find("internal.conf", CONFIG, READ)) Load_Conf (dirs.Path(), (char *)&internal, internal_index);
+	if (conf_overr)
+		Load_Conf (conf_overr, (char*)&internal, internal_index);
+	else if (dirs.Find("internal.conf", CONFIG, READ)) //try find by default
+		Load_Conf (dirs.Path(), (char *)&internal, internal_index);
 
 	//disable file logging is requested
 	if (!internal.logfile)
