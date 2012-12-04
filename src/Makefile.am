@@ -101,3 +101,44 @@ recaged_SOURCES =	./recaged.cpp \
 			simulation/timers.hpp \
 			simulation/wheel.cpp \
 			simulation/wheel.hpp
+
+#remove w32 files on all platforms (just in case)
+CLEANFILES = resources.rc resources.o
+
+if ON_W32
+
+#TODO: add icon (in 0.7.3)
+LDADD += resources.o
+
+#info file, only updates on changes to src/Makefile (like version change)
+#note: sed usage might be a ugly/unreliable, but only replaces dots anyway
+resources.rc: Makefile
+	( echo "1 VERSIONINFO"; \
+	echo "FILEVERSION $(PACKAGE_VERSION),0" | sed "s/\./,/g"; \
+	echo "PRODUCTVERSION $(PACKAGE_VERSION),0" | sed "s/\./,/g"; \
+	echo "BEGIN"; \
+	echo "BLOCK \"StringFileInfo\""; \
+	echo "BEGIN"; \
+	echo "BLOCK \"00000000\""; \
+	echo "BEGIN"; \
+	echo "VALUE \"ProductName\", \"ReCaged\""; \
+	echo "VALUE \"FileVersion\", \"$(PACKAGE_VERSION)\""; \
+	echo "VALUE \"ProductVersion\", \"$(PACKAGE_VERSION)\""; \
+	echo "VALUE \"Comments\", \"A Free Software, Futuristic, Racing Simulator\""; \
+	echo "VALUE \"FileDescription\", \"A Free Software, Futuristic, Racing Simulator\""; \
+	echo "VALUE \"LegalCopyright\", \"Copyright (C) Mats Wahlberg\""; \
+	echo "END"; \
+	echo "END"; \
+	echo "BLOCK \"VarFileInfo\""; \
+	echo "BEGIN"; \
+	echo "VALUE \"Translation\", 0x0000, 0x0000"; \
+	echo "END";\
+	echo "END" ) > resources.rc
+
+
+#windres creates resource obj from rc
+resources.o: resources.rc
+	$(WINDRES) -i $? -o $@
+
+endif
+

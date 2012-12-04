@@ -19,23 +19,18 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+EXTRA_DIST = README header.bmp installer.nsi side.bmp
+CLEANFILES = version.nsh
 
-AUTOMAKE_OPTIONS = subdir-objects
-ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
+#automatically generate version definition for nsis installer on w32:
+if ON_W32
 
-#TODO!
-SUBDIRS                 = config data icons man src w32
+#generate version file when making
+all-local: version.nsh
 
-#TODO!
-EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog make_w32.sh
+#only updates on changes to w32/Makefile (like version change)
+version.nsh: Makefile
+	echo "!define VERSION \"${PACKAGE_VERSION}\"" > $@
 
-#create ChangeLog from git log
-dist-hook:
-	( echo "Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg"; \
-	echo "Copying and distribution of this file, with or without modification,"; \
-	echo "are permitted in any medium without royalty provided the copyright"; \
-	echo "notice and this notice are preserved."; \
-	echo ""; \
-	cd "$(top_srcdir)" && ./missing --run git log \
-	--stat --name-only --date=short --abbrev-commit ) \
-	> ${distdir}/ChangeLog
+endif
+

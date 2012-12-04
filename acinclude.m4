@@ -40,6 +40,9 @@ AC_COMPILE_IFELSE( [AC_LANG_SOURCE([
 	])], [ ON_W32=no ], [ ON_W32=yes ] )
 AC_MSG_RESULT($ON_W32)
 
+#make this result available for automake
+AM_CONDITIONAL([ON_W32], [test "$ON_W32" != "no"])
+
 #if so, probably wanting static linking?
 AC_ARG_ENABLE(
 	[w32static],
@@ -58,6 +61,14 @@ AC_ARG_ENABLE(
 
 #pkg-config might exist?
 AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
+
+#need windres if on w32
+if test "$ON_W32" != "no"; then
+	AC_PATH_TOOL([WINDRES], [windres])
+	if test -z "$WINDRES"; then
+		AC_MSG_ERROR([Program windres appears to be missing])
+	fi
+fi
 
 ])
 
