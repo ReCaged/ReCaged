@@ -419,9 +419,6 @@ bool Trimesh::Load_Road(const char *f)
 	if (!file.Open(f))
 		return false;
 	
-	//set name to filename
-	name=f;
-
 	//empty old data (if any)
 	vertices.clear();
 	//texcoords.clear();

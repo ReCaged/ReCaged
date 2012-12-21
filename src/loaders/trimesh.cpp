@@ -47,6 +47,9 @@ bool Trimesh::Load(const char *file)
 		return false;
 	}
 
+	//set name to filename (without full path)
+	name=file;
+
 	//find
 	Directories dirs;
 	if (!dirs.Find(file, DATA, READ))
