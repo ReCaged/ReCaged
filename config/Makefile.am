@@ -21,6 +21,7 @@
 
 configdir = $(sysconfdir)/xdg/recaged/
 nobase_dist_config_DATA = \
+	internal.conf \
 	profiles/default/keys.lst \
 	profiles/default/profile.conf \
 	tmp_menu_selections
