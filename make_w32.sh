@@ -64,8 +64,10 @@ then
 	echo ""
 
 	#translate (add CRLF)
-	unix2dos -n README /tmp/make_w32_build/ReadMe.txt
-	unix2dos -n COPYING /tmp/make_w32_build/Copying.txt
+	#note: unix2dos got the "-n" option, but most mingw/msys installs got old versions:
+	cp README /tmp/make_w32_build/ReadMe.txt
+	cp COPYING /tmp/make_w32_build/Copying.txt
+	unix2dos /tmp/make_w32_build/ReadMe.txt /tmp/make_w32_build/Copying.txt
 
 	#copy the rest
 	cp w32/header.bmp /tmp/make_w32_build
