@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2012 Mats Wahlberg
+ * Copyright (C) 2012, 2013 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -25,6 +25,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+//arbitrarily-sized buffer for some w32 functions
+#define W32BUFSIZE 400
+//note: wont realloc buffer: I've HAD IT with the crap doze api and its bugs!
+//(example: GitModuleFileName on xp/2k: doesn't return buffer-size errors, and
+//forgets NULL termination of the string it returns...)
+#endif
 
 #include "directories.hpp"
 #include "../shared/log.hpp"
@@ -331,6 +342,11 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	//
 	bool found=true; //true if found both data+conf, assumed true until otherwise
 
+#ifdef _WIN32
+	char *w32buf=NULL;
+	char *path=NULL;
+#endif
+
 	if (installed_override || portable_override) //no need to search, user provided
 	{
 		const char *override=NULL; //figure out which one
@@ -349,68 +365,126 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	else //figure out from arg[0], or getmodulefilename (on windows)
 	{
 		int pos; //find from the right
-#ifndef _WIN32
-		for (pos=strlen(arg0); (pos>=0 && arg0[pos]!='/'); --pos); //find from right
-		for (; pos>0 && arg0[pos-1]=='/'; --pos); //in case several slashes in a row
-		//pos should now be leftmost slash in rightmost group of slashes, or -1
+#ifdef _WIN32
+		w32buf = new char[W32BUFSIZE];
+		const char *wstr;
 
+		//try w32 api thing first, but arg0 if not working
+		if (GetModuleFileNameA(NULL, w32buf, W32BUFSIZE) != 0) //OK
+		{
+			Log_Add(2, "Path to program retrieved from w32 crap");
+			w32buf[W32BUFSIZE-1]='\0'; //in case of insanity (see line 36 above)
+			wstr=w32buf;
+		}
+		else //failure...
+		{
+			Log_Add(0, "Warning: unable to retrieve path to program (from w32 crap), trying arg0");
+			wstr=arg0;
+		}
+
+		//note: checks for slashes too, but I don't think this can happen on w32?
+		for (pos=strlen(wstr)-1; (pos>=0 && wstr[pos]!='\\' && wstr[pos]!='/'); --pos);
+		for (; pos>0 && (wstr[pos-1]=='/' || wstr[pos-1]=='\\'); --pos);
+#else
+
+		//just check arg[0] on normal systems:
+		for (pos=strlen(arg0)-1; (pos>=0 && arg0[pos]!='/'); --pos); //find from right
+		for (; pos>0 && arg0[pos-1]=='/'; --pos); //in case several slashes in a row
+#endif
+
+		//pos should now be leftmost slash in rightmost group of slashes, or -1
 		if (pos==-1) //-1: passed through all without finding separator
 			found=false;
 		else //found
 		{
-			char path[pos+1]; //NOTE: skipping the slash, but adding '\0'
-			memcpy(path, arg0, sizeof(char)*pos);
-			path[pos]='\0';
+#ifdef _WIN32
+			path = new char[pos+1];
+			memcpy(path, wstr, sizeof(char)*pos);
 #else
-
-		//TODO:
-		//should probably check GetModuleFileName... but as usual, documentation of w32
-		//functions is utter crap (to say nothing of the functions themselves)... might
-		//be compiled to some unicode version? which might not work on older w32 OSes...?
-		//just better not having to include any w32 headers/definitions!
-
-		for (pos=strlen(arg0); (pos>=0 && arg0[pos]!='\\' && arg0[pos]!='/'); --pos);
-		for (; pos>0 && (arg0[pos-1]=='/' || arg0[pos-1]=='\\'); --pos);
-
-		const char *wstr;
-		if (pos==-1)
-		{
-			Log_Add(0, "WARNING: unable to retrieve path to program (from arg0), trying PWD");
-			pos=1;
-			wstr=".";
-		}
-		else
-			wstr=arg0;
-
-		char path[pos+1];
-		memcpy(path, wstr, sizeof(char)*pos);
-		path[pos]='\0';
-
+			char path[pos+1]; //room for s[0],s[1],s[2],...,s[pos-1],'\0'
+			memcpy(path, arg0, sizeof(char)*pos);
 #endif
+			path[pos]='\0';
 			if (	(Try_Set_Path(&inst_data, READ, path, "data") &&
 				Try_Set_Path(&inst_conf, READ, path, "config")) ||
 				(Try_Set_Path(&inst_data, READ, path, "../data") &&
 				Try_Set_Path(&inst_conf, READ, path, "../config")) )
-			{
 				Log_Add(2, "Installed directories located around the executable");
-				//TODO:
-				//if got here on w32, should compare with registry value (set by nsis)
-				//to determine if treat as installed, and ignore writeability test below.
-				//(w32 function, just as GetModuleFileName above)
-			}
 			else
+			{
+				Log_Add(0, "Found no installed directories around the executable");
 				found=false;
-#ifndef _WIN32
+			}
 		}
-#endif
 	}
 
-	//no path, or wasn't useful
-	if (!found)
+#ifdef _WIN32
+	//try to get path to installed dir from registry
+	HKEY hKey;
+	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\ReCaged", 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS)
+	{
+		if (!w32buf)
+			w32buf = new char[W32BUFSIZE];
+
+		unsigned long type;
+		unsigned long size=W32BUFSIZE;
+		if (RegQueryValueExA(hKey, "Installed", NULL, &type, (LPBYTE) w32buf, &size) == ERROR_SUCCESS)
+		{
+			if (type == REG_SZ) //should be safe...
+			{
+				w32buf[W32BUFSIZE-1]='\0'; //just in case registry reading is insane as well...
+				//in case reg str ends with one or more (back-)slashes, remove them
+				int pos;
+				//start at '\0' in end, and go left until last (back)slash
+				for (pos=strlen(w32buf); pos>0 && (w32buf[pos-1]=='/' || w32buf[pos-1]=='\\'); --pos);
+
+				//pos will be valid in any case
+				w32buf[pos]='\0';
+			}
+			else //wont be needing this any more...
+			{
+				delete[] w32buf;
+				w32buf=NULL;
+			}
+		}
+		RegCloseKey(hKey); //no function with A suffix here
+	}
+	else if (w32buf) //wont be needing this any more...
+	{
+		delete[] w32buf;
+		w32buf = NULL;
+	}
+
+	if (!w32buf)
+		Log_Add(2, "No registry string found for path to installed copy (probably not installed)");
+
+	//found a (possibly writeable) path, and if not forcing portable mode: check if matches registry (if so, don't write there)
+	if (found && !portable_force)
+	{
+		if (w32buf && strcasecmp(w32buf, path) == 0)
+		{
+			Log_Add(1, "Path to program matches registry string, running in installed mode");
+			found = false;
+		}
+	}
+	else //no path, or wasn't useful
+#else
+	if (!found) //no path, or wasn't useful
+#endif
 	{
 		if (	Try_Set_Path(&inst_data, READ, DATADIR, "") &&
 			Try_Set_Path(&inst_conf, READ, CONFDIR, "") )
 			Log_Add(2, "Installed directories as specified during build configuration");
+#ifdef _WIN32
+		else if (w32buf	&&	Try_Set_Path(&inst_data, READ, w32buf, "data") &&
+					Try_Set_Path(&inst_conf, READ, w32buf, "config") )
+			Log_Add(2, "Installed directories as specified during installation (from registry)");
+		else if (	(Try_Set_Path(&inst_data, READ, "data", "") &&
+				Try_Set_Path(&inst_conf, READ, "config", "")) ||
+				(Try_Set_Path(&inst_data, READ, "../data", "") &&
+				Try_Set_Path(&inst_conf, READ, "../config", "")) )
+				Log_Add(0, "WARNING: unable to retrieve path to program, but found directories in PWD (assuming installed)");
+#endif
 		else
 		{
 			if (!inst_data)
@@ -421,8 +495,12 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 		}
 	}
 
-	//TODO: (w32) if compare with registry above showed found directories should be treated
-	//as read-only, only check for directories in user home dir (or tmp)
+#ifdef _WIN32
+	if (w32buf)
+		delete[] w32buf;
+	if (path)
+		delete[] path;
+#endif
 
 	//NOTE: if found==true then both installed data+conf directories exists and aren't
 	//in an obvious installed path (as set during build configuration, or w32 installation)
@@ -438,6 +516,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	if (installed_force)
 		Log_Add(1, "Installed mode forced: treating installed directories as read-only");
 	//no. if found both installation paths, check if writeable (or forced portable)
+	//else if (w32 && GetReg strcmp not equals installed?, then also:
 	else if (	found && Try_Set_Path(&user_conf, WRITE, inst_conf, "") &&
 			Try_Set_Path(&user_data, WRITE, inst_data, "") )
 	{

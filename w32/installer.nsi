@@ -1,6 +1,6 @@
 ; ReCaged - a Free Software, Futuristic, Racing Simulator
 ;
-; Copyright (C) 2012 Mats Wahlberg
+; Copyright (C) 2012, 2013 Mats Wahlberg
 ;
 ; This file is part of ReCaged.
 ;
@@ -163,10 +163,23 @@ Function SelectionPage
 	nsDialogs::Show
 FunctionEnd
 
+Var UNINST
 Var INSTBACKUP
 Function SelectionLeave
 	${NSD_GetState} $B1 $0
 	${if} $0 == "1"
+		ReadRegStr $UNINST HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\ReCaged" "UninstallString"
+		${ifnot} $UNINST == ""
+			MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "ReCaged is already installed and needs to be uninstalled before a new installation. Press Ok to uninstall ReCaged." IDOK remove
+			abort
+
+			remove:
+			ClearErrors
+			ExecWait $UNINST
+
+			abort
+		${endif}
+
 		strcpy $DIR_BUTTON_TEXT "Install"
 		strcpy $DIR_TOP_TEXT "ReCaged will be installed to the following directory."
 		${if} $Install == "0"
@@ -175,7 +188,7 @@ Function SelectionLeave
 		StrCpy $Install "1"
 	${else} ;assume B2 == 1
 		strcpy $DIR_BUTTON_TEXT "Extract"
-		strcpy $DIR_TOP_TEXT "ReCaged will be extracted to the following directory. Consider choosing one with user write access, like your desktop or a removable drive. Otherwise ReCaged will run as if installed."
+		strcpy $DIR_TOP_TEXT "ReCaged will be extracted to the following directory. Consider choosing one with user write access, like your desktop or a removable drive."
 		${ifnot} $Install == "0"
 			strcpy $INSTBACKUP $INSTDIR
 			strcpy $INSTDIR $DESKTOP\ReCaged
