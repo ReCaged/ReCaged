@@ -65,9 +65,14 @@ then
 
 	#translate (add CRLF)
 	#note: unix2dos got the "-n" option, but most mingw/msys installs got old versions:
-	cp README /tmp/make_w32_build/ReadMe.txt
-	cp COPYING /tmp/make_w32_build/Copying.txt
-	unix2dos /tmp/make_w32_build/ReadMe.txt /tmp/make_w32_build/Copying.txt
+	#these two aren't installed automatically, copy:
+	cp README /tmp/make_w32_build/README.txt
+	cp COPYING /tmp/make_w32_build/COPYING.txt
+	#add carriage return to gpl text (all readmes handled in next line):
+	unix2dos /tmp/make_w32_build/COPYING.txt
+	#convert rest of the copyright info (files moved by install)
+	find /tmp/make_w32_build -name "README" -exec mv "{}" "{}".txt \; #add txt suffix
+	find /tmp/make_w32_build -name "README.txt" -exec unix2dos "{}" \; #add CRLF
 
 	#copy the rest
 	cp w32/header.bmp /tmp/make_w32_build

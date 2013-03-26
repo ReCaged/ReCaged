@@ -5,11 +5,12 @@
  A Free Software, Futuristic, Racing Simulator
 
 ---
- Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ Copyright (C) 2009, 2010, 2011, 2012, 2013 Mats Wahlberg
 
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
- notice and this notice are preserved.
+ notice and this notice are preserved. This file is offered as-is,
+ without any warranty.
 ---
 
 
@@ -35,7 +36,7 @@
 
 2) [LICENSING]
 
-ReCaged  Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ReCaged  Copyright (C) 2009, 2010, 2011, 2012, 2013 Mats Wahlberg
 
 ReCaged is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -51,9 +52,10 @@ You should have received a copy of the GNU General Public License
 along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
-Information on the licensing of the included media/"binary" files is
-specified in README files located in the same directory as each media file.
+Licensing information of binary media files is specified in a README file in
+the same directory as the relevant media file. However, all files are released
+under the same terms as above (GPL version 3), unless stated otherwise inside
+the file or in an accompanying README file.
 
 
 

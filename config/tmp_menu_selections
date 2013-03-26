@@ -2,7 +2,8 @@
 #
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
-# notice and this notice are preserved.
+# notice and this notice are preserved. This file is offered as-is,
+# without any warranty.
 
 #this file is meant to solve some problems with the current lack of menus.
 #the current race mode is just a debug mode thing:

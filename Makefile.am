@@ -34,7 +34,8 @@ dist-hook:
 	( echo "Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg"; \
 	echo "Copying and distribution of this file, with or without modification,"; \
 	echo "are permitted in any medium without royalty provided the copyright"; \
-	echo "notice and this notice are preserved."; \
+	echo "notice and this notice are preserved. This file is offered as-is,"; \
+	echo "without any warranty."; \
 	echo ""; \
 	cd "$(top_srcdir)" && ./missing --run git log \
 	--stat --name-only --date=short --abbrev-commit ) \

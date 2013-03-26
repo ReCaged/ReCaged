@@ -210,8 +210,8 @@ SectionIn RO
 	;should cover all
 	File /r "data"
 	File /r "config"
-	File "ReadMe.txt"
-	File "Copying.txt"
+	File "README.txt"
+	File "COPYING.txt"
 	File "ReCaged.exe"
 
 	;only if installing
@@ -239,8 +239,8 @@ Section "Start Menu Shortcuts" SecStart
 	${if} $Install == "1"
 		CreateDirectory "$SMPROGRAMS\ReCaged"
 		CreateShortCut "$SMPROGRAMS\ReCaged\ReCaged.lnk" "$INSTDIR\ReCaged.exe" "" "$INSTDIR\ReCaged.exe"
-		CreateShortCut "$SMPROGRAMS\ReCaged\Readme.lnk" "$INSTDIR\ReadMe.txt" "" "$INSTDIR\ReadMe.txt"
-		CreateShortCut "$SMPROGRAMS\ReCaged\Copying.lnk" "$INSTDIR\Copying.txt" "" "$INSTDIR\Copying.txt"
+		CreateShortCut "$SMPROGRAMS\ReCaged\Readme.lnk" "$INSTDIR\README.txt" "" "$INSTDIR\README.txt"
+		CreateShortCut "$SMPROGRAMS\ReCaged\Copying.lnk" "$INSTDIR\COPYING.txt" "" "$INSTDIR\COPYING.txt"
 		CreateShortCut "$SMPROGRAMS\ReCaged\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe"
 	${endif}
 
