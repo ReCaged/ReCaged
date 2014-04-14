@@ -21,6 +21,7 @@
 
 #include "../shared/trimesh.hpp"
 #include "../shared/log.hpp"
+#include "../shared/directories.hpp"
 
 //
 //for trimesh file loading
@@ -29,12 +30,11 @@
 //wrapper for loading
 bool Trimesh::Load(const char *file)
 {
-	printlog(1, "Loading trimesh from file \"%s\"", file);
-	printlog(2, "determining file type from suffix");
+	Log_Add(2, "Loading trimesh from file \"%s\" (identifying suffix)", file);
 
 	if (file == NULL)
 	{
-		printlog(0, "WARNING: empty file path+name for trimesh");
+		Log_Add(0, "WARNING: empty file path+name for trimesh");
 		return false;
 	}
 
@@ -43,32 +43,39 @@ bool Trimesh::Load(const char *file)
 	//in case something really wrong
 	if (!suffix)
 	{
-		printlog(0, "ERROR: no suffix for file \"%s\"", file);
+		Log_Add(0, "ERROR: no suffix for file \"%s\"", file);
 		return false;
 	}
 
+	//set name to filename (without full path)
+	name=file;
+
+	//find
+	Directories dirs;
+	if (!dirs.Find(file, DATA, READ))
+		return false;
+
 	//see if match:
 	if (!strcasecmp(suffix, ".obj"))
-		return Load_OBJ(file);
+		return Load_OBJ(dirs.Path());
 	else if (!strcasecmp(suffix, ".road"))
-		return Load_Road(file);
+		return Load_Road(dirs.Path());
 	//else if (!strcasecmp(suffix, ".3ds"))
-		//return Load_3DS(file);
+		//return Load_3DS(dirs.Path());
 	
 	//else, no match
-	printlog(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
+	Log_Add(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
 	return false;
 }
 
 //for materials
 bool Trimesh::Load_Material(const char *file)
 {
-	printlog(1, "Loading material from file \"%s\"", file);
-	printlog(2, "determining file type from suffix");
+	Log_Add(2, "Loading material from file \"%s\" (identifying suffix)", file);
 
 	if (file == NULL)
 	{
-		printlog(0, "WARNING: empty file path+name for material");
+		Log_Add(0, "WARNING: empty file path+name for material");
 		return false;
 	}
 
@@ -77,7 +84,7 @@ bool Trimesh::Load_Material(const char *file)
 	//in case something really wrong
 	if (!suffix)
 	{
-		printlog(0, "ERROR: no suffix for file \"%s\"", file);
+		Log_Add(0, "ERROR: no suffix for file \"%s\"", file);
 		return false;
 	}
 
@@ -86,6 +93,6 @@ bool Trimesh::Load_Material(const char *file)
 		return Load_MTL(file);
 
 	//else, no match
-	printlog(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
+	Log_Add(0, "ERROR: unknown 3D file suffix for \"%s\"", file);
 	return false;
 }

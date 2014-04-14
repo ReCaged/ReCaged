@@ -1,3 +1,10 @@
+# Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+#
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved. This file is offered as-is,
+# without any warranty.
+
 #Collision surface defaults that can be modified:
 #> mu 0 bounce 0 spring inf damping 0
 #more (less interesting) defaults (for tyre reaction):

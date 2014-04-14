@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -29,11 +29,12 @@
 #include "../shared/body.hpp"
 #include "../shared/joint.hpp"
 #include "text_file.hpp"
+#include "../shared/directories.hpp"
 
 
 Car_Template *Car_Template::Load (const char *path)
 {
-	printlog(1, "Loading car: %s", path);
+	Log_Add(1, "Loading car: %s", path);
 
 	//see if already loaded
 	if (Car_Template *tmp=Racetime_Data::Find<Car_Template>(path))
@@ -47,7 +48,8 @@ Car_Template *Car_Template::Load (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/car.conf");
 
-	if (!load_conf(conf, (char *)&target->conf, car_conf_index)) //try to load conf
+	Directories dirs;
+	if (!(dirs.Find(conf, DATA, READ) && Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
 		return NULL;
 
 	//geoms.lst
@@ -56,7 +58,7 @@ Car_Template *Car_Template::Load (const char *path)
 	strcat (lst, "/geoms.lst");
 
 	Text_File file;
-	if (file.Open(lst))
+	if (dirs.Find(lst, DATA, READ) && file.Open(dirs.Path()))
 	{
 		//default surface parameters
 		Surface surface;
@@ -88,7 +90,7 @@ Car_Template *Car_Template::Load (const char *path)
 						surface.tyre_rollres_scale = atof(file.words[++pos]);
 					else
 					{
-						printlog(0, "WARNING: surface option \"%s\" unknown", file.words[pos]);
+						Log_Add(0, "WARNING: surface option \"%s\" unknown", file.words[pos]);
 					}
 
 					//one step forward
@@ -134,7 +136,7 @@ Car_Template *Car_Template::Load (const char *path)
 					//failed to load
 					if (!tmp_geom.mesh)
 					{
-						printlog(0, "ERROR: trimesh geom in car geom list could not be loaded!");
+						Log_Add(0, "ERROR: trimesh geom in car geom list could not be loaded!");
 						continue; //don't add
 					}
 
@@ -142,7 +144,7 @@ Car_Template *Car_Template::Load (const char *path)
 				}
 				else
 				{
-					printlog(0, "ERROR: geom \"%s\" in car geom list not recognized/malformed!", file.words[0]);
+					Log_Add(0, "ERROR: geom \"%s\" in car geom list not recognized/malformed!", file.words[0]);
 					continue; //go to next line
 				}
 
@@ -184,7 +186,7 @@ Car_Template *Car_Template::Load (const char *path)
 		}
 	}
 	else
-		printlog(0, "WARNING: can not open list of car geoms (%s)!", lst);
+		Log_Add(0, "WARNING: can not open list of car geoms (%s)!", lst);
 
 	//helper datas:
 
@@ -206,19 +208,19 @@ Car_Template *Car_Template::Load (const char *path)
 	if (target->conf.xshape > 1.0)
 		target->wheel.xshape = target->conf.xshape;
 	else
-		printlog(0, "WARNING: xshape value should be bigger than 1!");
+		Log_Add(0, "WARNING: xshape value should be bigger than 1!");
 
 	if (target->conf.xpos[0] > 0.0)
 		target->wheel.xpos = target->conf.xpos[0];
 	else
-		printlog(0, "WARNING: first xpos value should be bigger than 0!");
+		Log_Add(0, "WARNING: first xpos value should be bigger than 0!");
 
 	target->wheel.xposch= target->conf.xpos[1];
 
 	if (target->conf.xsharp[0] > 0.0)
 		target->wheel.xsharp = target->conf.xsharp[0];
 	else
-		printlog(0, "WARNING: first xsharp value should be bigger than 0!");
+		Log_Add(0, "WARNING: first xsharp value should be bigger than 0!");
 
 	target->wheel.xsharpch = target->conf.xsharp[1];
 
@@ -229,19 +231,19 @@ Car_Template *Car_Template::Load (const char *path)
 	if (target->conf.yshape > 1.0)
 		target->wheel.yshape = target->conf.yshape;
 	else
-		printlog(0, "WARNING: yshape value should be bigger than 1!");
+		Log_Add(0, "WARNING: yshape value should be bigger than 1!");
 
 	if (target->conf.ypos[0] > 0.0)
 		target->wheel.ypos = target->conf.ypos[0];
 	else
-		printlog(0, "WARNING: first ypos value should be bigger than 0!");
+		Log_Add(0, "WARNING: first ypos value should be bigger than 0!");
 
 	target->wheel.yposch= target->conf.ypos[1];
 
 	if (target->conf.ysharp[0] > 0.0)
 		target->wheel.ysharp = target->conf.ysharp[0];
 	else
-		printlog(0, "WARNING: first ysharp value should be bigger than 0!");
+		Log_Add(0, "WARNING: first ysharp value should be bigger than 0!");
 
 	target->wheel.ysharpch = target->conf.ysharp[1];
 	target->wheel.yshift = target->conf.yshift;
@@ -258,30 +260,30 @@ Car_Template *Car_Template::Load (const char *path)
 	//steering distribution
 	if (target->conf.dist_steer >1.0 || target->conf.dist_steer <0.0 )
 	{
-		printlog(0, "ERROR: front/rear steering distribution should be range 0 to 1! (enabling front)");
+		Log_Add(0, "ERROR: front/rear steering distribution should be range 0 to 1! (enabling front)");
 		target->conf.dist_steer = 1.0;
 	}
 
 	//check if neither front or rear drive
 	if ( (!target->conf.dist_motor[0]) && (!target->conf.dist_motor[1]) )
 	{
-		printlog(0, "ERROR: either front and rear motor distribution must be enabled! (enabling 4WD)");
+		Log_Add(0, "ERROR: either front and rear motor distribution must be enabled! (enabling 4WD)");
 		target->conf.dist_motor[0] = true;
 		target->conf.dist_motor[1] = true;
 	}
 
-	//breaking distribution
-	if (target->conf.dist_break>1.0 || target->conf.dist_break<0.0 )
+	//braking distribution
+	if (target->conf.dist_brake>1.0 || target->conf.dist_brake<0.0 )
 	{
-		printlog(0, "ERROR: front/rear breaking distribution should be range 0 to 1! (enabling rear)");
-		target->conf.dist_break = 0.0;
+		Log_Add(0, "ERROR: front/rear braking distribution should be range 0 to 1! (enabling rear)");
+		target->conf.dist_brake = 0.0;
 	}
 
 
 	//load model if specified
 	if (target->conf.model[0] == '\0') //empty string
 	{
-		printlog(1, "WARNING: no car 3D model specified\n");
+		Log_Add(1, "WARNING: no car 3D model specified\n");
 		target->model=NULL;
 	}
 	else
@@ -304,11 +306,11 @@ Car_Template *Car_Template::Load (const char *path)
 
 Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D *rim)
 {
-	printlog(1, "spawning car at: %f %f %f", x,y,z);
+	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
-	printlog(1, "NOTE: wheels will not collide to other wheels - OPCODE lacks cylinder*cylinder collision");
+	Log_Add(1, "NOTE: wheels will not collide with each others unless ODE was built with \"--enable-libccd\"");
 
-	printlog(1, "TODO: proper antigravity and downforce (only debug implementation right now!)");
+	Log_Add(1, "TODO: proper antigravity and downforce (only test implementation right now!)");
 
 
 	//begin copying of needed configuration data
@@ -325,16 +327,16 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 		car->gear_limit = conf.gear_limit;
 
 
-	car->max_break = conf.max_break;
+	car->max_brake = conf.max_brake;
 	car->max_steer = conf.max_steer;
 	car->steerdecr = conf.steer_decrease;
 	car->min_steer = conf.min_steer;
 	car->limit_speed = conf.limit_speed;
 	car->airtorque = conf.air_torque;
-	car->hinge2_dbreaks = conf.handbreak_lock;
+	car->hinge2_dbrakes = conf.handbrake_lock;
 
 	car->dsteer = conf.dist_steer;
-	car->dbreak = conf.dist_break;
+	car->dbrake = conf.dist_brake;
 	car->fwd = conf.dist_motor[0];
 	car->rwd = conf.dist_motor[1];
 	car->fwredist = conf.redist[0];
@@ -563,7 +565,7 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 
 void Car::Respawn (dReal x, dReal y, dReal z)
 {
-	printlog(1, "respawning car at: %f %f %f", x,y,z);
+	Log_Add(1, "respawning car at: %f %f %f", x,y,z);
 
 	//remember old car position
 	const dReal *pos = dBodyGetPosition(bodyid);

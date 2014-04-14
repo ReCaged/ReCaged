@@ -24,13 +24,14 @@
 #include <ode/ode.h>
 
 extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include HEADER_LUA_H
+#include HEADER_LUALIB_H
+#include HEADER_LAUXLIB_H
 }
 #include "../shared/threads.hpp"
 
 #include "../shared/racetime_data.hpp"
+#include "../shared/directories.hpp"
 #include "../shared/trimesh.hpp"
 #include "../shared/log.hpp"
 #include "../shared/track.hpp"
@@ -38,10 +39,12 @@ extern "C" {
 #include "../shared/geom.hpp"
 #include "../shared/body.hpp"
 
+#include "../simulation/event_buffers.hpp"
+
 //load data for spawning object (object data), hard-coded debug version
 Object_Template *Object_Template::Load(const char *path)
 {
-	printlog(1, "Loading object: %s", path);
+	Log_Add(1, "Loading object: %s", path);
 
 	//see if already loaded
 	if (Object_Template *tmp=Racetime_Data::Find<Object_Template>(path))
@@ -54,20 +57,28 @@ Object_Template *Object_Template::Load(const char *path)
 	strcpy(script, path);
 	strcat(script, "/object.lua");
 
-	//load file as chunk
-	if (luaL_loadfile(lua_sim, script))
+	//check if found
+	Directories dirs;
+	if (!dirs.Find(script, DATA, READ))
 	{
-		printlog(0, "ERROR: could not load script \"%s\": \"%s\"!",
-				script, lua_tostring(lua_sim, -1));
-		lua_pop(lua_sim, -1);
+		Log_Add(0, "ERROR: could not find script \"%s\"!", script);
 		return NULL;
 	}
 
+	//load file as chunk
+	if (luaL_loadfile(lua_sim, dirs.Path()))
+	{
+		Log_Add(0, "ERROR: could not load script \"%s\": \"%s\"!",
+				dirs.Path(), lua_tostring(lua_sim, -1));
+		lua_pop(lua_sim, -1);
+		return NULL;
+	}
+	
 	//execute chunk and look for one return
 	if (lua_pcall(lua_sim, 0, 1, 0))
 	{
-		printlog(0, "ERROR: \"%s\" while running \"%s\"!",
-				lua_tostring(lua_sim, -1), script);
+		Log_Add(0, "ERROR: \"%s\" while running \"%s\"!",
+				lua_tostring(lua_sim, -1), dirs.Path());
 		lua_pop(lua_sim, -1);
 		return NULL;
 	}
@@ -75,7 +86,7 @@ Object_Template *Object_Template::Load(const char *path)
 	//if not returned ok
 	if (!lua_isfunction(lua_sim, -1))
 	{
-		printlog(0, "ERROR: no spawning function returned by \"%s\"!", script);
+		Log_Add(0, "ERROR: no spawning function returned by \"%s\"!", dirs.Path());
 		return NULL;
 	}
 
@@ -89,20 +100,14 @@ Object_Template *Object_Template::Load(const char *path)
 //TODO: rotation. move both pos+rot to arrays
 Object *Object_Template::Spawn (dReal x, dReal y, dReal z)
 {
-	printlog(2, "Spawning object at: %f %f %f", x,y,z);
-	dReal pos[3]={x,y,z};
-	//default to no rotation....
-	dReal rot[9]={	1.0, 0.0, 0.0,
-			0.0, 1.0, 0.0,
-			0.0, 0.0, 1.0	};
-
-	Object *obj = new Object(pos, rot);
+	Log_Add(2, "Spawning object at: %f %f %f", x,y,z);
+	Object *obj = new Object();
 
 	lua_rawgeti(lua_sim, LUA_REGISTRYINDEX, spawn_script);
 
 	if (obj->Run(0, 0))
 	{
-		printlog(0, "ERROR: \"%s\" while spawning object!",
+		Log_Add(0, "ERROR: \"%s\" while spawning object!",
 				lua_tostring(lua_sim, -1));
 		lua_pop(lua_sim, -1);
 		delete obj;
@@ -111,7 +116,7 @@ Object *Object_Template::Spawn (dReal x, dReal y, dReal z)
 
 	//hm... didn't do anything?
 	if (obj->activity == 0)
-		Event_Buffer_Add_Inactive(this);
+		Event_Buffer_Add_Inactive(obj);
 
 	return obj;
 }

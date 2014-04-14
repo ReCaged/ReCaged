@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -25,7 +25,7 @@ Profile *profile_head = NULL;
 
 void Profile_Remove (Profile *target)
 {
-	printlog(2, "removing profile");
+	Log_Add(2, "removing profile");
 
 	//remove from list
 	if (!target->prev) //head

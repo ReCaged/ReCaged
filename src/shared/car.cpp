@@ -33,13 +33,13 @@ Car *Car::head = NULL;
 //allocates car, add to list...
 Car::Car(void)
 {
-	printlog(2, "configuring Car class");
+	Log_Add(2, "configuring Car class");
 
 	//default values
 	dir = 1; //initiate to 1 for default
 
 	//control values
-	drift_breaks = true; //if the user does nothing, lock wheels
+	drift_brakes = true; //if the user does nothing, lock wheels
 	throttle = 0;
 	steering = 0;
 	oldsteerlimit = 0;
@@ -58,7 +58,7 @@ Car::Car(void)
 //run _before_ starting full erase of object/component lists (at race end)
 Car::~Car()
 {
-	printlog(2, "clearing Car class");
+	Log_Add(2, "clearing Car class");
 
 	//remove from list
 	if (!prev) //head

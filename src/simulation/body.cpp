@@ -31,8 +31,6 @@
 
 void Body::Update_Mass()
 {
-	printlog(2, "storing body mass for drag calculations");
-
 	dMass dmass;
 
 	//TODO: use the body's inertia tensor instead...?
@@ -45,16 +43,12 @@ void Body::Update_Mass()
 //(this way the body mass doesn't need to be requested and used in every calculation)
 void Body::Set_Linear_Drag (dReal drag)
 {
-	printlog(2, "setting body linear drag");
-
 	linear_drag = drag;
 	use_advanced_linear_drag = false;
 }
 
 void Body::Set_Advanced_Linear_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
 {
-	printlog(2, "setting body advanced linear drag");
-
 	advanced_linear_drag[0] = drag_x;
 	advanced_linear_drag[1] = drag_y;
 	advanced_linear_drag[2] = drag_z;
@@ -64,7 +58,6 @@ void Body::Set_Advanced_Linear_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
 
 void Body::Set_Angular_Drag (dReal drag)
 {
-	printlog(2, "setting body angular drag");
 	angular_drag = drag;
 }
 
@@ -79,10 +72,10 @@ void Body::Linear_Drag (dReal step)
 	dReal vel[3] = {abs_vel[0]-track.wind[0], abs_vel[1]-track.wind[1], abs_vel[2]-track.wind[2]}; //relative to wind
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
-	//how much of original velocity is left after breaking by air/liquid drag
+	//how much of original velocity is left after braking by air/liquid drag
 	dReal remain = 1-(total_vel*(track.density)*(linear_drag/mass)*(step));
 
-	if (remain < 0) //in case breaking is so extreme it will reverse movement, just change velocity to 0
+	if (remain < 0) //in case braking is so extreme it will reverse movement, just change velocity to 0
 		remain = 0;
 
 	//change velocity
@@ -111,7 +104,7 @@ void Body::Advanced_Linear_Drag (dReal step)
 	dBodyVectorFromWorld (body_id, (abs_vel[0]-track.wind[0]), (abs_vel[1]-track.wind[1]), (abs_vel[2]-track.wind[2]), vel);
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
-	//how much of original velocities is left after breaking by air/liquid drag
+	//how much of original velocities is left after braking by air/liquid drag
 	dReal remain;
 	int i;
 	for (i=0; i<3; ++i)
@@ -146,10 +139,10 @@ void Body::Angular_Drag (dReal step)
 	vel = dBodyGetAngularVel (body_id);
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
-	//how much of original velocity is left after breaking by air/liquid drag
+	//how much of original velocity is left after braking by air/liquid drag
 	dReal remain = 1-(total_vel*(track.density)*(angular_drag/mass)*(step));
 
-	if (remain < 0) //in case breaking is so extreme it will reverse movement, just change velocity to 0
+	if (remain < 0) //in case braking is so extreme it will reverse movement, just change velocity to 0
 		remain = 0;
 
 	//set velocity with change
@@ -161,8 +154,6 @@ void Body::Set_Buffer_Event(dReal thres, dReal buff, int scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{
-		printlog(2, "setting Body event");
-
 		threshold=thres;
 		buffer=buff;
 		buffer_script=scr;
@@ -173,8 +164,6 @@ void Body::Set_Buffer_Event(dReal thres, dReal buff, int scr)
 	}
 	else
 	{
-		printlog(2, "disabling Body event");
-
 		Event_Buffer_Remove_All(this);
 
 		//disable

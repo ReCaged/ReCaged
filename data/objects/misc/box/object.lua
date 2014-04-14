@@ -4,10 +4,10 @@
 --are permitted in any medium without royalty provided the copyright
 --notice and this notice are preserved.
 
-log.print(0, "hello, this is the Box object loading");
+log.add(0, "hello, this is the Box object loading");
 
 function spawn ()
-	log.print(0, "hello, this is the Box object spawning");
+	log.add(0, "hello, this is the Box object spawning");
 end
 
 return spawn;

@@ -47,7 +47,7 @@ class Racetime_Data
 				//type conversion+casting ok
 				if ((!strcmp(tmp->name, name)) && (casted=dynamic_cast<T*>(tmp)))
 				{
-					printlog(1, "racetime data already existed for \"%s\" (already loaded)", name);
+					Log_Add(2, "racetime data already existed for \"%s\" (already loaded)", name);
 					return casted;
 				}
 			}

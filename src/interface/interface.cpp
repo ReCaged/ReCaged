@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -23,17 +23,17 @@
 #include <GL/glew.h>
 
 extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include HEADER_LUA_H
+#include HEADER_LUALIB_H
+#include HEADER_LAUXLIB_H
 }
 
 #include "../shared/internal.hpp"
-#include "../shared/info.hpp"
 #include "../shared/track.hpp"
 #include "../shared/threads.hpp"
 #include "../shared/log.hpp"
 #include "../shared/profile.hpp"
+#include "../shared/directories.hpp"
 
 #include "../shared/camera.hpp"
 #include "render_list.hpp"
@@ -41,6 +41,8 @@ extern "C" {
 
 SDL_Surface *screen;
 const Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+int joysticks=0;
+SDL_Joystick **joystick;
 
 //list of lua functions:
 int int_TMP (lua_State *lua);
@@ -100,11 +102,11 @@ void Resize (int new_w, int new_h)
 	{
 		//angle between w/2 (distance from center of screen to right edge) and players eye distance
 		angle = atan( (((GLfloat) w)/2.0)/internal.dist );
-		printlog(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
+		Log_Add(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
 	}
 	else //bad...
 	{
-		printlog(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
+		Log_Add(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
 		angle = ( (internal.angle/2.0) * M_PI/180);;
 	}
 
@@ -129,15 +131,15 @@ void Resize (int new_w, int new_h)
 	glLoadIdentity();
 }
 
-bool Interface_Init(void)
+bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 {
-	printlog(0, "Initiating interface");
+	Log_Add(0, "Initiating interface");
 
 	//create lua state
 	lua_int = luaL_newstate();
 	if (!lua_int)
 	{
-		printlog(0, "ERROR: could not create new lua state");
+		Log_Add(0, "ERROR: could not create new lua state");
 		return false;
 	}
 
@@ -155,10 +157,14 @@ bool Interface_Init(void)
 
 
 	//initiate sdl
-	SDL_Init (SDL_INIT_VIDEO);
+	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
+	{
+		Log_Add(0, "Error: couldn't initiate video or joystick: %s", SDL_GetError());
+		return false;
+	}
 
 	//set title:
-	SDL_WM_SetCaption (TITLE, "ReCaged");
+	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\") (C) " PACKAGE_YEAR " Mats Wahlberg", "ReCaged");
 
 	//TODO: set icon (SDL_WM_SetIcon, from embedded into the executable?)
 
@@ -170,11 +176,15 @@ bool Interface_Init(void)
 	//try to create window
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
 	//SDL_CreateWindow and SDL_GL_CreateContext
-	screen = SDL_SetVideoMode (internal.res[0], internal.res[1], 0, flags);
+	//ALSO (sdl>1.2): try setting core context for gl 3.x. If possible: unlegacy rendering
+	int x, y;
+	if (xres > 0) x=xres; else x=internal.res[0];
+	if (yres > 0) y=yres; else y=internal.res[1];
+	screen = SDL_SetVideoMode (x, y, 0, flags); //TODO: SDL_GetVideoInfo() provides much needed info for fallbacks here
 
 	if (!screen)
 	{
-		printlog(0, "Error: couldn't set video mode");
+		Log_Add(0, "Error: couldn't set video mode: %s", SDL_GetError());
 		return false;
 	}
 
@@ -186,27 +196,46 @@ bool Interface_Init(void)
 		{
 			//should check ARB extensions if GL<1.5, but since this only affects old
 			//systems (the 1.5 standard was released in 2003), I'll ignore it...
-			printlog(0, "Error: you need GL 1.5 or later");
+			Log_Add(0, "Error: you need GL 1.5 or later");
 			return false;
 		}
 	}
 	else
 	{
-		printlog(0, "Error: couldn't init glew");
+		Log_Add(0, "Error: couldn't init glew");
 		return false;
 	}
 
 	//hide cursor
 	SDL_ShowCursor (SDL_DISABLE);
 
-	//toggle fullscreen (if requested)
-	if (internal.fullscreen)
-		if (!SDL_WM_ToggleFullScreen(screen))
-			printlog(0, "Error: unable to toggle fullscreen");
+	//toggle or prevent fullscreen (if requested/disabled in either conf or args)
+	if (!window && (fullscreen || internal.fullscreen))
+	{
+		if (SDL_WM_ToggleFullScreen(screen))
+			Log_Add(1, "Enabled fullscreen mode");
+		else
+			Log_Add(0, "Error: unable to toggle fullscreen");
+	}
 
 	//set up window, as if resized
 	Resize (screen->w, screen->h);
 
+	//grab all joysticks/gamepads detected
+	joysticks=SDL_NumJoysticks();
+	if (joysticks != 0)
+	{
+		joystick = new SDL_Joystick*[joysticks];
+		Log_Add(1, "Detected %i joystick(s). Opening:", joysticks);
+
+		for (int i=0; i<joysticks; ++i)
+		{
+			Log_Add(1, "Device %i: \"%s\"", i, SDL_JoystickName(i));
+			joystick[i]= SDL_JoystickOpen(i);
+			if (!joystick[i])
+				Log_Add(0, "Failed to open joystick %i", i);
+		}
+	}
 	//
 	//options
 	//
@@ -241,13 +270,20 @@ bool Interface_Init(void)
 
 bool Interface_Loop ()
 {
-	printlog(1, "Starting interface loop");
+	Log_Add(1, "Starting interface loop");
 
-	//all following will be moved to rc.lua!
-	//load file as chunk
-	if (luaL_loadfile(lua_int, "rc.lua"))
+	//find rc.lua
+	Directories dirs;
+	if (!dirs.Find("rc.lua", DATA, READ))
 	{
-		printlog(0, "ERROR: could not load \"rc.lua\" script: \"%s\"!",
+		Log_Add(0, "ERROR: could not find \"rc.lua\" script!");
+		return NULL;
+	}
+
+	//load file as chunk
+	if (luaL_loadfile(lua_int, dirs.Path()))
+	{
+		Log_Add(0, "ERROR: could not load \"rc.lua\" script: \"%s\"!",
 				lua_tostring(lua_int, -1));
 		lua_pop(lua_int, -1);
 		return false;
@@ -256,7 +292,7 @@ bool Interface_Loop ()
 	//execute chunk
 	if (lua_pcall(lua_int, 0, 0, 0))
 	{
-		printlog(0, "ERROR: \"%s\" while running \"rc.lua\"!",
+		Log_Add(0, "ERROR: \"%s\" while running \"rc.lua\"!",
 				lua_tostring(lua_int, -1));
 		lua_pop(lua_int, -1);
 		return false;
@@ -285,6 +321,7 @@ int int_TMP(lua_State *lua)
 
 		//get time
 		Uint32 time = SDL_GetTicks();
+//TODO: revert to old (looping) approach
 		//how much it differs from old
 		Uint32 delta = time-time_old;
 		time_old = time;
@@ -305,7 +342,7 @@ int int_TMP(lua_State *lua)
 					if (screen)
 						Resize (screen->w, screen->h);
 					else
-						printlog(0, "Warning: resizing failed");
+						Log_Add(0, "Warning: resizing failed");
 				break;
 
 				case SDL_QUIT:
@@ -314,10 +351,10 @@ int int_TMP(lua_State *lua)
 
 				case SDL_ACTIVEEVENT:
 					if (event.active.gain == 0)
-						printlog(1, "(FIXME: pause when losing focus (or being iconified)!)");
+						Log_Add(1, "(FIXME: pause when losing focus (or being iconified)!)");
 				break;
 
-				//check for special key presses (debug/demo keys)
+				//check for special key presses (tmp debug/demo keys)
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym)
 					{
@@ -403,7 +440,18 @@ int int_TMP(lua_State *lua)
 				default:
 					break;
 			}
+
+			//make sure not performing anything else
+			if (runlevel == done)
+				break;
+
+			//and always send this to profiles
+			Profile_Input_Collect(&event);
 		}
+
+		//again, not performing anything else
+		//if (runlevel == done)
+			//break;
 
 		//(tmp) camera movement keys:
 		Uint8 *keys = SDL_GetKeyState(NULL);
@@ -426,7 +474,7 @@ int int_TMP(lua_State *lua)
 
 		//car control
 		if (runlevel == running)
-			Profile_Events_Step(delta);
+			Profile_Input_Step(delta);
 
 
 		//done with sdl
@@ -452,8 +500,8 @@ int int_TMP(lua_State *lua)
 		//clear screen
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//move camera
-		camera.Graphics_Step();
+		//check/set updated scene+camera
+		Render_List_Prepare();
 
 		//place sun
 		glLightfv (GL_LIGHT0, GL_POSITION, track.position);
@@ -482,11 +530,19 @@ void Interface_Quit(void)
 	//during rendering, memory might be allocated
 	//(will quickly be reallocated in each race and can be removed)
 	Geom_Render_Clear();
-	Render_List_Clear();
+	Render_List_Clear_Interface();
 	//
 
-	printlog(1, "Quit interface");
+	Log_Add(1, "Quit interface");
 	lua_close(lua_int);
 	SDL_Quit();
+
+	//close all joysticks
+	for (int i=0; i<joysticks; ++i)
+		if (joystick[i])
+			SDL_JoystickClose(joystick[i]);
+	delete[] joystick;
+
+	SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 }
 

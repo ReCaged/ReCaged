@@ -22,12 +22,13 @@
 #include "object.hpp"
 #include "log.hpp"
 #include "track.hpp"
+#include "log.hpp"
 #include "../simulation/event_buffers.hpp"
 
 extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include HEADER_LUA_H
+#include HEADER_LUALIB_H
+#include HEADER_LAUXLIB_H
 }
 #include "../shared/threads.hpp"
 
@@ -48,22 +49,13 @@ Object *Object::head = NULL;
 Object *Object::active = NULL;
 
 //allocate a new object, add it to the list and returns its pointer
-Object::Object (dReal position[3], dReal rotation[9])
+Object::Object ()
 {
-	printlog(1, "creating Object");
-
 	prev=NULL;
 	next=head;
 	head=this;
 
-	if (next)
-		next->prev = this;
-	else
-		printlog(2, "(first registered object)");
-
-	//set position/rotation
-	memcpy(pos, position, sizeof(dReal)*3);
-	memcpy(rot, rotation, sizeof(dReal)*9);
+	if (next) next->prev = this;
 
 	//default values
 	components = NULL;
@@ -74,9 +66,7 @@ Object::Object (dReal position[3], dReal rotation[9])
 //destroys an object
 Object::~Object()
 {
-	//lets just hope the given pointer is ok...
-	printlog(1, "freeing Object");
-
+	Log_Add(1, "Object removed");
 	//1: remove it from the list
 	if (prev == NULL) //first link
 		head = next;

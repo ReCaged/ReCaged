@@ -1,7 +1,9 @@
-The files "Box.obj", "Box.mtl" and "surfaces.mtl" are:
+The files "Box.obj", "Box.mtl", "figure_8.road", "in_a_spin.road",
+"superbowl.road", "surfaces.mtl" and "vertigo.road" are:
 
-Copyright (C) 2010, 2011 Mats Wahlberg
+Copyright (C) 2010, 2011, 2012 Mats Wahlberg
 
 Copying and distribution of these files, with or without modification,
 are permitted in any medium without royalty provided the copyright
-notice and this notice are preserved.
+notice and this notice are preserved. These files are offered as-is,
+without any warranty.

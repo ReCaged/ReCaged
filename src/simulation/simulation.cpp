@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -21,11 +21,12 @@
 
 #include <SDL/SDL_timer.h>
 #include <SDL/SDL_mutex.h>
+#include <ode/ode.h>
 
 extern "C" {
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
+#include HEADER_LUA_H
+#include HEADER_LUALIB_H
+#include HEADER_LAUXLIB_H
 }
 
 #include "../shared/threads.hpp"
@@ -75,13 +76,13 @@ unsigned int simulation_count = 0;
 
 bool Simulation_Init(void)
 {
-	printlog(0, "Initiating simulation");
+	Log_Add(0, "Initiating simulation");
 
 	//lua state
 	lua_sim = luaL_newstate();
 	if (!lua_sim)
 	{
-		printlog(0, "ERROR: could not create new lua state");
+		Log_Add(0, "ERROR: could not create new lua state");
 		return false;
 	}
 
@@ -124,7 +125,7 @@ bool Simulation_Init(void)
 
 int Simulation_Loop (void *d)
 {
-	printlog(1, "Starting simulation loop");
+	Log_Add(1, "Starting simulation loop");
 
 	simtime = SDL_GetTicks(); //set simulated time to realtime
 	Uint32 realtime; //real time (with possible delay since last update)
@@ -172,11 +173,9 @@ int Simulation_Loop (void *d)
 
 			//opdate for interface:
 			Render_List_Update(); //make copy of position/rotation for rendering
-			camera.Generate_Matrix(); //matrix based on new position/rotation
-			Render_List_Finish(); //move new list to render
 		}
 		else
-			camera.Generate_Matrix(); //still update camera position (if manually moving)
+			Render_List_Update(); //still copy (in case camera updates or something)
 
 		//broadcast to wake up sleeping threads
 		if (internal.sync_interface)
@@ -213,13 +212,16 @@ int Simulation_Loop (void *d)
 	//during simulation, memory might be allocated, remove
 	Wheel::Clear_List();
 
+	//remove buffers for building rendering list
+	Render_List_Clear_Simulation();
+
 	return 0;
 }
 
 //not lua
 void Simulation_Quit (void)
 {
-	printlog(1, "Quit simulation");
+	Log_Add(1, "Quit simulation");
 	lua_close(lua_sim);
 	dJointGroupDestroy (contactgroup);
 	dSpaceDestroy (space);

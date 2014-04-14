@@ -44,5 +44,5 @@ struct Conf_Index {
 	size_t offset;
 };
 
-bool load_conf (const char *name, char *memory, const struct Conf_Index index[]);
+bool Load_Conf (const char *name, char *memory, const struct Conf_Index index[]);
 #endif

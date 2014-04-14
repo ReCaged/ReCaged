@@ -1,0 +1,16 @@
+recaged
+recaged-*.tar.gz
+recaged-*.tar.gz.sig
+
+*.Po
+*.o
+.dirstamp
+
+Makefile
+Makefile.in
+
+aclocal.m4
+autom4te.cache/
+config.log
+config.status
+configure

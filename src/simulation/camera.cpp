@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -74,7 +74,7 @@ void Camera::Accelerate(dReal step)
 	dBodyGetRelPointPos (car->bodyid, settings->anchor[0], settings->anchor[1]-car->offset, settings->anchor[2]*car->dir, a_pos);
 
 	//relative pos and vel of camera (from anchor)
-	float r_pos[3] = {pos[0]-a_pos[0], pos[1]-a_pos[1], pos[2]-a_pos[2]};
+	float r_pos[3] = {(float)(pos[0]-a_pos[0]), (float)(pos[1]-a_pos[1]), (float)(pos[2]-a_pos[2])};
 
 	//vector lengths
 	float r_pos_l = VLength(r_pos);
@@ -219,7 +219,7 @@ void Camera::Damp(dReal step)
 		//damping (of relative movement)
 		dVector3 a_vel; //anchor velocity
 		dBodyGetRelPointVel (car->bodyid, settings->anchor[0], settings->anchor[1]-car->offset, settings->anchor[2]*car->dir, a_vel);
-		float r_vel[3] = {vel[0]-a_vel[0], vel[1]-a_vel[1], vel[2]-a_vel[2]}; //velocity relative to anchor
+		float r_vel[3] = {(float)(vel[0]-a_vel[0]), (float)(vel[1]-a_vel[1]), (float)(vel[2]-a_vel[2])}; //velocity relative to anchor
 
 		float damping = (step*settings->damping);
 		if (damping > 1)
@@ -579,22 +579,3 @@ void Camera::Physics_Step(dReal step)
 	}
 }
 
-//create rendering matrix
-void Camera::Generate_Matrix()
-{
-	//rotation (right, up, forward)
-	//m0-m3
-	matrix[0]=camera.rotation[0]; matrix[1]=camera.rotation[2]; matrix[2]=-camera.rotation[1]; matrix[3]=0.0,
-	//m4-m7
-	matrix[4]=camera.rotation[3]; matrix[5]=camera.rotation[5]; matrix[6]=-camera.rotation[4]; matrix[7]=0.0,
-	//m4-m7
-	matrix[8]=camera.rotation[6]; matrix[9]=camera.rotation[8]; matrix[10]=-camera.rotation[7]; matrix[11]=0.0,
-
-	//m12-m14, translation
-	matrix[12]=-matrix[0]*camera.pos[0]-matrix[4]*camera.pos[1]-matrix[8]*camera.pos[2],
-	matrix[13]=-matrix[1]*camera.pos[0]-matrix[5]*camera.pos[1]-matrix[9]*camera.pos[2],
-	matrix[14]=-matrix[2]*camera.pos[0]-matrix[6]*camera.pos[1]-matrix[10]*camera.pos[2],
-
-	//m15
-	matrix[15]=1.0;
-}

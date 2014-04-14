@@ -9,9 +9,9 @@ care of start/stop the simulation thread and instructs it what it should
 load. will eventually handle menu]]
 
 --TODO: arguments to recaged should be passed to this script...
-log.print(0, "hello, this is rc.lua providing the user interface")
+log.add(0, "hello, this is rc.lua providing the user interface")
 
-log.print(1, "This is a normal log input")
+log.add(1, "This is a normal log input")
 
 --[[the following will be used to mimic menu selections
 

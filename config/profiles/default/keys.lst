@@ -1,0 +1,66 @@
+# Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+#
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved. This file is offered as-is,
+# without any warranty.
+
+#input mapping syntax:
+#
+# action input_type input
+#
+#where action is one of:
+#  up, down, right, left, drift_brake,
+#  camera1, camera2, camera3, camera4
+#
+#and input_type and input is one of:
+#
+#  key keyboard_key
+#  axis joystick_axis axis_min axis_max
+#  button joystick_button
+#  hat joystick_hat hat_direction
+#
+#note1: axis_min/axis_max are in the interval: -32768 to 32767
+#note2: axis_min/axis_max specifies center+dead zone and range.
+#note3: when axis is used as a button, axis_min is threshold
+
+#keyboard: bind to arrow keys and space for locking brakes
+forward key up
+reverse key down
+right key right
+left key left
+drift_brake key space
+
+#camera change with F1-F4
+camera1 key f1
+camera2 key f2
+camera3 key f3
+camera4 key f4
+
+#simple default for joysticks/gamepads
+#axes:
+forward axis 1 -500 -32000
+reverse axis 1 500 32000
+right axis 0 500 32000
+left axis 0 -500 -32000
+#buttons:
+forward button 0
+reverse button 1
+drift_brake button 2
+camera1 button 3
+camera2 button 4
+camera3 button 5
+camera4 button 6
+#hat
+forward hat 0 up 
+reverse hat 0 down 
+right hat 0 right 
+left hat 0 left 
+
+#note: if you got analog shoulder buttons, they are probably
+#mapped as two axis resting at -32768 (fully pressed at 32767)
+#they can be mapped as (assuming the axes are 5 and 2):
+#(just uncomment the follwing lines. it's really good!)
+#forward axis 5 -3200 32000
+#reverse axis 2 -3200 32000
+#drift_brake button 0

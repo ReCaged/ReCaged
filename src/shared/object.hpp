@@ -61,7 +61,7 @@ class Object
 		void Decrease_Activity();
 		int Run(int args, int results);
 	private:
-		Object(dReal pos[3], dReal rot[9]);
+		Object();
 		//the following are either using or inherited from this class
 		friend class Object_Template; //needs access to constructor
 		friend bool load_track (const char *);
@@ -70,7 +70,6 @@ class Object
 		//things to keep track of when cleaning out object
 		unsigned int activity; //counts geoms,bodies and future stuff (script timers, loops, etc)
 
-		dReal pos[3], rot[9];
 		Component *components;
 		dSpaceID selected_space; //TODO: remove!
 
@@ -89,7 +88,7 @@ class Object
 		static Object *head;
 		Object *prev, *next;
 
-		static Object *selected;
+		static Object *active;
 };
 
 #endif
