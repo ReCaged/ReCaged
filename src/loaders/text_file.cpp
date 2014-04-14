@@ -34,7 +34,7 @@
 
 Text_File::Text_File ()
 {
-	fp = false; //default until attempting opening
+	fp = NULL; //default until attempting opening
 	word_count = 0; //no words read yet
 
 	//allocate buffer anyway (even if not open), if reopening
