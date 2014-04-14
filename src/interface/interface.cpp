@@ -34,7 +34,8 @@
 #include "geom_render.hpp"
 
 SDL_Surface *screen;
-const Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+int bpp;
 int joysticks=0;
 SDL_Joystick **joystick;
 
@@ -58,7 +59,13 @@ bool background = true;
 
 void Resize (int new_w, int new_h)
 {
-	screen = SDL_SetVideoMode (new_w, new_h, 0, flags);
+	screen = SDL_SetVideoMode (new_w, new_h, bpp, flags);
+
+	if (!screen)
+	{
+		Log_Add(0, "Warning: Could not update video mode on resize!");
+		return; //can't really quit here, just don't do anything
+	}
 	int w=screen->w;
 	int h=screen->h;
 
@@ -127,15 +134,38 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1); //make sure double-buffering
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16); //good default (Z buffer)
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0); //not used yet
+	const SDL_VideoInfo *info = SDL_GetVideoInfo(); //for native resolution&bpp
+
+	//not sure if this can fail, but just in case:
+	if (!info)
+	{
+		Log_Add(0, "Error: Could not get video info: %s", SDL_GetError());
+		return false;
+	}
+
+	//store current bpp as global
+	bpp = info->vfmt->BitsPerPixel;
 
 	//try to create window
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
 	//SDL_CreateWindow and SDL_GL_CreateContext
 	//ALSO (sdl>1.2): try setting core context for gl 3.x. If possible: unlegacy rendering
 	int x, y;
-	if (xres > 0) x=xres; else x=internal.res[0];
-	if (yres > 0) y=yres; else y=internal.res[1];
-	screen = SDL_SetVideoMode (x, y, 0, flags); //TODO: SDL_GetVideoInfo() provides much needed info for fallbacks here
+	if (!window && (fullscreen || internal.fullscreen)) //fullscreen (and not forcing window)
+	{
+		flags |= SDL_FULLSCREEN; //add fullscreen flag
+		//set resolution from screen info
+		x = info->current_w;
+		y = info->current_h;
+	}
+	else //windowed mode
+	{
+		//set resolution from conf or as forced by args
+		if (xres > 0) x=xres; else x=internal.res[0];
+		if (yres > 0) y=yres; else y=internal.res[1];
+	}
+
+	screen = SDL_SetVideoMode (x, y, bpp, flags);
 
 	if (!screen)
 	{
@@ -163,15 +193,6 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 
 	//hide cursor
 	SDL_ShowCursor (SDL_DISABLE);
-
-	//toggle or prevent fullscreen (if requested/disabled in either conf or args)
-	if (!window && (fullscreen || internal.fullscreen))
-	{
-		if (SDL_WM_ToggleFullScreen(screen))
-			Log_Add(1, "Enabled fullscreen mode");
-		else
-			Log_Add(0, "Error: unable to toggle fullscreen");
-	}
 
 	//set up window, as if resized
 	Resize (screen->w, screen->h);
@@ -263,12 +284,7 @@ int Interface_Loop ()
 			switch (event.type)
 			{
 				case SDL_VIDEORESIZE:
-					screen = SDL_SetVideoMode (event.resize.w, event.resize.h, 0, flags);
-
-					if (screen)
-						Resize (screen->w, screen->h);
-					else
-						Log_Add(0, "Warning: resizing failed");
+					Resize (event.resize.w, event.resize.h);
 				break;
 
 				case SDL_QUIT:

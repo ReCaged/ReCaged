@@ -1,4 +1,4 @@
- Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
 
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
@@ -7,9 +7,11 @@
 
 TODO: more info in header!
 
-ReCaged 0.7.1 (?/?/2012)
+ReCaged 0.7.1 (?/?/2014)
 	* Move to Autotools (Automake, Autoconf) for building
 	* Detect if running in "installed" or "portable" mode
 	* Logging to file
 	* NSIS installer for w32
 	* Joystick (gamepad) support
+	* More reliable window creation (native BPP, better fullscreen support)
+	* Use native screen resolution for fullscreen mode
