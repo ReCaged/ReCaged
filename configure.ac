@@ -3,7 +3,7 @@
 #
 # ReCaged - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2012, 2013 Mats Wahlberg
+# Copyright (C) 2012, 2013, 2014 Mats Wahlberg
 #
 # This file is part of ReCaged.
 #
@@ -26,7 +26,7 @@ AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com], [recaged], [http://www.nongn
 
 # Define codename and year (for title and version printout)
 AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
-AC_DEFINE([PACKAGE_YEAR], ["2013"])
+AC_DEFINE([PACKAGE_YEAR], ["2014"])
 
 # Only a safety check
 AC_CONFIG_SRCDIR([src/recaged.cpp])

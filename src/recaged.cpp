@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -480,7 +480,7 @@ Options for overriding normal (automatic) directory detection:\n\
 
 	//TODO: rotate credits/libraries order/descriptions
 	Log_puts(1, "\
-ReCaged is copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg\n\
+ReCaged is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n\
 \n\
 ReCaged is free software: you can redistribute it and/or modify\n\
 it under the terms of the GNU General Public License as published by\n\
