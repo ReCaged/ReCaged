@@ -22,7 +22,7 @@
 #
 
 AC_PREREQ([2.60]) #should work (and be old enough)
-AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com], [recaged], [http://www.nongnu.org/recaged])
+AC_INIT([ReCaged], [0.7.1], [rcxslinger@gmail.com], [recaged], [http://recaged.net])
 
 # Define codename and year (for title and version printout)
 AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
