@@ -202,8 +202,8 @@ compiler, Autotools, libraries etc).
 The build process is the standard autoconf routine: run "./configure" and
 "make". "make install" will install (but it's not needed to run, you could just
 start "recaged" from the src directory). If you're building a development (git)
-version first run "autoreconf" to generate the configure script. Remember to
-set "CPPFLAGS" and "LDFLAGS" before running "./configure" if necessary.
+version first run "autoreconf -fi" to generate the configure script and other
+required files. Remember to set "CPPFLAGS" and "LDFLAGS" if necessary.
 
 
 On windows things will be more difficult: since there is no package manager,
