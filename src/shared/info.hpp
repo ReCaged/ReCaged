@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Simulator
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -25,10 +25,10 @@
 //general info
 const char VERSION[] = "0.7.1 (\"The Sky's the Limit\")";
 
-const char TITLE[] = "ReCaged 0.7.1 (\"The Sky's the Limit\") (C) 2009, 2010, 2011 Mats Wahlberg"; 
+const char TITLE[] = "ReCaged 0.7.1 (\"The Sky's the Limit\") (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg"; 
 
 const char ISSUE[] = "\
-   ReCaged  Copyright (C) 2009, 2010, 2011 Mats Wahlberg\n\
+   ReCaged  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n\
 \n\
    ReCaged is free software: you can redistribute it and/or modify\n\
    it under the terms of the GNU General Public License as published by\n\
