@@ -1,7 +1,7 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -23,7 +23,6 @@
 #define _RC_PROFILE_H
 
 #include "SDL/SDL_keyboard.h"
-#define UNUSED_KEY SDLK_QUESTION //key that's not used during race ("safe" default)
 
 #include "car.hpp"
 #include "camera.hpp"
@@ -35,22 +34,29 @@ struct Profile {
 	Car *car;
 
 	//settings (loaded from conf)
-	dReal steer_speed;
-	dReal throttle_speed;
+	dReal digital_steer_speed, analog_steer_speed, last_steer_speed;
+	dReal digital_throttle_speed, analog_throttle_speed, last_throttle_speed;
 
-	//keys (loaded from keys.lst)
-	SDLKey up;
-	SDLKey down;
-	SDLKey right;
-	SDLKey left;
-	SDLKey drift_break;
+	//player inputs
+	struct {
+		//states
+		bool key_state, button_state, hat_state;
+		dReal axis_state;
+
+		//mapping:
+		SDLKey key;
+
+		Uint8 axis;
+		Sint16 axis_min, axis_max;
+
+		Uint8 button;
+
+		Uint8 hat;
+		Uint8 hatpos;
+	} input[9];
 
 	struct Camera_Settings cam[4];
 	int camera;
-	SDLKey cam1;
-	SDLKey cam2;
-	SDLKey cam3;
-	SDLKey cam4;
 
 	//for list
 	Profile *prev,*next;
@@ -61,14 +67,20 @@ extern Profile *profile_head;
 const Profile profile_defaults = {
 	NULL, //car
 	//steering throttling speed
-	0.0075,
-	0.0075,
-	//control
-	SDLK_UP,
-	SDLK_DOWN,
-	SDLK_RIGHT,
-	SDLK_LEFT,
-	SDLK_SPACE,
+	0.0075, 0.0075, 0.0,
+	0.02, 0.02, 0.0,
+	//control+camera selection keys
+	{ //set states to false/0, set default inputs. 255 are unmapped (override in keys.lst)
+	{false, false, false, 0.0,	SDLK_UP,	1, -500, -32000, 0, 0, SDL_HAT_UP},
+	{false, false, false, 0.0,	SDLK_DOWN,	1, 500, 32000, 1, 0, SDL_HAT_DOWN},
+	{false, false, false, 0.0,	SDLK_RIGHT,	0, 500, 32000, 255, 0, SDL_HAT_RIGHT},
+	{false, false, false, 0.0,	SDLK_LEFT,	0, -500, -32000, 255, 0, SDL_HAT_LEFT},
+	{false, false, false, 0.0,	SDLK_SPACE,	255, -200, -32768, 2, 255, SDL_HAT_CENTERED},
+	{false, false, false, 0.0,	SDLK_F1,	255, -200, -32768, 3, 255, SDL_HAT_CENTERED},
+	{false, false, false, 0.0,	SDLK_F2,	255, -200, -32768, 4, 255, SDL_HAT_CENTERED},
+	{false, false, false, 0.0,	SDLK_F3,	255, -200, -32768, 5, 255, SDL_HAT_CENTERED},
+	{false, false, false, 0.0,	SDLK_F4,	255, -200, -32768, 6, 255, SDL_HAT_CENTERED}
+	},
 	//camera settings:
 	{
 	//1:
@@ -126,17 +138,14 @@ const Profile profile_defaults = {
 	//end of settings
 	},
 	//default camera setting
-	3,
-	//camera setting selection keys
-	SDLK_F1,
-	SDLK_F2,
-	SDLK_F3,
-	SDLK_F4};
+	3};
 
 
 const struct Conf_Index profile_index[] = {
-	{"steer_speed",			'R' ,1 ,offsetof(Profile, steer_speed)},
-	{"throttle_speed",		'R' ,1 ,offsetof(Profile, throttle_speed)},
+	{"digital:steer_speed",		'R' ,1 ,offsetof(Profile, digital_steer_speed)},
+	{"digital:throttle_speed",	'R' ,1 ,offsetof(Profile, digital_throttle_speed)},
+	{"analog:steer_speed",		'R' ,1 ,offsetof(Profile, analog_steer_speed)},
+	{"analog:throttle_speed",	'R' ,1 ,offsetof(Profile, analog_throttle_speed)},
 
 	{"camera_default",   	   	'i' ,1 ,offsetof(Profile, camera)},
 
@@ -209,28 +218,12 @@ const struct Conf_Index profile_index[] = {
 	{"camera4:offset_scale_speed",	'f', 1, offsetof(Profile, cam[3].offset_scale_speed)},
 	{"",0,0}}; //end
 
-//list of all buttons
-const struct {
-	const char *name;
-	size_t offset;
-} profile_key_list[] = {
-	{"up",			offsetof(Profile, up)},
-	{"down",		offsetof(Profile, down)},
-	{"right",		offsetof(Profile, right)},
-	{"left",		offsetof(Profile, left)},
-	{"drift_break",		offsetof(Profile, drift_break)},
-
-	{"camera1",		offsetof(Profile, cam1)},
-	{"camera2",		offsetof(Profile, cam2)},
-	{"camera3",		offsetof(Profile, cam3)},
-	{"camera4",		offsetof(Profile, cam4)},
-	{"",0}}; //end
-	
 
 //functions
 Profile *Profile_Load(const char*);
 void Profile_Remove(Profile*);
 void Profile_Remove_All();
-void Profile_Events_Step(Uint32);
+void Profile_Input_Collect(SDL_Event*);
+void Profile_Input_Step(Uint32);
 
 #endif

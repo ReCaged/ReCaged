@@ -1,7 +1,7 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -24,6 +24,21 @@
 #include "../shared/printlog.hpp"
 #include "text_file.hpp"
 //#include "loaders.hpp"
+
+
+//inputs (loaded from keys.lst)
+//0: forward
+//1: reverse
+//2: right
+//3: left
+//4: drifting brakes
+//5: select camera 1
+//6: select camera 2
+//7: select camera 3
+//8: select camera 4
+const char *profile_input_list[] = { "forward", "reverse", "right", "left",
+	"drift_brake", "camera1", "camera2", "camera3", "camera4" };
+
 
 // required to iterate through an enum in C++
 template <class Enum>
@@ -52,7 +67,7 @@ SDLKey get_key (char *name)
 
 	//we only get here if no match found
 	printlog(0, "ERROR: Key name %s didn't match any known key!", name);
-	return UNUSED_KEY;
+	return SDLK_UNKNOWN;
 }
 
 //load profile (conf and key list)
@@ -99,17 +114,51 @@ Profile *Profile_Load (const char *path)
 
 			//find match
 			int i;
-			for (i=0; (profile_key_list[i].offset != 0) && (strcmp(profile_key_list[i].name, file.words[0])); ++i);
-
-			if (profile_key_list[i].offset == 0) //we reached end (no found)
-				printlog(0, "ERROR: no key action match: %s!",file.words[0]);
-			else //found
+			for (i=0; i<9; ++i)
 			{
-				printlog(2, "match found");
-				if (file.word_count == 2) //got a key name
-					*(SDLKey*)((char*)prof+profile_key_list[i].offset) = get_key(file.words[1]);
-				else
-					printlog(0, "ERROR: no key specified for action \"%s\"", file.words[i]);
+				//match!
+				if (!strcmp(profile_input_list[i], file.words[0]))
+				{
+					//these are rather crude, but doesn't matter:
+					//they're safe and will be replaced when moving to lua
+					printlog(2, "match found");
+					if (file.word_count == 3 && !strcmp(file.words[1], "key")) //keyboard
+					{
+						prof->input[i].key = get_key(file.words[2]);
+						if (prof->input[i].key == SDLK_UNKNOWN)
+							printlog(0, "ERROR: ignoring invalid keyboard button \"%s\"", file.words[2]);
+					}
+					else if (file.word_count == 5 && !strcmp(file.words[1], "axis")) //joystick axis
+					{
+						prof->input[i].axis = atoi (file.words[2]);
+						prof->input[i].axis_min = atoi (file.words[3]);
+						prof->input[i].axis_max = atoi (file.words[4]);
+					}
+					else if (file.word_count == 3 && !strcmp(file.words[1], "button")) //joystick button
+					{
+						prof->input[i].button = atoi (file.words[2]);
+					}
+					else if (file.word_count == 4 && !strcmp(file.words[1], "hat")) //joystick hat
+					{
+						prof->input[i].hat = atoi (file.words[2]);
+
+						if (!strcmp(file.words[3], "up"))
+							prof->input[i].hatpos = SDL_HAT_UP;
+						else if (!strcmp(file.words[3], "down"))
+							prof->input[i].hatpos = SDL_HAT_DOWN;
+						else if (!strcmp(file.words[3], "right"))
+							prof->input[i].hatpos = SDL_HAT_RIGHT;
+						else if (!strcmp(file.words[3], "left"))
+							prof->input[i].hatpos = SDL_HAT_LEFT;
+						else
+						{
+							prof->input[i].hat=255;
+							printlog(0, "ERROR: ignoring invalid joystick hat direction \"%s\"", file.words[2]);
+						}
+					}
+					else
+						printlog(0, "ERROR: invalid/malformed input action \"%s\"", file.words[0]);
+				}
 			}
 		}
 	}

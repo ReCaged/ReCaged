@@ -1,7 +1,7 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -21,24 +21,92 @@
 
 #include "../shared/profile.hpp"
 
-void Profile_Events_Step(Uint32 step)
+//extract state change for used inputs
+//LUA note: will be performed by rc.lua
+void Profile_Input_Collect(SDL_Event *event)
 {
-	Profile *prof;
-	Uint8 *keys;
-	for (prof=profile_head; prof; prof=prof->next)
+	for (Profile *prof=profile_head; prof; prof=prof->next)
 	{
-		//get keys pressed
-		keys = SDL_GetKeyState(NULL);
+		switch (event->type)
+		{
+			//keyboard:
+			case (SDL_KEYDOWN):
+				for (int i=0; i<9; ++i)
+					if (prof->input[i].key!=SDLK_UNKNOWN && event->key.keysym.sym == prof->input[i].key)
+						prof->input[i].key_state=true;
+				break;
+			case (SDL_KEYUP):
+				for (int i=0; i<9; ++i)
+					if (prof->input[i].key!=SDLK_UNKNOWN && event->key.keysym.sym == prof->input[i].key)
+						prof->input[i].key_state=false;
+				break;
 
+			//joystick:
+			case (SDL_JOYAXISMOTION):
+				for (int i=0; i<9; ++i)
+					if (prof->input[i].axis!=255 && event->jaxis.axis == prof->input[i].axis)
+					{
+						//determine positive direciton:
+						if (prof->input[i].axis_min < prof->input[i].axis_max) //+
+							prof->input[i].axis_state=
+								((float)(event->jaxis.value - prof->input[i].axis_min))
+								/((float)(prof->input[i].axis_max - prof->input[i].axis_min));
+						else //-
+							prof->input[i].axis_state=
+								((float)(-event->jaxis.value + prof->input[i].axis_min))
+								/((float)(prof->input[i].axis_min - prof->input[i].axis_max));
 
-		//set camera settings
-		if (keys[prof->cam1])
+						if (prof->input[i].axis_state < 0.0)
+							prof->input[i].axis_state=0.0;
+						else if (prof->input[i].axis_state > 1.0)
+							prof->input[i].axis_state=1.0;
+					}
+				break;
+			case (SDL_JOYBUTTONDOWN):
+				for (int i=0; i<9; ++i)
+					if (prof->input[i].button!=255  && event->jbutton.button == prof->input[i].button)
+						prof->input[i].button_state=true;
+				break;
+			case (SDL_JOYBUTTONUP):
+				for (int i=0; i<9; ++i)
+					if (prof->input[i].button!=255  && event->jbutton.button == prof->input[i].button)
+						prof->input[i].button_state=false;
+				break;
+			case (SDL_JOYHATMOTION):
+				for (int i=0; i<9; ++i)
+					if (prof->input[i].hat!=255  && event->jhat.hat == prof->input[i].hat)
+						prof->input[i].hat_state=(event->jhat.value & prof->input[i].hatpos)? true:false;
+				break;
+
+			//otherwise
+			default:
+				break;
+		}
+	}
+}
+
+//act based on inputs
+//LUA note: will be performed by remote control for specific vehicle-type
+void Profile_Input_Step(Uint32 step)
+{
+	bool digital[9];
+	dReal wanted, change_speed; //wanted "analog"+speed of change
+	int i;
+
+	for (Profile *prof=profile_head; prof; prof=prof->next)
+	{
+		//combine all digital inputs ("OR" them together):
+		for (i=0; i<9; ++i)
+			digital[i] = prof->input[i].key_state||prof->input[i].button_state||prof->input[i].hat_state;
+
+		//set camera settings (fallback to analog)
+		if (digital[5]||prof->input[5].axis_state)
 			camera.Set_Settings (&prof->cam[0]);
-		else if (keys[prof->cam2])
+		else if (digital[6]||prof->input[6].axis_state)
 			camera.Set_Settings (&prof->cam[1]);
-		else if (keys[prof->cam3])
+		else if (digital[7]||prof->input[7].axis_state)
 			camera.Set_Settings (&prof->cam[2]);
-		else if (keys[prof->cam4])
+		else if (digital[8]||prof->input[8].axis_state)
 			camera.Set_Settings (&prof->cam[3]);
 
 
@@ -46,59 +114,80 @@ void Profile_Events_Step(Uint32 step)
 		if (prof->car)
 		{
 			Car *carp = prof->car;
-			if (keys[prof->drift_break])
-				carp->drift_breaks = true;
-			else
-				carp->drift_breaks = false;
 
-			dReal t_speed = prof->throttle_speed*step;
-			if (keys[prof->up])
-				carp->throttle += t_speed*carp->dir;
-			else if (keys[prof->down])
-				carp->throttle -= t_speed*carp->dir;
+			//drift brakes: try digital, fallback to analog
+			if (digital[4]||prof->input[4].axis_state)
+				carp->drift_brakes = true;
 			else
+				carp->drift_brakes = false;
+
+			//check for explicit digital throttle, fallback to analog
+			//if all zeroed, keep centering with last speed
+			if (digital[0] && !digital[1])
 			{
-				if (fabs(carp->throttle) <= t_speed)
-					carp->throttle = 0.0;
+				wanted = 1.0*carp->dir;
+				prof->last_throttle_speed = prof->digital_throttle_speed;
+			}
+			else if (!digital[0] && digital[1])
+			{
+				wanted = -1.0*carp->dir;
+				prof->last_throttle_speed = prof->digital_throttle_speed;
+			}
+			else if (prof->input[0].axis_state || prof->input[1].axis_state)
+			{
+				//combine both analog inputs into wanted
+				wanted = (prof->input[0].axis_state - prof->input[1].axis_state)*carp->dir;
+				prof->last_throttle_speed = prof->analog_throttle_speed;
+			}
+			else
+				wanted = 0.0;
 
-				else if (carp->throttle > 0.0)
-				    carp->throttle -= t_speed;
+			change_speed = prof->last_throttle_speed*(dReal)step;
 
-				else
-				    carp->throttle += t_speed;
+			if (carp->throttle > wanted)
+			{
+				if ((carp->throttle-=change_speed) <wanted)
+					carp->throttle=wanted;
+			}
+			else if (carp->throttle < wanted)
+			{
+				if ((carp->throttle+=change_speed) >wanted)
+					carp->throttle=wanted;
 			}
 
-			//check if too much
-			if (carp->throttle > 1.0)
-				carp->throttle = 1.0;
-			else if (carp->throttle < -1.0)
-				carp->throttle = -1.0;
 
-
-
-			t_speed = prof->steer_speed*step;
-			if (keys[prof->left]&&!keys[prof->right])
-				carp->steering -= t_speed*carp->dir;
-			else if (!keys[prof->left]&&keys[prof->right])
-				carp->steering += t_speed*carp->dir;
-			else //center
+			//steering, same as throttle...
+			if (digital[2] && !digital[3])
 			{
-				//can center in this step
-				if (fabs(carp->steering) <= t_speed)
-					carp->steering = 0.0;
-
-				else if (carp->steering > 0.0)
-				    carp->steering -= t_speed;
-
-				else
-				    carp->steering += t_speed;
+				wanted = 1.0*carp->dir;
+				prof->last_steer_speed = prof->digital_steer_speed;
 			}
+			else if (!digital[2] && digital[3])
+			{
+				wanted = -1.0*carp->dir;
+				prof->last_steer_speed = prof->digital_steer_speed;
+			}
+			else if (prof->input[2].axis_state || prof->input[3].axis_state)
+			{
+				//combine both analog inputs into wanted
+				wanted = (prof->input[2].axis_state - prof->input[3].axis_state)*carp->dir;
+				prof->last_steer_speed = prof->analog_steer_speed;
+			}
+			else
+				wanted = 0.0;
 
-			//same kind of check
-			if (carp->steering > 1.0)
-				carp->steering = 1.0;
-			else if (carp->steering < -1.0)
-				carp->steering = -1.0;
+			change_speed = prof->last_steer_speed*(dReal)step;
+
+			if (carp->steering > wanted)
+			{
+				if ((carp->steering-=change_speed) <wanted)
+					carp->steering=wanted;
+			}
+			else if (carp->steering < wanted)
+			{
+				if ((carp->steering+=change_speed) >wanted)
+					carp->steering=wanted;
+			}
 		}
 	}
 }

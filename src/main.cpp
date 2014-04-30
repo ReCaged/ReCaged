@@ -1,5 +1,5 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
@@ -112,7 +112,7 @@ bool tmp_menus(const char *profiledir)
 	if (!Simulation_Init())
 	{
 		//menu: warn and quit!
-		Interface_Init();
+		Interface_Quit();
 		return false;
 	}
 
@@ -379,7 +379,7 @@ int main (int argc, char *argv[])
 	}
 
 	//not needed anymore (used or not, will not be needed any more)
-	delete[] datadefault;;
+	delete[] datadefault;
 
 
 	//ok, start loading

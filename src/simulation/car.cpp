@@ -1,5 +1,5 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
@@ -177,7 +177,7 @@ void Car::Physics_Step(dReal step)
 		}
 		//
 
-		//breaking/accelerating:
+		//braking/accelerating:
 
 		//the torque we want to apply
 		dReal torque[4] = {0,0,0,0};
@@ -186,21 +186,21 @@ void Car::Physics_Step(dReal step)
 		//useful values:
 		dReal kinertiatensor = carp->wheel->inertia; //moment of inertia tensor for wheel rotation
 		dReal kpower = carp->power*carp->throttle; //motor power
-		dReal krbreak = (1.0-carp->dbreak)*carp->max_break*carp->throttle/2.0; //breaking power for rear wheels
-		dReal kfbreak = carp->dbreak*carp->max_break*carp->throttle/2.0; //breaking power for front wheels
-		dReal kbreak[4] = {kfbreak, krbreak, krbreak, kfbreak}; //break power for each wheel (to make things easier)
+		dReal krbrake = (1.0-carp->dbrake)*carp->max_brake*carp->throttle/2.0; //braking power for rear wheels
+		dReal kfbrake = carp->dbrake*carp->max_brake*carp->throttle/2.0; //braking power for front wheels
+		dReal kbrake[4] = {kfbrake, krbrake, krbrake, kfbrake}; //brake power for each wheel (to make things easier)
 
-		//check if using the built-in hinge2 motor for handbreaking, and release it
-		if (carp->hinge2_dbreaks)
+		//check if using the built-in hinge2 motor for handbraking, and release it
+		if (carp->hinge2_dbrakes)
 		{
 			dJointSetHinge2Param (carp->joint[1],dParamFMax2, 0.0);
 			dJointSetHinge2Param (carp->joint[2],dParamFMax2, 0.0);
 		}
 
-		//no fancy motor/break solution, lock rear wheels to handbrake turn (oversteer)
-		if (carp->drift_breaks)
+		//no fancy motor/brake solution, lock rear wheels to handbrake turn (oversteer)
+		if (carp->drift_brakes)
 		{
-			if (carp->hinge2_dbreaks) //use super-break
+			if (carp->hinge2_dbrakes) //use super-brake
 			{
 				//request ode to apply as much force as needed to completely lock wheels
 				dJointSetHinge2Param (carp->joint[1],dParamVel2, 0.0);
@@ -219,7 +219,7 @@ void Car::Physics_Step(dReal step)
 		}
 		else
 		{
-			if (carp->throttle) //if driver is throttling (breake/accelerate)
+			if (carp->throttle) //if driver is throttling (brake/accelerate)
 			{
 				//motor torque based on gearbox output rotation:
 				//check if using good torque calculation or bad one:
@@ -272,24 +272,24 @@ void Car::Physics_Step(dReal step)
 					}
 				}
 
-				//check if wanting to break
+				//check if wanting to brake
 				dReal needed;
 				for (i=0; i<4; ++i)
 				{
-					//if rotating in the oposite way of wanted, use breaks
+					//if rotating in the oposite way of wanted, use brakes
 					if (rotv[i]*kpower < 0.0) //(different signs makes negative)
 					{
-						//this much torque (in this direction) is needed to break wheel
+						//this much torque (in this direction) is needed to brake wheel
 						//not too reliable, since ignores the mass of the car body, and the fact
-						//that the breaking will have to slow down the car movement too...
+						//that the brakeing will have to slow down the car movement too...
 						needed = -rotv[i]*kinertiatensor/step;
 
-						//to make transition between breaking and acceleration smooth
-						//use different ways of calculate breaking torque:
-						if ( needed/kbreak[i] < 1.0) //more breaking than needed
-							torque[i] += needed; //break as needed + keep possible motor
-						else //not enough break to stop... full break
-							torque[i] += kbreak[i]; //full break + possible motor
+						//to make transition between brakeing and acceleration smooth
+						//use different ways of calculate braking torque:
+						if ( needed/kbrake[i] < 1.0) //more braking than needed
+							torque[i] += needed; //brake as needed + keep possible motor
+						else //not enough brake to stop... full brake
+							torque[i] += kbrake[i]; //full brake + possible motor
 					}
 				}
 			}

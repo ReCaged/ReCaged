@@ -1,5 +1,5 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *

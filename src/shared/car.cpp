@@ -1,5 +1,5 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
@@ -39,7 +39,7 @@ Car::Car(void)
 	dir = 1; //initiate to 1 for default
 
 	//control values
-	drift_breaks = true; //if the user does nothing, lock wheels
+	drift_brakes = true; //if the user does nothing, lock wheels
 	throttle = 0;
 	steering = 0;
 	oldsteerlimit = 0;

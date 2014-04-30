@@ -1,5 +1,5 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
@@ -696,7 +696,7 @@ bool Trimesh::Load_Road(const char *f)
 		else if (!strcmp(file.words[0], "nocapping"))
 			capping=false;
 		else
-			printlog(0, "WARNING: malformated line in road file, ignoring");
+			printlog(0, "WARNING: malformed line in road file, ignoring");
 	}
 
 	//at end, should cap?

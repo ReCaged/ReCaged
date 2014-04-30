@@ -1,5 +1,5 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
@@ -371,12 +371,12 @@ bool Wheel::Prepare_Contact(dBodyID b1, dBodyID b2, Geom *g1, Geom *g2, Surface 
 	}
 
 	//
-	//4) rolling resistance (breaking torque based on normal force)
+	//4) rolling resistance (braking torque based on normal force)
 	//
 	//some simplifications:
 	//*rolling speed is ignored (doesn't make much difference)
 	//*compression of tyre is also ignored (assumed to be small enough)
-	dReal torque = Fz*resistance*surface->tyre_rollres_scale; //breaking torque
+	dReal torque = Fz*resistance*surface->tyre_rollres_scale; //braking torque
 
 	//rotation inertia (relative to ground if got body)
 	dReal rotation;
@@ -401,13 +401,13 @@ bool Wheel::Prepare_Contact(dBodyID b1, dBodyID b2, Geom *g1, Geom *g2, Surface 
 	if (needed < 0.0)
 		torque = -torque;
 
-	//can break in this step
+	//can brake in this step
 	if (torque/needed > 1.0) //torque bigger than needed
 		torque = needed; //decrease torque to needed
 
 	dBodyAddRelTorque(wbody, 0.0, 0.0, torque);
 	//TODO: if the ground has a body, perhaps the torque should affect it too?
-	//perhaps add a the breaking force (at the point of the wheel) to the ground body?
+	//perhaps add a the braking force (at the point of the wheel) to the ground body?
 
 
 	//

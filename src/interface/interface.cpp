@@ -1,7 +1,7 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Simulator
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -42,7 +42,10 @@ float fpstime=0;
 //
 
 SDL_Surface *screen;
-const Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
+int bpp;
+int joysticks=0;
+SDL_Joystick **joystick;
 
 //TMP: keep track of demo spawn stuff
 Object_Template *box = NULL;
@@ -67,7 +70,13 @@ int width=0, height=0;
 
 void Resize (int new_w, int new_h)
 {
-	screen = SDL_SetVideoMode (new_w, new_h, 0, flags);
+	screen = SDL_SetVideoMode (new_w, new_h, bpp, flags);
+
+	if (!screen)
+	{
+		printlog(0, "Warning: Could not update video mode on resize!");
+		return; //can't really quit here, just don't do anything
+	}
 	int w=screen->w;
 	int h=screen->h;
 
@@ -125,7 +134,11 @@ bool Interface_Init(void)
 	printlog(0, "Initiating interface");
 
 	//initiate sdl
-	SDL_Init (SDL_INIT_VIDEO);
+	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK))
+	{
+		printlog(0, "Error: couldn't initiate SDL: %s", SDL_GetError());
+		return false;
+	}
 
 	//set title:
 	SDL_WM_SetCaption (TITLE, "ReCaged");
@@ -136,15 +149,32 @@ bool Interface_Init(void)
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1); //make sure double-buffering
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16); //good default (Z buffer)
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0); //not used yet
+	const SDL_VideoInfo *info = SDL_GetVideoInfo(); //for native resolution&bpp
+
+	//not sure if this can fail, but just in case:
+	if (!info)
+	{
+		printlog(0, "Error: Could not get video info: %s\n", SDL_GetError());
+		return false;
+	}
+
+	//store current bpp as global
+	bpp = info->vfmt->BitsPerPixel;
 
 	//try to create window
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
 	//SDL_CreateWindow and SDL_GL_CreateContext
-	screen = SDL_SetVideoMode (internal.res[0], internal.res[1], 0, flags);
+	if (internal.fullscreen) //fullscreen, use native resolution
+	{
+		flags |= SDL_FULLSCREEN; //add fullscreen flag
+		screen = SDL_SetVideoMode (info->current_w, info->current_h, bpp, flags);
+	}
+	else //windowed mode
+		screen = SDL_SetVideoMode (internal.res[0], internal.res[1], bpp, flags);
 
 	if (!screen)
 	{
-		printlog(0, "Error: couldn't set video mode");
+		printlog(0, "Error: couldn't set video mode: %s", SDL_GetError());
 		return false;
 	}
 
@@ -169,17 +199,28 @@ bool Interface_Init(void)
 	//hide cursor
 	SDL_ShowCursor (SDL_DISABLE);
 
-	//toggle fullscreen (if requested)
-	if (internal.fullscreen)
-		if (!SDL_WM_ToggleFullScreen(screen))
-			printlog(0, "Error: unable to toggle fullscreen");
-
 	//set up window, as if resized
 	Resize (screen->w, screen->h);
 
 	//hack
 	if (!HUD_Load())
 		return false;
+
+	//grab all joysticks/gamepads detected
+	joysticks=SDL_NumJoysticks();
+	if (joysticks != 0)
+	{
+		joystick = new SDL_Joystick*[joysticks];
+		printlog(1, "Detected %i joystick(s). Opening:", joysticks);
+
+		for (int i=0; i<joysticks; ++i)
+		{
+			printlog(1, "Device %i: \"%s\"", i, SDL_JoystickName(i));
+			joystick[i]= SDL_JoystickOpen(i);
+			if (!joystick[i])
+				printlog(0, "Failed to open joystick %i", i);
+		}
+	}
 
 	//
 	//options
@@ -403,12 +444,7 @@ int Interface_Loop ()
 			switch (event.type)
 			{
 				case SDL_VIDEORESIZE:
-					screen = SDL_SetVideoMode (event.resize.w, event.resize.h, 0, flags);
-
-					if (screen)
-						Resize (screen->w, screen->h);
-					else
-						printlog(0, "Warning: resizing failed");
+					Resize (event.resize.w, event.resize.h);
 				break;
 
 				case SDL_QUIT:
@@ -420,7 +456,7 @@ int Interface_Loop ()
 						printlog(1, "(FIXME: pause when losing focus (or being iconified)!)");
 				break;
 
-				//check for special key presses (debug/demo keys)
+				//check for special key presses (tmp debug/demo keys)
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym)
 					{
@@ -506,7 +542,18 @@ int Interface_Loop ()
 				default:
 					break;
 			}
+
+			//make sure not performing anything else
+			if (runlevel == done)
+				break;
+
+			//and always send this to profiles
+			Profile_Input_Collect(&event);
 		}
+
+		//again, not performing anything else
+		if (runlevel == done)
+			break;
 
 		//(tmp) camera movement keys:
 		Uint8 *keys = SDL_GetKeyState(NULL);
@@ -529,7 +576,7 @@ int Interface_Loop ()
 
 		//car control
 		if (runlevel == running)
-			Profile_Events_Step(delta);
+			Profile_Input_Step(delta);
 
 
 
@@ -556,8 +603,8 @@ int Interface_Loop ()
 		//clear screen
 		glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//move camera
-		camera.Graphics_Step();
+		//check/set updated scene+camera
+		Render_List_Prepare();
 
 		//place sun
 		glLightfv (GL_LIGHT0, GL_POSITION, track.position);
@@ -582,7 +629,7 @@ int Interface_Loop ()
 	//during rendering, memory might be allocated
 	//(will quickly be reallocated in each race and can be removed)
 	Geom_Render_Clear();
-	Render_List_Clear();
+	Render_List_Clear_Interface();
 
 	return 0;
 }
@@ -590,6 +637,13 @@ int Interface_Loop ()
 void Interface_Quit(void)
 {
 	printlog(1, "Quit interface");
+
+	//close all joysticks
+	for (int i=0; i<joysticks; ++i)
+		if (joystick[i])
+			SDL_JoystickClose(joystick[i]);
+	delete[] joystick;
+
 	SDL_Quit();
 }
 
