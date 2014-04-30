@@ -1,5 +1,5 @@
 #
-# ReCaged - a Free Software, Futuristic, Racing Simulator
+# ReCaged - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012 Mats Wahlberg
 #
@@ -124,8 +124,8 @@ resources.rc: Makefile
 	echo "VALUE \"ProductName\", \"ReCaged\""; \
 	echo "VALUE \"FileVersion\", \"$(PACKAGE_VERSION)\""; \
 	echo "VALUE \"ProductVersion\", \"$(PACKAGE_VERSION)\""; \
-	echo "VALUE \"Comments\", \"A Free Software, Futuristic, Racing Simulator\""; \
-	echo "VALUE \"FileDescription\", \"A Free Software, Futuristic, Racing Simulator\""; \
+	echo "VALUE \"Comments\", \"A Free Software, Futuristic, Racing Game\""; \
+	echo "VALUE \"FileDescription\", \"A Free Software, Futuristic, Racing Game\""; \
 	echo "VALUE \"LegalCopyright\", \"Copyright (C) Mats Wahlberg\""; \
 	echo "END"; \
 	echo "END"; \
