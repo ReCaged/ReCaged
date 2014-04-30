@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -223,6 +223,7 @@ bool Trimesh::Load_MTL(const char *f)
 	printlog(2, "Loading trimesh material(s) from MTL file %s", f);
 
 	Text_File file;
+	Material_Float *material;
 
 	//check if ok...
 	if (!file.Open(f))
@@ -243,38 +244,41 @@ bool Trimesh::Load_MTL(const char *f)
 		}
 		else if (mat_nr == INDEX_ERROR)
 		{
-			printlog(0, "ERROR: mtl wants to specify material properties for unnamed material?! ignoring");
+			printlog(0, "ERROR: mtl wants to specify material properties for unnamed material?! Ignoring");
 		}
 		else
 		{
+			//direct pointer to material struct
+			material=&materials[mat_nr].material;
+
 			//material properties:
 			if (file.words[0][0] == 'K') //colours?
 			{
 				if (file.words[0][1] == 'a' && file.word_count == 4) //ambient
 				{
-					materials[mat_nr].ambient[0] = atof(file.words[1]);
-					materials[mat_nr].ambient[1] = atof(file.words[2]);
-					materials[mat_nr].ambient[2] = atof(file.words[3]);
+					material->ambient[0] = atof(file.words[1]);
+					material->ambient[1] = atof(file.words[2]);
+					material->ambient[2] = atof(file.words[3]);
 				}
 				else if (file.words[0][1] == 'd' && file.word_count == 4) //diffuse
 				{
-					materials[mat_nr].diffuse[0] = atof(file.words[1]);
-					materials[mat_nr].diffuse[1] = atof(file.words[2]);
-					materials[mat_nr].diffuse[2] = atof(file.words[3]);
+					material->diffuse[0] = atof(file.words[1]);
+					material->diffuse[1] = atof(file.words[2]);
+					material->diffuse[2] = atof(file.words[3]);
 				}
 				else if (file.words[0][1] == 's' && file.word_count == 4) //specular
 				{
-					materials[mat_nr].specular[0] = atof(file.words[1]);
-					materials[mat_nr].specular[1] = atof(file.words[2]);
-					materials[mat_nr].specular[2] = atof(file.words[3]);
+					material->specular[0] = atof(file.words[1]);
+					material->specular[1] = atof(file.words[2]);
+					material->specular[2] = atof(file.words[3]);
 				}
 
 				//the following seems to be an unofficial extension of the mtl format (which us usefull):
 				else if (file.words[0][1] == 'e' && file.word_count == 4) //emission
 				{
-					materials[mat_nr].emission[0] = atof(file.words[1]);
-					materials[mat_nr].emission[1] = atof(file.words[2]);
-					materials[mat_nr].emission[2] = atof(file.words[3]);
+					material->emission[0] = atof(file.words[1]);
+					material->emission[1] = atof(file.words[2]);
+					material->emission[2] = atof(file.words[3]);
 				}
 			}
 			else if (file.words[0][0] == 'N') //some other stuff?
@@ -286,12 +290,12 @@ bool Trimesh::Load_MTL(const char *f)
 					//materials[mat_nr].shininess = (atof(file.words[1])*(128.0/1000.0));
 					//...but all mtl files I've seen are under 128 (valid opengl range),
 					//so lets just load it directly (without converting)...?
-					materials[mat_nr].shininess = atof(file.words[1]);
+					material->shininess = atof(file.words[1]);
 
 					//seems like there are mtl files out there with Ns>128?
-					if (materials[mat_nr].shininess > 128.0)
+					if (material->shininess > 128.0)
 					{
-						materials[mat_nr].shininess=128.0;
+						material->shininess=128.0;
 						printlog(0, "ERROR: mtl file got Ns>128, please tell me (Mats) to fix the mtl loader!");
 					}
 				}
@@ -311,14 +315,15 @@ bool Trimesh::Load_MTL(const char *f)
 	//see if any material sets ambient to 0, if so set it to diffuse instead
 	for (unsigned int i=0; i<=mat_nr; ++i)
 	{
-		if (	materials[i].ambient[0] == 0 &&
-			materials[i].ambient[1] == 0 &&	
-			materials[i].ambient[2] == 0	)
+		material = &materials[i].material;
+		if (	material->ambient[0] == 0 &&
+			material->ambient[1] == 0 &&	
+			material->ambient[2] == 0	)
 		{
 			printlog(2, "NOTE: found material with ambient colour of 0, setting to diffuse instead");
-			materials[i].ambient[0] = materials[i].diffuse[0];
-			materials[i].ambient[1] = materials[i].diffuse[1];
-			materials[i].ambient[2] = materials[i].diffuse[2];
+			material->ambient[0] = material->diffuse[0];
+			material->ambient[1] = material->diffuse[1];
+			material->ambient[2] = material->diffuse[2];
 		}
 	}
 			

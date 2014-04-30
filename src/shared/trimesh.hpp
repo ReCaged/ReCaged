@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -45,6 +45,15 @@ struct Triangle_Uint
 	unsigned int normal[3];
 };
 
+//material properties
+struct Material_Float
+{
+	GLfloat ambient[4];
+	GLfloat diffuse[4];
+	GLfloat specular[4];
+	GLfloat emission[4];
+	GLfloat shininess;
+};
 
 //for indicating missing data
 #define INDEX_ERROR UINT_MAX
@@ -74,8 +83,8 @@ class Trimesh_3D: public Racetime_Data
 		//element (vertex+normal) for interleaved array
 		struct Vertex
 		{
-			float x,y,z;
-			float nx,ny,nz;
+			GLfloat x,y,z;
+			GLfloat nx,ny,nz;
 		};
 
 		//material (all lements are grouped by materials for performance)
@@ -84,11 +93,7 @@ class Trimesh_3D: public Racetime_Data
 			GLuint start; //where in vbo this material is used
 			GLsizei size; //how much to render
 
-			float ambient[4];
-			GLfloat diffuse[4];
-			GLfloat specular[4];
-			GLfloat emission[4];
-			GLfloat shininess;
+			Material_Float material;
 		};
 
 		Trimesh_3D(const char* n, float r, GLuint vbo, Material* m, unsigned int mc); //constructor
@@ -219,11 +224,7 @@ class Trimesh
 		{
 			std::string name;
 
-			float ambient[4];
-			float diffuse[4];
-			float specular[4];
-			float emission[4];
-			float shininess;
+			Material_Float material;
 
 			//all triangles with this material
 			std::vector<Triangle_Uint> triangles;

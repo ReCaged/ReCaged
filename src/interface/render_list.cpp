@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -315,9 +315,10 @@ void Render_List_Render()
 	float *camera_rot=buffer_render->camera_rot;
 	Object *camera_hide=buffer_render->camera_hide;
 
-	//variables
+	//variables/pointers
 	unsigned int m_loop;
 	Trimesh_3D *model;
+	Material_Float *material;
 	float *matrix;
 	Trimesh_3D::Material *materials;
 	unsigned int material_count;
@@ -421,11 +422,15 @@ void Render_List_Render()
 			//loop through materials, and draw section(s) of model with this material
 			for (m_loop=0; m_loop< (material_count); ++m_loop)
 			{
-				glMaterialfv(GL_FRONT, GL_AMBIENT, materials[m_loop].ambient);
-				glMaterialfv(GL_FRONT, GL_DIFFUSE, materials[m_loop].diffuse);
-				glMaterialfv(GL_FRONT, GL_SPECULAR, materials[m_loop].specular);
-				glMaterialfv(GL_FRONT, GL_EMISSION, materials[m_loop].emission);
-				glMaterialf (GL_FRONT, GL_SHININESS, materials[m_loop].shininess);
+				//pointer for less clutter
+				material = &materials[m_loop].material;
+
+				//set
+				glMaterialfv(GL_FRONT, GL_AMBIENT, material->ambient);
+				glMaterialfv(GL_FRONT, GL_DIFFUSE, material->diffuse);
+				glMaterialfv(GL_FRONT, GL_SPECULAR, material->specular);
+				glMaterialfv(GL_FRONT, GL_EMISSION, material->emission);
+				glMaterialf (GL_FRONT, GL_SHININESS, material->shininess);
 
 				//draw
 				glDrawArrays(GL_TRIANGLES, materials[m_loop].start, materials[m_loop].size);
