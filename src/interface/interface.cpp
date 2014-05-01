@@ -121,7 +121,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	//initiate sdl
 	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
 	{
-		Log_Add(0, "Error: couldn't initiate video or joystick: %s", SDL_GetError());
+		Log_Add(-1, "Could not initiate video or joystick: %s", SDL_GetError());
 		return false;
 	}
 
@@ -139,7 +139,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	//not sure if this can fail, but just in case:
 	if (!info)
 	{
-		Log_Add(0, "Error: Could not get video info: %s", SDL_GetError());
+		Log_Add(-1, "Could not get video info: %s", SDL_GetError());
 		return false;
 	}
 
@@ -169,7 +169,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 
 	if (!screen)
 	{
-		Log_Add(0, "Error: couldn't set video mode: %s", SDL_GetError());
+		Log_Add(-1, "Could not set video mode: %s", SDL_GetError());
 		return false;
 	}
 
@@ -181,13 +181,13 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 		{
 			//should check ARB extensions if GL<1.5, but since this only affects old
 			//systems (the 1.5 standard was released in 2003), I'll ignore it...
-			Log_Add(0, "Error: you need GL 1.5 or later");
+			Log_Add(-1, "You need GL version 1.5 or later");
 			return false;
 		}
 	}
 	else
 	{
-		Log_Add(0, "Error: couldn't init glew");
+		Log_Add(-1, "could not initiate GLEW");
 		return false;
 	}
 

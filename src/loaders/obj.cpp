@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -76,7 +76,7 @@ bool Trimesh::Load_OBJ(const char *f)
 			//no material right now, warn and create default:
 			if (matnr == INDEX_ERROR)
 			{
-				Log_Add(0, "ERROR: obj file did not specify material to use before index, using default\n");
+				Log_Add(-1, "\"%s\" did not specify material to use before index, using default", f);
 				materials.push_back(Material_Default); //add new material (with defaults)
 				matnr = 0;
 			}
@@ -91,7 +91,7 @@ bool Trimesh::Load_OBJ(const char *f)
 
 				if (count == 0) //nothing read
 				{
-					Log_Add(0, "ERROR: obj file got malformed index, ignoring");
+					Log_Add(-1, "\"%s\" got malformed index, ignoring", f);
 					break;
 				}
 				else //at least v read
@@ -171,7 +171,7 @@ bool Trimesh::Load_OBJ(const char *f)
 	//check that at least something got loaded:
 	if (materials.empty() || vertices.empty())
 	{
-		Log_Add(0, "ERROR: obj seems to exist, but empty?!");
+		Log_Add(0, "\"%s\" seems to exist, but is empty?!", f);
 		return false;
 	}
 
@@ -193,14 +193,14 @@ bool Trimesh::Load_OBJ(const char *f)
 
 			if (trip->vertex[0] >= vl || trip->vertex[1] >= vl || trip->vertex[2] >= vl)
 			{
-				Log_Add(0, "ERROR: vertex index out of range, trying to bypass problem (not rendering)");
+				Log_Add(-1, "vertex index in \"%s\" out of range, trying to bypass problem (not rendering)", f);
 				trip->vertex[0] = trip->vertex[1] = trip->vertex[2] = 0; //set them all to 0
 			}
 			if (	(trip->normal[0] >= nl && trip->normal[0] != INDEX_ERROR) ||
 				(trip->normal[1] >= nl && trip->normal[1] != INDEX_ERROR) ||
 				(trip->normal[2] >= nl && trip->normal[2] != INDEX_ERROR)	)
 			{
-				Log_Add(0, "ERROR: normal index out of range, trying to bypass problem (generating new)");
+				Log_Add(-1, "normal index in \"%s\" out of range, trying to bypass problem (generating new)", f);
 				trip->normal[0] = trip->normal[1] = trip->normal[2] = INDEX_ERROR; //set them all to 0
 			}
 		}
@@ -240,7 +240,7 @@ bool Trimesh::Load_MTL(const char *f)
 		}
 		else if (mat_nr == INDEX_ERROR)
 		{
-			Log_Add(0, "ERROR: mtl wants to specify material properties for unnamed material?! ignoring");
+			Log_Add(0, "\"%s\" wants to specify material properties for unnamed material?! Ignoring", f);
 		}
 		else
 		{
@@ -289,7 +289,7 @@ bool Trimesh::Load_MTL(const char *f)
 					if (materials[mat_nr].shininess > 128.0)
 					{
 						materials[mat_nr].shininess=128.0;
-						Log_Add(0, "ERROR: mtl file got Ns>128, please tell me (Mats) to fix the mtl loader!");
+						Log_Add(-1, "\"%s\" file got Ns>128, please tell me (Mats) to fix the mtl loader!", f);
 					}
 				}
 			}
@@ -301,7 +301,7 @@ bool Trimesh::Load_MTL(const char *f)
 	//check if we got any data:
 	if (mat_nr == INDEX_ERROR)
 	{
-		Log_Add(0, "ERROR: mtl existed, but was empty?!");
+		Log_Add(-1, "\"%s\" seems to exist, but is empty?!", f);
 		return false;
 	}
 

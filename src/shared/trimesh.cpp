@@ -50,7 +50,7 @@ unsigned int Trimesh::Find_Material(const char *name)
 	}
 
 	//failure
-	Log_Add(0, "ERROR: could not find trimesh material %s", name);
+	Log_Add(-1, "could not find trimesh material %s", name);
 	return INDEX_ERROR;
 }
 

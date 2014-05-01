@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -48,8 +48,16 @@ Uint32 simulation_time = 0;
 bool Simulation_Init(void)
 {
 	Log_Add(0, "Initiating simulation");
-	dInitODE2(0);
-	dAllocateODEDataForThread(dAllocateFlagBasicData | dAllocateFlagCollisionData);
+	if (!dInitODE2(0))
+	{
+		Log_Add(-1, "Could not initiate ODE!");
+		return false;
+	}
+	if (!dAllocateODEDataForThread(dAllocateFlagBasicData | dAllocateFlagCollisionData))
+	{
+		Log_Add(-1, "Could not allocate thread data for ODE!");
+		return false;
+	}
 
 	world = dWorldCreate();
 

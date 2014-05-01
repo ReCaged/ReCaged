@@ -80,9 +80,9 @@ class VBO: public Racetime_Data
 			{
 				//...should be a memory issue...
 				if (error == GL_OUT_OF_MEMORY)
-					Log_Add(0, "WARNING: insufficient graphics memory, can not store rendering models...");
+					Log_Add(-1, "Insufficient graphics memory, can not store rendering models...");
 				else //...but might be a coding error
-					Log_Add(0, "ERROR: unexpected opengl error!!! Fix this!");
+					Log_Add(-1, "Unexpected opengl error!!! Fix this!");
 
 				//anyway, we return NULL to indicate failure
 				return NULL;
@@ -256,7 +256,7 @@ Trimesh_3D *Trimesh::Create_3D()
 
 	if (!vcount)
 	{
-		Log_Add(0, "ERROR: trimesh is empty (at least no triangles)");
+		Log_Add(-1, "trimesh is empty (at least no triangles)");
 		return NULL;
 	}
 	//mcount is always secured

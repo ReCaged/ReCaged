@@ -75,7 +75,7 @@ bool Text_File::Open (const char *file)
 	}
 	else
 	{
-		Log_Add(0, "ERROR: Text_File could not open file %s!", file);
+		Log_Add(-1, "Text_File could not open file %s!", file);
 		return false;
 	}
 }
@@ -95,7 +95,7 @@ bool Text_File::Read_Line ()
 	//first check if we got an open file...
 	if (!fp)
 	{
-		Log_Add(0, "ERROR: Text_File tried reading without an open file!");
+		Log_Add(0, "WARNING: Text_File tried reading without an open file!");
 		return false;
 	}
 

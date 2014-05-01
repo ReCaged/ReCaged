@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -23,6 +23,11 @@
 #include <SDL/SDL_mutex.h>
 #include "internal.hpp"
 #include "log.hpp"
+
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
 
 //default
 int stdout_verbosity = 1;
@@ -95,23 +100,34 @@ void Log_Add (int level, const char *text, ...)
 	if (logfile || level <= stdout_verbosity)
 	{
 		SDL_mutexP(logmutex); //make sure no conflicts
+		int pos;
 
-		//begin with verbosity indicator (if in normal range)
-		if (level >=0 && level <=2)
+		//begin with verbosity indicator
+		if (level == -1) //real error
+		{
+			strcpy(logbuffer, "ERROR: ");
+			pos=7;
+		}
+		else //normal, using standard indicator
+		{
 			strcpy(logbuffer, indicator[level]);
-		else
-			fputs(" ? ", stdout);
+			pos=3;
+		}
 
-		//print message
+		//generate and append message
 		va_list list;
 		va_start (list, text);
-		int i=vsnprintf (logbuffer+3, LOG_BUFFER_SIZE-3, text, list);
+		int i=vsnprintf (logbuffer+pos, LOG_BUFFER_SIZE-pos, text, list);
 		va_end (list);
 
 		//safety precaution...
 		if (i==-1)
 		{
 			puts("ERROR DURING LOG OUTPUT GENERATION!");
+#ifdef _WIN32
+			//and annoy the user on windoze
+			MessageBoxA(NULL, "ERROR DURING LOG OUTPUT GENERATION!", "Error!", MB_ICONERROR | MB_OK);
+#endif
 			SDL_mutexV(logmutex);
 			return;
 		}
@@ -123,7 +139,19 @@ void Log_Add (int level, const char *text, ...)
 			fputs(logbuffer, logfile);
 			putc('\n', logfile); //should be faster than fputc...
 		}
-		if (level <=stdout_verbosity)
+		if (level == -1) //special case
+		{
+			//write to stderr instead of stdout (+some newlines to
+			//make it visible)
+			putc('\n', stderr);
+			fputs(logbuffer, stderr);
+			putc('\n', stderr);
+#ifdef _WIN32
+			//and annoy the user on windoze
+			MessageBoxA(NULL, logbuffer, "Error!", MB_ICONERROR | MB_OK);
+#endif
+		}
+		else if (level <=stdout_verbosity) //normal case, if high enough verbosity
 		{
 			if (level==0) putchar('\n');
 			puts(logbuffer);
@@ -147,12 +175,17 @@ void Log_printf (int level, const char *text, ...)
 		if (i==-1)
 		{
 			puts("ERROR DURING LOG OUTPUT GENERATION!");
+#ifdef _WIN32
+			//and annoy the user on windoze
+			MessageBoxA(NULL, "ERROR DURING LOG OUTPUT GENERATION!", "Error!", MB_ICONERROR | MB_OK);
+#endif
 			SDL_mutexV(logmutex);
 			return;
 		}
 
 		if (logfile) fputs(logbuffer, logfile);
-		if (level <=stdout_verbosity) fputs(logbuffer, stdout);
+		if (level == -1) fputs(logbuffer, stderr);
+		else if (level <=stdout_verbosity) fputs(logbuffer, stdout);
 		SDL_mutexV(logmutex);
 	}
 }
@@ -161,7 +194,8 @@ void Log_puts (int level, const char *text)
 {
 	SDL_mutexP(logmutex);
 	if (logfile) fputs(text, logfile);
-	if (level <= stdout_verbosity) fputs(text, stdout);
+	if (level == -1) fputs(logbuffer, stderr);
+	else if (level <= stdout_verbosity) fputs(text, stdout);
 	SDL_mutexV(logmutex);
 }
 

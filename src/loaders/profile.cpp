@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -63,7 +63,7 @@ SDLKey get_key (char *name)
 			return key;
 
 	//we only get here if no match found
-	Log_Add(0, "ERROR: Key name %s didn't match any known key!", name);
+	Log_Add(-1, "Key name %s didn't match any known key!", name);
 	return SDLK_UNKNOWN;
 }
 
@@ -96,7 +96,7 @@ Profile *Profile_Load (const char *path)
 	if (prof->camera >0 && prof->camera <5)
 		camera.Set_Settings (&(prof->cam[prof->camera -1]));
 	else
-		Log_Add(0, "ERROR: default camera should be a value between 1 and 4!");
+		Log_Add(-1, "Default camera should be a value between 1 and 4!");
 
 	//load key list
 	char list[strlen(path)+9+1];
@@ -123,7 +123,7 @@ Profile *Profile_Load (const char *path)
 					{
 						prof->input[i].key = get_key(file.words[2]);
 						if (prof->input[i].key == SDLK_UNKNOWN)
-							Log_Add(0, "ERROR: ignoring invalid keyboard button \"%s\"", file.words[2]);
+							Log_Add(-1, "Ignoring invalid keyboard button \"%s\"", file.words[2]);
 					}
 					else if (file.word_count == 5 && !strcmp(file.words[1], "axis")) //joystick axis
 					{
@@ -150,11 +150,11 @@ Profile *Profile_Load (const char *path)
 						else
 						{
 							prof->input[i].hat=255;
-							Log_Add(0, "ERROR: ignoring invalid joystick hat direction \"%s\"", file.words[2]);
+							Log_Add(-1, "Ignoring invalid joystick hat direction \"%s\"", file.words[2]);
 						}
 					}
 					else
-						Log_Add(0, "ERROR: invalid/malformed input action \"%s\"", file.words[0]);
+						Log_Add(-1, "Invalid/malformed input action \"%s\"", file.words[0]);
 				}
 			}
 		}

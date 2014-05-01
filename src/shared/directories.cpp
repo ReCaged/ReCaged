@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2012, 2013 Mats Wahlberg
+ * Copyright (C) 2012, 2013, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -32,8 +32,8 @@
 
 //arbitrarily-sized buffer for some w32 functions
 #define W32BUFSIZE 400
-//note: wont realloc buffer: I've HAD IT with the crap doze api and its bugs!
-//(example: GitModuleFileName on xp/2k: doesn't return buffer-size errors, and
+//Note: Wont realloc this! I've HAD IT with the crap doze api and its bugs!
+//(example: GetModuleFileName on xp/2k: doesn't return buffer-size errors, and
 //forgets NULL termination of the string it returns...)
 #endif
 
@@ -333,7 +333,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	if (	(installed_force || installed_override || user_override) &&
 		(portable_force || portable_override)	)
 	{
-		Log_Add(0, "ERROR: contradicting installed/portable overrides");
+		Log_Add(-1, "Contradicting installed/portable overrides");
 		return false;
 	}
 
@@ -358,7 +358,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			Log_Add(1, "Alternate path to installed directory specified");
 		else
 		{
-			Log_Add(0, "ERROR: overriding path to installed directory (\"%s\") is incorrect", override);
+			Log_Add(-1, "Overriding path to installed directory (\"%s\") is incorrect", override);
 			return false;
 		}
 	}
@@ -550,7 +550,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	//did exist in not obvious read-only location, but no write access: was required for portable mode...
 	else if (found && portable_force)
 	{
-		Log_Add(0, "ERROR: portable mode forced, but no write access to directories around executable");
+		Log_Add(-1, "Portable mode forced, but no write access to directories around executable");
 		return false;
 	}
 	else
@@ -563,7 +563,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			Log_Add(1, "Alternate path to user directory specified (for config)");
 		else
 		{
-			Log_Add(0, "ERROR: overriding path to user directory (\"%s\") is incorrect (for config)", user_override);
+			Log_Add(-1, "Overriding path to user directory (\"%s\") is incorrect (for config)", user_override);
 			return false;
 		}
 	}
@@ -593,7 +593,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			Log_Add(1, "Alternate path to user directory specified (for data)");
 		else
 		{
-			Log_Add(0, "ERROR: overriding path to user directory (\"%s\") is incorrect (for data)", user_override);
+			Log_Add(-1, "Overriding path to user directory (\"%s\") is incorrect (for data)", user_override);
 			return false;
 		}
 	}
@@ -623,7 +623,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			Log_Add(1, "Alternate path to user directory specified (for cache)");
 		else
 		{
-			Log_Add(0, "ERROR: overriding path to user directory (\"%s\") is incorrect (for cache)", user_override);
+			Log_Add(-1, "Overriding path to user directory (\"%s\") is incorrect (for cache)", user_override);
 			return false;
 		}
 	}

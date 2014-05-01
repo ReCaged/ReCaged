@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -136,7 +136,7 @@ Car_Template *Car_Template::Load (const char *path)
 					//failed to load
 					if (!tmp_geom.mesh)
 					{
-						Log_Add(0, "ERROR: trimesh geom in car geom list could not be loaded!");
+						Log_Add(-1, "Trimesh geom in car geom list could not be loaded!");
 						continue; //don't add
 					}
 
@@ -144,7 +144,7 @@ Car_Template *Car_Template::Load (const char *path)
 				}
 				else
 				{
-					Log_Add(0, "ERROR: geom \"%s\" in car geom list not recognized/malformed!", file.words[0]);
+					Log_Add(-1, "Geom \"%s\" in car geom list not recognized/malformed!", file.words[0]);
 					continue; //go to next line
 				}
 
@@ -260,14 +260,14 @@ Car_Template *Car_Template::Load (const char *path)
 	//steering distribution
 	if (target->conf.dist_steer >1.0 || target->conf.dist_steer <0.0 )
 	{
-		Log_Add(0, "ERROR: front/rear steering distribution should be range 0 to 1! (enabling front)");
+		Log_Add(-1, "Front/rear steering distribution should be range 0 to 1! (enabling front)");
 		target->conf.dist_steer = 1.0;
 	}
 
 	//check if neither front or rear drive
 	if ( (!target->conf.dist_motor[0]) && (!target->conf.dist_motor[1]) )
 	{
-		Log_Add(0, "ERROR: either front and rear motor distribution must be enabled! (enabling 4WD)");
+		Log_Add(-1, "Either front and rear motor distribution must be enabled! (enabling 4WD)");
 		target->conf.dist_motor[0] = true;
 		target->conf.dist_motor[1] = true;
 	}
@@ -275,7 +275,7 @@ Car_Template *Car_Template::Load (const char *path)
 	//braking distribution
 	if (target->conf.dist_brake>1.0 || target->conf.dist_brake<0.0 )
 	{
-		Log_Add(0, "ERROR: front/rear braking distribution should be range 0 to 1! (enabling rear)");
+		Log_Add(-1, "Front/rear braking distribution should be range 0 to 1! (enabling rear)");
 		target->conf.dist_brake = 0.0;
 	}
 

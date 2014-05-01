@@ -260,7 +260,7 @@ bool tmp_menus()
 		{
 			if (!car_template)
 			{
-				Log_Add(0, "ERROR in menu: specify car before position!");
+				Log_Add(-1, "Incorrect menu list: Specify car before position!");
 				return false;
 			}
 
@@ -337,7 +337,8 @@ int main (int argc, char *argv[])
 	//(also init timers when at it)
 	if (SDL_Init(SDL_INIT_TIMER))
 	{
-		printf("Error: couldn't initiate SDL: %s", SDL_GetError());
+		Log_Add(-1, "Couldn't initiate SDL: %s", SDL_GetError());
+		return -1;
 	}
 	Log_Init();
 
@@ -384,7 +385,7 @@ int main (int argc, char *argv[])
 				xres=atoi(optarg);
 				if (xres <= 0)
 				{
-					Log_Add(0, "ERROR: window width requires a positive integer");
+					Log_Add(-1, "Window width requires a positive integer");
 					exit(-1);
 				}
 				break;
@@ -393,7 +394,7 @@ int main (int argc, char *argv[])
 				yres=atoi(optarg);
 				if (yres <= 0)
 				{
-					Log_Add(0, "ERROR: window height requires a positive integer");
+					Log_Add(-1, "Window height requires a positive integer");
 					exit(-1);
 				}
 				break;
@@ -424,7 +425,7 @@ int main (int argc, char *argv[])
 
 			default: //print help output
 				//TODO: "Usage: %s [OPTION]... -- [LUA OPTIONS]\n"
-				Log_puts(1, "\
+				Log_puts(0, "\
 Usage: recaged [OPTION]...\n\
   -h, --help		display help and exit\n\
   -V, --version		display version and exit\n\
@@ -479,35 +480,36 @@ Options for overriding normal (automatic) directory detection:\n\
 	Log_Change_Verbosity((internal.verbosity-1));
 
 	//TODO: rotate credits/libraries order/descriptions
-	Log_puts(1, "\
-ReCaged is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n\
+	Log_puts(0, " ReCaged is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n");
+
+Log_puts(1, "\
 \n\
-ReCaged is free software: you can redistribute it and/or modify\n\
-it under the terms of the GNU General Public License as published by\n\
-the Free Software Foundation, either version 3 of the License, or\n\
-(at your option) any later version.\n\
+ ReCaged is free software: you can redistribute it and/or modify\n\
+ it under the terms of the GNU General Public License as published by\n\
+ the Free Software Foundation, either version 3 of the License, or\n\
+ (at your option) any later version.\n\
 \n\
-ReCaged is distributed in the hope that it will be useful,\n\
-but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
-GNU General Public License for more details.\n\
+ ReCaged is distributed in the hope that it will be useful,\n\
+ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+ GNU General Public License for more details.\n\
 \n\
-You should have received a copy of the GNU General Public License\n\
-along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
+ You should have received a copy of the GNU General Public License\n\
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
 \n\n\
 				-=[ Credits ]=-\n\n\
-* Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
-* \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
-* \"Spontificus\"				-	Testing, hacks and various fixes\n\n\
+  * Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
+  * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
+  * \"Spontificus\"				-	Testing, hacks and various fixes\n\n\
 \n		-=[ Other Projects that made RC possible ]=-\n\n\
-* \"Free Software Foundation\"		-	\"Free Software, Free Society\", supporting the free software movement\n\
-* \"The GNU Project\"			-	Developing a Free OS. Its work for freedom has changed the world\n\
-* \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
-* \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
-* \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\n\n\
-Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
-More keys exists for debug/testing/demo, see README if you are interested.\n\n\
-- See README for more info -\n\n");
+  * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
+  * \"The GNU Project\"			-	For Developing a Free OS\n\
+  * \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
+  * \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
+  * \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\n\n\
+ Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
+ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
+ - See README for more info -\n\n");
 
 
 	//ok, start loading
@@ -523,7 +525,7 @@ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
 	//on failure, rc should not just terminate but instead abort the race and warn the user
 	if (!tmp_menus())
 	{
-		Log_Add(0, "One or more errors, can not start!");
+		Log_Add(-1, "One or more errors, can not start!");
 		return -1; //just quit if failure
 	}
 	//

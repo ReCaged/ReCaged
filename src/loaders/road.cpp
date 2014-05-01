@@ -488,7 +488,7 @@ bool Trimesh::Load_Road(const char *f)
 			//check if got material:
 			if (!material)
 			{
-				Log_Add(0, "ERROR: road file did not specify material to use, using default\n");
+				Log_Add(-1, "\"%s\" did not specify material to use, using default\n", f);
 				materials.push_back(Material_Default); //add new material (with defaults)
 				material=&materials[0];
 			}
@@ -706,7 +706,7 @@ bool Trimesh::Load_Road(const char *f)
 	//check that at least something got loaded:
 	if (materials.empty() || vertices.empty())
 	{
-		Log_Add(0, "ERROR: road file seems to exist, but empty?!");
+		Log_Add(-1, "\"%s\" seems to exist, but is empty?!", f);
 		return false;
 	}
 

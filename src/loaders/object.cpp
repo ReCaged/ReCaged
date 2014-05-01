@@ -151,7 +151,7 @@ Object_Template *Object_Template::Load(const char *path)
 	}
 	else
 	{
-		Log_Add(0, "ERROR: path didn't match any hard-coded object");
+		Log_Add(-1, "Object path didn't match any hard-coded object");
 		return NULL;
 	}
 
@@ -709,7 +709,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 	//
 	//
 	else
-		Log_Add(0, "ERROR: trying to spawn unidentified object?!");
+		Log_Add(-1, "trying to spawn unidentified object?!");
 
 }
 

@@ -559,9 +559,9 @@ void Geom_Render()
 	{
 		//should be a memory issue, but lets take a look
 		if (error == GL_OUT_OF_MEMORY)
-			Log_Add(0, "WARNING: insufficient graphics memory, can not render geoms...");
+			Log_Add(-1, "Insufficient graphics memory, can not render geoms...");
 		else
-			Log_Add(0, "ERROR: unexpected opengl error!!! Fix this!");
+			Log_Add(-1, "Unexpected opengl error!!! Fix this!");
 
 		//disable rendering and quit before causing any harm (hope gl is still ok)...
 		geom_render_level = 0;

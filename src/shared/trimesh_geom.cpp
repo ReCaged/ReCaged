@@ -168,7 +168,7 @@ Trimesh_Geom *Trimesh::Create_Geom()
 
 	if (!tris)
 	{
-		Log_Add(0, "ERROR: trimesh is empty (at least no triangles)");
+		Log_Add(-1, "trimesh is empty (at least no triangles)");
 		return NULL;
 	}
 
@@ -180,7 +180,7 @@ Trimesh_Geom *Trimesh::Create_Geom()
 	//check (vertice and indix count can't exceed int limit)
 	if (verts>INT_MAX || (tris*3)>INT_MAX)
 	{
-		Log_Add(0, "ERROR: trimesh is too big for ode collision trimesh");
+		Log_Add(-1, "trimesh is too big for ode collision trimesh");
 		return NULL;
 	}
 

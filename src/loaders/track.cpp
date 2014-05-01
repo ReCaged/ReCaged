@@ -315,7 +315,7 @@ bool load_track (const char *path)
 	}
 	else
 	{
-		Log_Add(0, "ERROR: no geom list for track! can not create any terrain...");
+		Log_Add(-1, "No geom list for track! Can not create any terrain...");
 		RemoveMeshes();
 		delete track.object;
 		return false;
@@ -350,7 +350,7 @@ bool load_track (const char *path)
 
 				if (!(obj = Object_Template::Load(obj_name))) //NULL if failure
 				{
-					Log_Add(0, "ERROR: could not load object \"%s\"", obj_name);
+					Log_Add(-1, "Could not load object \"%s\" (requested by track)", obj_name);
 					delete track.object;
 					return false;
 				}
@@ -362,7 +362,7 @@ bool load_track (const char *path)
 				//in case no object has been loaded yet
 				if (!obj)
 				{
-					Log_Add(0, "ERROR: trying to spawn object without specifying what object!");
+					Log_Add(-1, "Track is trying to spawn object without specifying what object!");
 					continue; //go to next
 				}
 
@@ -378,7 +378,7 @@ bool load_track (const char *path)
 			}
 			else
 			{
-				Log_Add(0, "ERROR: unknown line in object list!");
+				Log_Add(0, "WARNING: did not understand line in object list!");
 				break;
 			}
 		}
