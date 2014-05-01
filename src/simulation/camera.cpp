@@ -340,8 +340,8 @@ void Camera::Rotate(dReal step)
 	if (in_air) //if in air, use absolute up instead
 	{
 		float norm=sqrt(track.gravity[0]*track.gravity[0] +
-				track.gravity[0]*track.gravity[0] +
-				track.gravity[0]*track.gravity[0]);
+				track.gravity[1]*track.gravity[1] +
+				track.gravity[2]*track.gravity[2]);
 		int i;
 
 		if (norm > 0)
