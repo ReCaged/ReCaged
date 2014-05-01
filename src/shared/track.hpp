@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -44,7 +44,7 @@ extern struct Track_Struct {
 	float specular[4];
 	float position[4]; //light position
 	
-	dReal gravity;
+	dReal gravity[3];
 
 	dReal density; //for air drag (friction)
 	dReal wind[3];
@@ -66,7 +66,7 @@ const struct Track_Struct track_defaults = {
 	{1.0,1.0,1.0 ,1.0},
 	{1.0,1.0,1.0 ,1.0},
 	{-1.0,0.5,1.0,0.0},
-	9.82,
+	{0, 0, -9.82},
 	1.29,
 	{0.5,1.0,0.0},
 	{0,-20,1.5},
@@ -80,7 +80,7 @@ const struct Conf_Index track_index[] = {
 	{"diffuse",	'f',3,	offsetof(Track_Struct, diffuse[0])},
 	{"specular",	'f',3,	offsetof(Track_Struct, specular[0])},
 	{"position",	'f',4,	offsetof(Track_Struct, position[0])},
-	{"gravity",	'R',1,	offsetof(Track_Struct, gravity)},
+	{"gravity",	'R',3,	offsetof(Track_Struct, gravity)},
 	{"density",	'R',1,	offsetof(Track_Struct, density)},
 	{"wind",	'R',3,	offsetof(Track_Struct, wind)},
 	{"start",	'R',3,	offsetof(Track_Struct, start)},

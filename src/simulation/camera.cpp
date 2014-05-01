@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -312,7 +312,7 @@ void Camera::Rotate(dReal step)
 	//first: needed values
 	//---
 
-	//while working with new camera values, store them here
+	//while working with new camera values, store old here
 	float c_right[3] = {rotation[0], rotation[3], rotation[6]};
 	float c_dir[3] = {rotation[1], rotation[4], rotation[7]};
 	float c_up[3] = {rotation[2], rotation[5], rotation[8]};
@@ -339,9 +339,17 @@ void Camera::Rotate(dReal step)
 
 	if (in_air) //if in air, use absolute up instead
 	{
-		t_up[0]=0.0;
-		t_up[1]=0.0;
-		t_up[2]=1.0;
+		float norm=sqrt(track.gravity[0]*track.gravity[0] +
+				track.gravity[0]*track.gravity[0] +
+				track.gravity[0]*track.gravity[0]);
+		int i;
+
+		if (norm > 0)
+			for (i=0; i<3; ++i)
+				t_up[i]=-track.gravity[i]/norm;
+		else //zero gravity... lets just assume current "up" is fine...
+			for (i=0; i<3; ++i)
+				t_up[i]=c_up[i];
 	}
 	else //use car up
 	{

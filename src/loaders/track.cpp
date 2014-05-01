@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -105,7 +105,7 @@ bool load_track (const char *path)
 	glLightfv (GL_LIGHT0, GL_POSITION, track.position);
 
 	//set track specific global ode params:
-	dWorldSetGravity (world,0,0,-track.gravity);
+	dWorldSetGravity (world, track.gravity[0], track.gravity[1], track.gravity[2]);
 
 	//
 	//geoms
