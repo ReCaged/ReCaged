@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -357,23 +357,7 @@ Trimesh_3D *Trimesh::Create_3D()
 			//copy material data:
 			//
 			//boooooooorrrriiiiinnnngggg....
-			material_list[mcount].ambient[0] = materials[m].ambient[0];
-			material_list[mcount].ambient[1] = materials[m].ambient[1];
-			material_list[mcount].ambient[2] = materials[m].ambient[2];
-			material_list[mcount].ambient[3] = materials[m].ambient[3];
-			material_list[mcount].diffuse[0] = materials[m].diffuse[0];
-			material_list[mcount].diffuse[1] = materials[m].diffuse[1];
-			material_list[mcount].diffuse[2] = materials[m].diffuse[2];
-			material_list[mcount].diffuse[3] = materials[m].diffuse[3];
-			material_list[mcount].specular[0] = materials[m].specular[0];
-			material_list[mcount].specular[1] = materials[m].specular[1];
-			material_list[mcount].specular[2] = materials[m].specular[2];
-			material_list[mcount].specular[3] = materials[m].specular[3];
-			material_list[mcount].emission[0] = materials[m].emission[0];
-			material_list[mcount].emission[1] = materials[m].emission[1];
-			material_list[mcount].emission[2] = materials[m].emission[2];
-			material_list[mcount].emission[3] = materials[m].emission[3];
-			material_list[mcount].shininess = materials[m].shininess;
+			material_list[mcount].material = materials[m].material;
 
 			//set up rendering tracking:
 			material_list[mcount].start=vcount_old;

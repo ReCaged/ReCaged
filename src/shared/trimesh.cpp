@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -30,11 +30,13 @@
 const Trimesh::Material Trimesh::Material_Default = 
 {
 	"unknown material",
+	{
 	{0.2, 0.2, 0.2, 1.0},
 	{0.8, 0.8, 0.8, 1.0},
 	{0.0, 0.0, 0.0, 1.0},
 	{0.0, 0.0, 0.0, 1.0},
 	0.0
+	}
 	//no value for vector of triangles
 };
 
