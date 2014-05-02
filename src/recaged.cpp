@@ -337,7 +337,7 @@ int main (int argc, char *argv[])
 	//(also init timers when at it)
 	if (SDL_Init(SDL_INIT_TIMER))
 	{
-		Log_Add(-1, "Couldn't initiate SDL: %s", SDL_GetError());
+		Log_Add(-1, "Could not initiate SDL: \"%s\"", SDL_GetError());
 		return -1;
 	}
 	Log_Init();
