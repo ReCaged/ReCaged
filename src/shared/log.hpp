@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -24,16 +24,17 @@
 #ifndef _RC_PRINTLOG_H
 #define _RC_PRINTLOG_H
 
-//max line size (should be enough...)
-#define LOG_BUFFER_SIZE 2048
-
-//TODO: should store copy of log in memory as well
+//starting size for lines, also for logging to RAM
+//(increased dynamically if needed)
+#define LOG_BUFFER_SIZE 1024
 
 //configuration
 void Log_Init();
+//enable/disable storing of log in ram
+void Log_RAM(bool);
 //enable/disable log file
 bool Log_File(const char *file);
-//set verbosity level
+//set verbosity level (relative to current)
 void Log_Change_Verbosity(int);
 //Log_File();
 void Log_Quit();

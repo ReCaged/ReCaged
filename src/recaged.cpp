@@ -332,14 +332,8 @@ static const struct option options[] =
 //main function, will change a lot in future versions...
 int main (int argc, char *argv[])
 {
-	//make sure we can print (just stdout for now)
-	//"Log" uses mutexes, so make sure sdl has initiated
-	//(also init timers when at it)
-	if (SDL_Init(SDL_INIT_TIMER))
-	{
-		Log_Add(-1, "Could not initiate SDL: \"%s\"", SDL_GetError());
-		return -1;
-	}
+	//make sure we can print (allocates a mutex before SDL_Init, but seems
+	//safe anyway, I think...)
 	Log_Init();
 
 	//use getopt_long to parse options to override defaults:
@@ -458,13 +452,19 @@ Options for overriding normal (automatic) directory detection:\n\
 	//welcome message
 	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
+	//start SDL (also init timers when at it)
+	if (SDL_Init(SDL_INIT_TIMER))
+	{
+		Log_Add(-1, "Could not initiate SDL: \"%s\"", SDL_GetError());
+		return -1;
+	}
+
 	//unlikely to fail, but still possible (if incorrect path overriding or something)
 	if (!Directories::Init(argv[0], inst_force, port_force, inst_overr, user_overr, port_overr))
 		return -1;
 
-	//enable file logging (if possible)
+	//for finding some files
 	Directories dirs;
-	if (dirs.Find("log.txt", CACHE, WRITE)) Log_File(dirs.Path());
 
 	//load conf file if found
 	if (conf_overr)
@@ -472,9 +472,20 @@ Options for overriding normal (automatic) directory detection:\n\
 	else if (dirs.Find("internal.conf", CONFIG, READ)) //try find by default
 		Load_Conf (dirs.Path(), (char *)&internal, internal_index);
 
-	//disable file logging is requested
-	if (!internal.logfile)
-		Log_File(NULL);
+	//only enable file logging if requested
+	if (internal.logfile)
+	{
+		if (dirs.Find("log.txt", CACHE, WRITE))
+			Log_File(dirs.Path());
+		else
+			Log_Add(-1, "Unable to find/create writeable log file");
+	}
+	else
+		Log_Add(1, "File logging disabled");
+
+	//now disable storage of files in ram (not used for anything more)
+	//(and no on ringbuffer - can resize dynamically during log writes)
+	Log_RAM(false);
 
 	//update log verbosity according to settings in conf _and_ any arguments)
 	Log_Change_Verbosity((internal.verbosity-1));
@@ -500,7 +511,7 @@ Log_puts(1, "\
 				-=[ Credits ]=-\n\n\
   * Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
   * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
-  * \"Spontificus\"				-	Testing, hacks and various fixes\n\n\
+  * \"Spontificus\"			-	Testing, hacks and various fixes\n\n\
 \n		-=[ Other Projects that made RC possible ]=-\n\n\
   * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
   * \"The GNU Project\"			-	For Developing a Free OS\n\
@@ -550,9 +561,9 @@ Log_puts(1, "\
 	Log_puts(1, "\n Bye!\n\n");
 
 	//close
-	SDL_Quit();
-	Log_Quit();
 	Directories::Quit();
+	Log_Quit();
+	SDL_Quit();
 
 	return 0;
 }
