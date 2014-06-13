@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -66,6 +66,7 @@ struct Car_Conf
 	dReal suspension_spring, suspension_damping;
 	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
 	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, join_dist;
+	dReal down_max, down_air, down_aero, down_mass;
 
 	dReal xpeak[2], xshape, xpos[2], xsharp[2];
 	dReal ypeak[2], yshape, ypos[2], ysharp[2], yshift;
@@ -78,7 +79,6 @@ struct Car_Conf
 	bool turn, gyro, approx1;
 	dReal fixedmu;
 	bool wsphere, wcapsule;
-	dReal downforce[3];
 	//debug sizes
 	dReal s[4],w[2],wp[2],jx;
 };
@@ -108,6 +108,7 @@ const struct Car_Conf car_conf_defaults = {
 	160000.0, 12000.0,
 	{3.0,1.0,5.0}, 10.0, 0.0, 0.5,
 	400000.0, 1000.0, 0.1, 50.0, 0.1, 0.8,
+	0, true, 0, 0,
 
 	{4.0, -0.0001}, 1.75, {0.1, 0.0}, {8.0, 0.0},
 	{4.0, -0.0001}, 1.5, {2.0, 0.0}, {0.2, 0.0}, 0.00001,
@@ -118,7 +119,6 @@ const struct Car_Conf car_conf_defaults = {
 	true, true, true,
 	0.0,
 	false, false,
-	{30.0, 80000.0, 0.5},
 
 	{4.8,3.6,1.6,1.25}, {1.25,1.4}, {2.4,1.8}, 2.05};
 
@@ -151,6 +151,10 @@ const struct Conf_Index car_conf_index[] = {
 	{"wheel_mass",		'R',1, offsetof(struct Car_Conf, wheel_mass)},
 	{"suspension_spring",	'R',1, offsetof(struct Car_Conf, suspension_spring)},
 	{"suspension_damping",	'R',1, offsetof(struct Car_Conf, suspension_damping)},
+	{"downforce:max",	'R',1, offsetof(struct Car_Conf, down_max)},
+	{"downforce:in_air",	'b',1, offsetof(struct Car_Conf, down_air)},
+	{"downforce:aerodynamic",'R',1, offsetof(struct Car_Conf, down_aero)},
+	{"downforce:mass_boost",'R',1, offsetof(struct Car_Conf, down_mass)},
 	{"body_linear_drag",	'R',3, offsetof(struct Car_Conf, body_linear_drag)},
 	{"body_angular_drag",	'R',1, offsetof(struct Car_Conf, body_angular_drag)},
 	{"wheel_linear_drag",	'R',1, offsetof(struct Car_Conf, wheel_linear_drag)},
@@ -185,7 +189,6 @@ const struct Conf_Index car_conf_index[] = {
 	{"debug:fixedmu",	'R',1, offsetof(struct Car_Conf, fixedmu)},
 	{"debug:sphere_wheels",	'b',1, offsetof(struct Car_Conf, wsphere)},
 	{"debug:capsule_wheels",'b',1, offsetof(struct Car_Conf, wcapsule)},
-	{"debug:downforce",	'R',3, offsetof(struct Car_Conf, downforce)},
 	
 	//the following is for sizes not yet determined
 	{"s",	'R',	4,	offsetof(struct Car_Conf, s)}, //flipover
@@ -246,6 +249,8 @@ class Car:public Object
 		//configuration data (copied from Car_Template)
 		dReal power, gear_limit;
 		dReal airtorque;
+		dReal mass;
+		dReal down_max, down_air, down_aero, down_mass;
 
 		dReal max_steer, steerdecr, min_steer, limit_speed, oldsteerlimit;
 		dReal max_brake;
@@ -279,7 +284,6 @@ class Car:public Object
 
 		//debug options:
 		bool turn;
-		dReal downforce, maxdownforce, distdownforce;
 
 		//tmp: wheel+hinge position...
 		dReal jx, wx, wy;

@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -331,6 +331,15 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->min_steer = conf.min_steer;
 	car->limit_speed = conf.limit_speed;
 	car->airtorque = conf.air_torque;
+
+	car->mass = conf.body_mass+4*conf.wheel_mass;
+
+	car->down_max = conf.down_max;
+	car->down_air = conf.down_air;
+	car->down_air = conf.down_air;
+	car->down_aero = conf.down_aero;
+	car->down_mass = conf.down_mass;
+
 	car->hinge2_dbrakes = conf.handbrake_lock;
 
 	car->dsteer = conf.dist_steer;
@@ -350,9 +359,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->offset = conf.mass_position;
 
 	car->turn = conf.turn;
-	car->downforce = conf.downforce[0];
-	car->maxdownforce = conf.downforce[1];
-	car->distdownforce = conf.downforce[2];
 
 	//start building
 	new Space(car);

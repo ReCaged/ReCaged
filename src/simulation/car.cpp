@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -27,29 +27,29 @@ void Car::Physics_Step(dReal step)
 {
 	int i;
 	Car *carp = head;
-	bool downforce;
+	bool ground; //on ground (not in air)
 	while (carp != NULL)
 	{
 		//first flipover detection (+ antigrav forces)
 
 		//both sensors are triggered, not flipping, only downforce
 		if (carp->sensor1->colliding && carp->sensor2->colliding)
-			downforce = true;
+			ground = true;
 		//only one sensor, flipping+downforce
 		else if (carp->sensor1->colliding)
 		{
-			downforce = true;
+			ground = true;
 			carp->dir = 1.0;
 		}
 		//same
 		else if (carp->sensor2->colliding)
 		{
-			downforce = true;
+			ground = true;
 			carp->dir = -1.0;
 		}
 		//no sensor active, no flipping, no downforce
 		else
-			downforce = false;
+			ground = false;
 
 		//rotation speed of wheels
 		dReal rotv[4];
@@ -73,23 +73,73 @@ void Car::Physics_Step(dReal step)
 		//(not implemented yet. will need bitfield to mask away non-ground gepms)
 		//
 
-		//downforce (debug implementation)
-		if (downforce && carp->downforce)
+		//downforce
+		if (carp->down_max > 0)
 		{
-			//downforce (by thrusters to make space tracks possible)
-			//for air-based downforce, this would be: conf*air_density*v*v
-			//but since using thrusters, I'd guess: conf*v*v or just: conf*v
+			if (ground)
+			{
+				dReal relgrav[3];
+				dBodyVectorToWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
+				dReal grav=-relgrav[2]*carp->dir;
 
-			//here: debug based on air dynamics:
-			//TODO/NOTE: should, but does not, care about wind speed/direction!
-			dReal force = carp->downforce*track.density*carp->velocity*carp->velocity;
+				dReal missing = carp->down_max - grav*carp->mass;
 
-			//avoid too big value:
-			if (force > carp->maxdownforce)
-				force=carp->maxdownforce;
+				if (missing > 0)
+				{
+					dReal available = 0;
 
-			dBodyAddForce (carp->bodyid,0,0, carp->distdownforce*force);
-			dBodyAddRelForce (carp->bodyid,0,0, -(1.0-carp->distdownforce)*force*carp->dir);
+					if (carp->down_mass > 0 && grav > 0)
+						available += grav*carp->down_mass;
+
+					if (carp->down_aero > 0)
+					{
+						dReal relvel[3];
+
+						dBodyVectorFromWorld(carp->bodyid,
+								vel[0]-track.wind[0], vel[1]-track.wind[1], vel[2]-track.wind[2],
+								relvel);
+
+						if (relvel[1] > 0)
+							available += relvel[1]*relvel[1]*track.density*carp->down_aero;
+					}
+
+					dReal force;
+					if (missing < available)
+						force=missing;
+					else
+						force=available;
+
+					dBodyAddRelForce (carp->bodyid,0,0, -carp->dir*force);
+				}
+			}
+			else if (carp->down_air > 0 && carp->down_mass)
+			{
+				dReal grav= sqrt(	track.gravity[0]*track.gravity[0]+
+							track.gravity[1]*track.gravity[1]+
+							track.gravity[2]*track.gravity[2]);
+
+				dReal missing = carp->down_max - grav*carp->mass;
+
+				if (missing > 0)
+				{
+					dReal available = grav*carp->down_mass;
+
+					if (missing < available)
+					{
+						dBodyAddForce(	carp->bodyid,
+								missing/grav*track.gravity[0],
+								missing/grav*track.gravity[1],
+								missing/grav*track.gravity[2]);
+					}
+					else
+					{
+						dBodyAddForce(	carp->bodyid,
+								carp->down_mass*track.gravity[0],
+								carp->down_mass*track.gravity[1],
+								carp->down_mass*track.gravity[2]);
+					}
+				}
+			}
 		}
 
 		//calculate turning:
