@@ -79,7 +79,7 @@ void Car::Physics_Step(dReal step)
 			if (ground)
 			{
 				dReal relgrav[3];
-				dBodyVectorToWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
+				dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
 				dReal grav=-relgrav[2]*carp->dir;
 
 				dReal missing = carp->down_max - grav*carp->mass;

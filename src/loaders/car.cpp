@@ -306,11 +306,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 {
 	printlog(1, "spawning car at: %f %f %f", x,y,z);
 
-	printlog(1, "NOTE: wheels will not collide to other wheels - OPCODE lacks cylinder*cylinder collision");
-
-	printlog(1, "TODO: proper antigravity and downforce (only debug implementation right now!)");
-
-
 	//begin copying of needed configuration data
 	Car *car = new Car();
 
