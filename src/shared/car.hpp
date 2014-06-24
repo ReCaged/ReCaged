@@ -64,9 +64,11 @@ struct Car_Conf
 	//other
 	dReal body_mass, mass_position, body[3], wheel_mass;
 	dReal suspension_spring, suspension_damping;
+	bool suspension_elevation;
 	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
 	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, join_dist;
-	dReal down_max, down_air, down_aero, down_mass;
+	dReal down_max, down_aero, down_mass;
+	bool down_air;
 
 	dReal xpeak[2], xshape, xpos[2], xsharp[2];
 	dReal ypeak[2], yshape, ypos[2], ysharp[2], yshift;
@@ -106,9 +108,11 @@ const struct Car_Conf car_conf_defaults = {
 
 	4000.0, 0, {2.6,5.8,0.7}, 30.0,
 	160000.0, 12000.0,
+	true,
 	{3.0,1.0,5.0}, 10.0, 0.0, 0.5,
 	400000.0, 1000.0, 0.1, 50.0, 0.1, 0.8,
-	0, true, 0, 0,
+	0, 0, 0,
+	true,
 
 	{4.0, -0.0001}, 1.75, {0.1, 0.0}, {8.0, 0.0},
 	{4.0, -0.0001}, 1.5, {2.0, 0.0}, {0.2, 0.0}, 0.00001,
@@ -149,8 +153,9 @@ const struct Conf_Index car_conf_index[] = {
 	{"body_mass_position",	'R',1, offsetof(struct Car_Conf, mass_position)},
 	{"body",		'R',3, offsetof(struct Car_Conf, body)},
 	{"wheel_mass",		'R',1, offsetof(struct Car_Conf, wheel_mass)},
-	{"suspension_spring",	'R',1, offsetof(struct Car_Conf, suspension_spring)},
-	{"suspension_damping",	'R',1, offsetof(struct Car_Conf, suspension_damping)},
+	{"suspension:spring",	'R',1, offsetof(struct Car_Conf, suspension_spring)},
+	{"suspension:damping",	'R',1, offsetof(struct Car_Conf, suspension_damping)},
+	{"suspension:elevation",'b',1, offsetof(struct Car_Conf, suspension_elevation)},
 	{"downforce:max",	'R',1, offsetof(struct Car_Conf, down_max)},
 	{"downforce:in_air",	'b',1, offsetof(struct Car_Conf, down_air)},
 	{"downforce:aerodynamic",'R',1, offsetof(struct Car_Conf, down_aero)},
@@ -249,8 +254,9 @@ class Car:public Object
 		//configuration data (copied from Car_Template)
 		dReal power, gear_limit;
 		dReal airtorque;
-		dReal mass;
-		dReal down_max, down_air, down_aero, down_mass;
+		dReal body_mass, wheel_mass;
+		dReal down_max, down_aero, down_mass;
+		bool down_air, elevation;
 
 		dReal max_steer, steerdecr, min_steer, limit_speed, oldsteerlimit;
 		dReal max_brake;

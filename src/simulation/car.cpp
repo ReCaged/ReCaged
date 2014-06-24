@@ -81,15 +81,16 @@ void Car::Physics_Step(dReal step)
 				dReal relgrav[3];
 				dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
 				dReal grav=-relgrav[2]*carp->dir;
+				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
 
-				dReal missing = carp->down_max - grav*carp->mass;
+				dReal missing = carp->down_max - gravforce;
 
 				if (missing > 0)
 				{
 					dReal available = 0;
 
 					if (carp->down_mass > 0 && grav > 0)
-						available += grav*carp->down_mass;
+						available += gravforce;
 
 					if (carp->down_aero > 0)
 					{
@@ -103,11 +104,28 @@ void Car::Physics_Step(dReal step)
 							available += relvel[1]*relvel[1]*track.density*carp->down_aero;
 					}
 
-					dReal force;
+					dReal force; //applied downforce
 					if (missing < available)
 						force=missing;
 					else
 						force=available;
+
+					//apply force to wheels ("elevate suspension")
+					//TODO: could add maximum ammount of force
+					//(prevent too weird elevations)
+					if (carp->elevation)
+					{
+						//compensate total force on body (not wheels) by gravity+downforce
+						dReal elevate=force+grav*carp->body_mass;
+						//remove this force from downforce
+						force-=elevate;
+
+						//apply 1/4 of this force to each wheel
+						dReal wheelforce[3];
+						dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
+						for (i=0; i<4; ++i)
+							dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
+					}
 
 					dBodyAddRelForce (carp->bodyid,0,0, -carp->dir*force);
 				}
@@ -117,8 +135,8 @@ void Car::Physics_Step(dReal step)
 				dReal grav= sqrt(	track.gravity[0]*track.gravity[0]+
 							track.gravity[1]*track.gravity[1]+
 							track.gravity[2]*track.gravity[2]);
-
-				dReal missing = carp->down_max - grav*carp->mass;
+				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
+				dReal missing = carp->down_max - gravforce;
 
 				if (missing > 0)
 				{

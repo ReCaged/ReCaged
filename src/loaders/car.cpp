@@ -327,14 +327,15 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->limit_speed = conf.limit_speed;
 	car->airtorque = conf.air_torque;
 
-	car->mass = conf.body_mass+4*conf.wheel_mass;
+	car->body_mass = conf.body_mass;
+	car->wheel_mass = conf.wheel_mass;
 
 	car->down_max = conf.down_max;
-	car->down_air = conf.down_air;
 	car->down_air = conf.down_air;
 	car->down_aero = conf.down_aero;
 	car->down_mass = conf.down_mass;
 
+	car->elevation = conf.suspension_elevation;
 	car->hinge2_dbrakes = conf.handbrake_lock;
 
 	car->dsteer = conf.dist_steer;
