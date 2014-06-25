@@ -100,8 +100,8 @@ void Car::Physics_Step(dReal step)
 								vel[0]-track.wind[0], vel[1]-track.wind[1], vel[2]-track.wind[2],
 								relvel);
 
-						if (relvel[1] > 0)
-							available += relvel[1]*relvel[1]*track.density*carp->down_aero;
+						//velocity along x (sideways) and y (forwards), squared, multiplied by density and constant
+						available += (relvel[0]*relvel[0]+relvel[1]*relvel[1]) * track.density*carp->down_aero;
 					}
 
 					dReal force; //applied downforce
