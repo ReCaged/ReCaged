@@ -263,9 +263,7 @@ void Car::Physics_Step(dReal step)
 			if (carp->hinge2_dbrakes) //use super-brake
 			{
 				//request ode to apply as much force as needed to completely lock wheels
-				dJointSetHinge2Param (carp->joint[1],dParamVel2, 0.0);
 				dJointSetHinge2Param (carp->joint[1],dParamFMax2, dInfinity);
-				dJointSetHinge2Param (carp->joint[2],dParamVel2, 0.0);
 				dJointSetHinge2Param (carp->joint[2],dParamFMax2, dInfinity);
 			}
 			else

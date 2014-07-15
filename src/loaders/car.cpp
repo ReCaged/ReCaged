@@ -80,12 +80,10 @@ Car_Template *Car_Template::Load (const char *path)
 						surface.spring = strtod(file.words[++pos], (char**)NULL);
 					else if (!strcmp(file.words[pos], "damping"))
 						surface.damping = atof(file.words[++pos]);
-					else if (!strcmp(file.words[pos], "position"))
-						surface.tyre_pos_scale = atof(file.words[++pos]);
-					else if (!strcmp(file.words[pos], "sharpness"))
-						surface.tyre_sharp_scale = atof(file.words[++pos]);
-					else if (!strcmp(file.words[pos], "rollingres"))
-						surface.tyre_rollres_scale = atof(file.words[++pos]);
+					else if (!strcmp(file.words[pos], "sensitivity"))
+						surface.sensitivity = atof(file.words[++pos]);
+					else if (!strcmp(file.words[pos], "rollres"))
+						surface.rollres = atof(file.words[++pos]);
 					else
 					{
 						printlog(0, "WARNING: surface option \"%s\" unknown", file.words[pos]);
@@ -175,9 +173,6 @@ Car_Template *Car_Template::Load (const char *path)
 				//set surface options
 				tmp_geom.surf = surface;
 
-				//compensate for (possibly) non-centered body
-				tmp_geom.pos[1]-=target->conf.mass_position;
-
 				//store
 				target->geoms.push_back(tmp_geom);
 			}
@@ -189,69 +184,35 @@ Car_Template *Car_Template::Load (const char *path)
 	//helper datas:
 
 	//wheel simulation class (friction + some custom stuff):
-	target->wheel.join_dist = target->conf.join_dist;
-	target->wheel.rim_angle = target->conf.rim_angle;
-	target->wheel.spring = target->conf.wheel_spring;
-	target->wheel.damping = target->conf.wheel_damping;
+	//target->wheel.join_d2 = target->conf.join_dist*target->conf.join_dist;
+	target->wheel.merge_dot = cos(target->conf.merge_angle*M_PI/180.0);
+	target->wheel.rim_dot = sin(target->conf.rim_angle*M_PI/180.0);
 	//cylinder moment of inertia tensor for Z = (mass*r²)/2
 	target->wheel.inertia = target->conf.wheel_mass*target->conf.w[0]*target->conf.w[0]/2.0; 
-	target->wheel.resistance = target->conf.rollres;
-	target->wheel.radius = target->conf.w[0];
+	target->wheel.rollres = target->conf.rollres;
 
 	//check and copy data from conf to wheel class
 	//x
-	target->wheel.xpeak = target->conf.xpeak[0];
-	target->wheel.xpeaksch = target->conf.xpeak[1];
-
-	if (target->conf.xshape > 1.0)
-		target->wheel.xshape = target->conf.xshape;
-	else
-		printlog(0, "WARNING: xshape value should be bigger than 1!");
-
-	if (target->conf.xpos[0] > 0.0)
-		target->wheel.xpos = target->conf.xpos[0];
-	else
-		printlog(0, "WARNING: first xpos value should be bigger than 0!");
-
-	target->wheel.xposch= target->conf.xpos[1];
-
-	if (target->conf.xsharp[0] > 0.0)
-		target->wheel.xsharp = target->conf.xsharp[0];
-	else
-		printlog(0, "WARNING: first xsharp value should be bigger than 0!");
-
-	target->wheel.xsharpch = target->conf.xsharp[1];
+	target->wheel.x_static_mu = target->conf.xstatic;
+	target->wheel.x_peak_pos = target->conf.xpeak[0];
+	target->wheel.x_peak_mu = target->conf.xpeak[1];
+	target->wheel.x_tail_pos = target->conf.xtail[0];
+	target->wheel.x_tail_mu = target->conf.xtail[1];
 
 	//y
-	target->wheel.ypeak = target->conf.ypeak[0];
-	target->wheel.ypeaksch = target->conf.ypeak[1];
-
-	if (target->conf.yshape > 1.0)
-		target->wheel.yshape = target->conf.yshape;
-	else
-		printlog(0, "WARNING: yshape value should be bigger than 1!");
-
-	if (target->conf.ypos[0] > 0.0)
-		target->wheel.ypos = target->conf.ypos[0];
-	else
-		printlog(0, "WARNING: first ypos value should be bigger than 0!");
-
-	target->wheel.yposch= target->conf.ypos[1];
-
-	if (target->conf.ysharp[0] > 0.0)
-		target->wheel.ysharp = target->conf.ysharp[0];
-	else
-		printlog(0, "WARNING: first ysharp value should be bigger than 0!");
-
-	target->wheel.ysharpch = target->conf.ysharp[1];
-	target->wheel.yshift = target->conf.yshift;
+	target->wheel.y_static_mu = target->conf.ystatic;
+	target->wheel.y_peak_pos = target->conf.ypeak[0];
+	target->wheel.y_peak_mu = target->conf.ypeak[1];
+	target->wheel.y_tail_pos = target->conf.ytail[0];
+	target->wheel.y_tail_mu = target->conf.ytail[1];
 	//
 
-	//debug options:
-	target->wheel.fixedmu = target->conf.fixedmu;
-	target->wheel.approx1 = target->conf.approx1;
-	//
-
+	target->wheel.x_alt_denom = target->conf.xaltdenom;
+	target->wheel.y_alt_denom = target->conf.yaltdenom;
+	target->wheel.x_min_denom = target->conf.xmindenom;
+	target->wheel.y_min_denom = target->conf.ymindenom;
+	target->wheel.x_min_combine = target->conf.xmincombine;
+	target->wheel.y_min_combine = target->conf.ymincombine;
 
 
 	//make sure the values are correct
@@ -294,7 +255,7 @@ Car_Template *Car_Template::Load (const char *path)
 		if ( !(target->model = Trimesh_3D::Quick_Load(file,
 				target->conf.resize,
 				target->conf.rotate[0], target->conf.rotate[1], target->conf.rotate[2],
-				target->conf.offset[0], target->conf.offset[1]-target->conf.mass_position, target->conf.offset[2])) )
+				target->conf.offset[0], target->conf.offset[1], target->conf.offset[2])) )
 			return NULL;
 	}
 
@@ -351,8 +312,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->adapt_steer = conf.adapt_steer;
 	car->adapt_redist = conf.adapt_redist;
 	car->redist_force = conf.redist_force;
-
-	car->offset = conf.mass_position;
 
 	car->turn = conf.turn;
 
@@ -490,6 +449,9 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 		//
 		//friction (use rim mu by default until knowing it's tyre)
 		wheel_data[i]->surface.mu = conf.rim_mu;
+		//spring&damping even against rim (transitions likely to cause bumps)
+		wheel_data[i]->surface.spring = conf.wheel_spring;
+		wheel_data[i]->surface.damping = conf.wheel_damping;
 		//points at our wheel simulation class (indicates wheel)
 		wheel_data[i]->wheel = &wheel;
 

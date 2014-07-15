@@ -96,20 +96,19 @@ int Simulation_Loop (void *d)
 
 			for (int i=0; i<internal.multiplier; ++i)
 			{
-				Car::Physics_Step(divided_stepsize); //control, antigrav...
+				//perform collision detection
+				Geom::Clear_Collisions(); //clear all collision flags
+				dSpaceCollide (space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
+
+				//special
+				Geom::Physics_Step(); //sensor/radar handling
 				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
+				Car::Physics_Step(divided_stepsize); //control, antigrav...
 				camera.Physics_Step(divided_stepsize); //calculate velocity and move
 
-				Geom::Clear_Collisions(); //set all collision flags to false
-
-				//perform collision detection
-				dSpaceCollide (space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
-				Wheel::Generate_Contacts(divided_stepsize); //add tyre contact points
-
-				Geom::Physics_Step(); //sensor/radar handling
-
+				//simulate
 				dWorldQuickStep (world, divided_stepsize);
-				dJointGroupEmpty (contactgroup);
+				dJointGroupEmpty (contactgroup); //clean up
 
 				Joint::Physics_Step(divided_stepsize); //joint forces
 				Collision_Feedback::Physics_Step(divided_stepsize); //forces from collisions
@@ -161,9 +160,6 @@ int Simulation_Loop (void *d)
 		//count how many steps
 		++simulation_count;
 	}
-
-	//during simulation, memory might be allocated, remove
-	Wheel::Clear_List();
 
 	//remove buffers for building rendering list
 	Render_List_Clear_Simulation();

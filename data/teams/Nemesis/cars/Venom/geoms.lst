@@ -3,7 +3,7 @@
 #more (less interesting) defaults (for tyre reaction):
 #position 1 sharpness 1 rollingres 1
 
-> mu 1 #1N/N friction
+> mu 0.1 #1N/N friction
 #(now all following geoms will have mu=1 if not changed)
 
 #

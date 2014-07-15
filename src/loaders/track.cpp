@@ -225,12 +225,10 @@ bool load_track (const char *path)
 							surface->spring = strtod(file.words[++pos], (char**)NULL);
 						else if (!strcmp(file.words[pos], "damping"))
 							surface->damping = atof(file.words[++pos]);
-						else if (!strcmp(file.words[pos], "position"))
-							surface->tyre_pos_scale = atof(file.words[++pos]);
-						else if (!strcmp(file.words[pos], "sharpness"))
-							surface->tyre_sharp_scale = atof(file.words[++pos]);
-						else if (!strcmp(file.words[pos], "rollingres"))
-							surface->tyre_rollres_scale = atof(file.words[++pos]);
+						else if (!strcmp(file.words[pos], "sensitivity"))
+							surface->sensitivity = atof(file.words[++pos]);
+						else if (!strcmp(file.words[pos], "rollres"))
+							surface->rollres = atof(file.words[++pos]);
 						else
 							printlog(0, "WARNING: trimesh surface option \"%s\" unknown", file.words[pos]);
 

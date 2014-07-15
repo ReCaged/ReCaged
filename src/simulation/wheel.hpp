@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -23,59 +23,44 @@
 #define _RC_WHEEL_H
 
 #include <ode/ode.h>
-
-//tmp:
-//extern class Geom;
-
-//size of each chunk of the list of contact points/joints
-#define INITIAL_WHEEL_LIST_SIZE 64
+#include "../shared/surface.hpp"
+#include "../shared/geom.hpp"
 
 //wheel friction simulation class (created by Car_Template, used by Physics/Geom.cpp)
 class Wheel
 {
 	public:
-		//prepare to add contact points
-		bool Prepare_Contact(dBodyID wb, dBodyID ob, class Geom *g1, class Geom *g2, class Surface *os, bool wf, dContact *contact, int count, dReal stepsize);
+		int Merge_Doubles(dContact *contact, dReal wheelaxle[], int oldcount);
 
-		//go through list, and add them
-		static void Generate_Contacts(dReal stepsize);
-
-		//make sure list is removed
-		static void Clear_List();
+		void Configure_Contacts(dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2,
+					dReal wheelaxle[], Surface *surface, dContact *contact,
+					dReal stepsize);
 
 	private:
 		//not allowing creation and modifying of class unless by friend
 		Wheel();
 
 		//friction data:
-		dReal xpeak;
-		dReal xpeaksch;
-		dReal xshape;
-		dReal xpos;
-		dReal xposch;
-		dReal xsharp;
-		dReal xsharpch;
+		dReal x_static_mu;
+		dReal x_peak_pos, x_peak_mu;
+		dReal x_tail_pos, x_tail_mu;
 
-		dReal ypeak;
-		dReal ypeaksch;
-		dReal yshape;
-		dReal ypos;
-		dReal yposch;
-		dReal ysharp;
-		dReal ysharpch;
-		dReal yshift;
+		dReal y_static_mu;
+		dReal y_peak_pos, y_peak_mu;
+		dReal y_tail_pos, y_tail_mu;
 
-		//extra data:
-		dReal join_dist;
-		dReal rim_angle;
-		dReal spring, damping;
+		bool x_alt_denom, y_alt_denom;
+		dReal x_min_denom, y_min_denom;
+
+		dReal x_min_combine, y_min_combine;
+
+		//extra tyre data:
+		dReal rim_dot;
+		dReal rollres;
+		dReal merge_dot;
+
+		//tmp:
 		dReal inertia;
-		dReal resistance;
-		dReal radius;
-
-		//debug data:
-		bool approx1;
-		dReal fixedmu;
 
 		//only car and car template (wheen loading) is allowed
 		friend class Car;

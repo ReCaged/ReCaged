@@ -62,24 +62,25 @@ struct Car_Conf
 	dReal toe[2];
 
 	//other
-	dReal body_mass, mass_position, body[3], wheel_mass;
+	dReal body_mass, body[3], wheel_mass;
 	dReal suspension_spring, suspension_damping;
 	bool suspension_elevation;
 	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
-	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, join_dist;
+	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, merge_angle;
 	dReal down_max, down_aero, down_mass;
 	bool down_air;
 
-	dReal xpeak[2], xshape, xpos[2], xsharp[2];
-	dReal ypeak[2], yshape, ypos[2], ysharp[2], yshift;
-
+	dReal xstatic, xpeak[2], xtail[2];
+	dReal ystatic, ypeak[2], ytail[2];
+	bool xaltdenom, yaltdenom;
+	dReal xmindenom, ymindenom;
+	dReal xmincombine, ymincombine;
 
 	Conf_String model; //filename+path for model
 	float resize, rotate[3], offset[3];
 
 	//debug
-	bool turn, gyro, approx1;
-	dReal fixedmu;
+	bool turn, gyro;
 	bool wsphere, wcapsule;
 	//debug sizes
 	dReal s[4],w[2],wp[2],jx;
@@ -106,22 +107,24 @@ const struct Car_Conf car_conf_defaults = {
 	true,
 	{0.0, 0.0},
 
-	4000.0, 0, {2.6,5.8,0.7}, 30.0,
+	4000.0, {2.6,5.8,0.7}, 30.0,
 	160000.0, 12000.0,
 	true,
 	{3.0,1.0,5.0}, 10.0, 0.0, 0.5,
-	400000.0, 1000.0, 0.1, 50.0, 0.1, 0.8,
+	400000.0, 1000.0, 0.1, 50.0, 0.1, 10,
 	0, 0, 0,
 	true,
 
-	{4.0, -0.0001}, 1.75, {0.1, 0.0}, {8.0, 0.0},
-	{4.0, -0.0001}, 1.5, {2.0, 0.0}, {0.2, 0.0}, 0.00001,
+	0, {0,0}, {0,0},
+	0, {0,0}, {0,0},
+	false, false,
+	0, 0,
+	0, 0,
 
 	"",
 	1.0, {0,0,0}, {0,0,0},
 
-	true, true, true,
-	0.0,
+	true, true,
 	false, false,
 
 	{4.8,3.6,1.6,1.25}, {1.25,1.4}, {2.4,1.8}, 2.05};
@@ -149,10 +152,9 @@ const struct Conf_Index car_conf_index[] = {
 	{"adaptive_steering",	'b',1, offsetof(struct Car_Conf, adapt_steer)},
 	{"toe",			'R',2, offsetof(struct Car_Conf, toe)},
 
-	{"body_mass",		'R',1, offsetof(struct Car_Conf, body_mass)},
-	{"body_mass_position",	'R',1, offsetof(struct Car_Conf, mass_position)},
+	{"body:mass",		'R',1, offsetof(struct Car_Conf, body_mass)},
 	{"body",		'R',3, offsetof(struct Car_Conf, body)},
-	{"wheel_mass",		'R',1, offsetof(struct Car_Conf, wheel_mass)},
+	{"wheel:mass",		'R',1, offsetof(struct Car_Conf, wheel_mass)},
 	{"suspension:spring",	'R',1, offsetof(struct Car_Conf, suspension_spring)},
 	{"suspension:damping",	'R',1, offsetof(struct Car_Conf, suspension_damping)},
 	{"suspension:elevation",'b',1, offsetof(struct Car_Conf, suspension_elevation)},
@@ -160,27 +162,34 @@ const struct Conf_Index car_conf_index[] = {
 	{"downforce:in_air",	'b',1, offsetof(struct Car_Conf, down_air)},
 	{"downforce:aerodynamic",'R',1, offsetof(struct Car_Conf, down_aero)},
 	{"downforce:mass_boost",'R',1, offsetof(struct Car_Conf, down_mass)},
-	{"body_linear_drag",	'R',3, offsetof(struct Car_Conf, body_linear_drag)},
-	{"body_angular_drag",	'R',1, offsetof(struct Car_Conf, body_angular_drag)},
-	{"wheel_linear_drag",	'R',1, offsetof(struct Car_Conf, wheel_linear_drag)},
-	{"wheel_angular_drag",	'R',1, offsetof(struct Car_Conf, wheel_angular_drag)},
-	{"wheel_spring",	'R',1, offsetof(struct Car_Conf, wheel_spring)},
-	{"wheel_damping",	'R',1, offsetof(struct Car_Conf, wheel_damping)},
-	{"rolling_resistance",	'R',1, offsetof(struct Car_Conf, rollres)},
-	{"rim_angle",		'R',1, offsetof(struct Car_Conf, rim_angle)},
-	{"rim_mu",		'R',1, offsetof(struct Car_Conf, rim_mu)},
-	{"join_dist",		'R',1, offsetof(struct Car_Conf, join_dist)},
+	{"body:linear_drag",	'R',3, offsetof(struct Car_Conf, body_linear_drag)},
+	{"body:angular_drag",	'R',1, offsetof(struct Car_Conf, body_angular_drag)},
+	{"wheel:linear_drag",	'R',1, offsetof(struct Car_Conf, wheel_linear_drag)},
+	{"wheel:angular_drag",	'R',1, offsetof(struct Car_Conf, wheel_angular_drag)},
+	{"wheel:spring",	'R',1, offsetof(struct Car_Conf, wheel_spring)},
+	{"wheel:damping",	'R',1, offsetof(struct Car_Conf, wheel_damping)},
+	{"wheel:rollres",	'R',1, offsetof(struct Car_Conf, rollres)},
+	{"wheel:rim_angle",	'R',1, offsetof(struct Car_Conf, rim_angle)},
+	{"wheel:rim_mu",	'R',1, offsetof(struct Car_Conf, rim_mu)},
 
-	{"tyre.x:peak",		'R',2, offsetof(struct Car_Conf, xpeak)},
-	{"tyre.x:shape",	'R',1, offsetof(struct Car_Conf, xshape)},
-	{"tyre.x:position",	'R',2, offsetof(struct Car_Conf, xpos)},
-	{"tyre.x:sharpness",	'R',2, offsetof(struct Car_Conf, xsharp)},
+	{"tyre:merge_angle",	'R',1, offsetof(struct Car_Conf, merge_angle)},
 
-	{"tyre.y:peak",		'R',2, offsetof(struct Car_Conf, ypeak)},
-	{"tyre.y:shape",	'R',1, offsetof(struct Car_Conf, yshape)},
-	{"tyre.y:position",	'R',2, offsetof(struct Car_Conf, ypos)},
-	{"tyre.y:sharpness",	'R',2, offsetof(struct Car_Conf, ysharp)},
-	{"tyre.y:shift",	'R',1, offsetof(struct Car_Conf, yshift)},
+	{"tyre:x.static",	'R',1, offsetof(struct Car_Conf, xstatic)},
+	{"tyre:x.peak",		'R',2, offsetof(struct Car_Conf, xpeak)},
+	{"tyre:x.tail",		'R',2, offsetof(struct Car_Conf, xtail)},
+
+	{"tyre:y.static",	'R',1, offsetof(struct Car_Conf, ystatic)},
+	{"tyre:y.peak",		'R',2, offsetof(struct Car_Conf, ypeak)},
+	{"tyre:y.tail",		'R',2, offsetof(struct Car_Conf, ytail)},
+
+	{"tyre:x.alt_denom",	'b',1, offsetof(struct Car_Conf, xaltdenom)},
+	{"tyre:y.alt_denom",	'b',1, offsetof(struct Car_Conf, yaltdenom)},
+
+	{"tyre:x.min_denom",	'R',1, offsetof(struct Car_Conf, xmindenom)},
+	{"tyre:y.min_denom",	'R',1, offsetof(struct Car_Conf, ymindenom)},
+
+	{"tyre:x.min_combine",	'R',1, offsetof(struct Car_Conf, xmincombine)},
+	{"tyre:y.min_combine",	'R',1, offsetof(struct Car_Conf, ymincombine)},
 
 	{"model",		's',1, offsetof(struct Car_Conf, model)},
 	{"model:resize",	'f',1, offsetof(struct Car_Conf, resize)},
@@ -190,8 +199,6 @@ const struct Conf_Index car_conf_index[] = {
 	//debug options:
 	{"debug:turn",		'b',1, offsetof(struct Car_Conf, turn)},
 	{"debug:gyroscopic",	'b',1, offsetof(struct Car_Conf, gyro)},
-	{"debug:contactapprox1",'b',1, offsetof(struct Car_Conf, approx1)},
-	{"debug:fixedmu",	'R',1, offsetof(struct Car_Conf, fixedmu)},
 	{"debug:sphere_wheels",	'b',1, offsetof(struct Car_Conf, wsphere)},
 	{"debug:capsule_wheels",'b',1, offsetof(struct Car_Conf, wcapsule)},
 	
