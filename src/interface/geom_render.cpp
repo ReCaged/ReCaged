@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -548,7 +548,7 @@ void Geom_Render()
 
 	glVertexPointer(3, GL_FLOAT, sizeof(geom_vertex), BUFFER_OFFSET(0)); //strided
 	glColorPointer(3, GL_FLOAT, sizeof(geom_vertex), BUFFER_OFFSET(sizeof(float)*3));
-	
+
 	//indices:
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(geom_index)*index_usage, indices, GL_STREAM_DRAW);
@@ -571,6 +571,7 @@ void Geom_Render()
 	//configure rendering options:
 	glDisable (GL_LIGHTING);
 	glShadeModel (GL_FLAT);
+	glEnable (GL_TEXTURE_2D);
 
 	//disable depth testing at level 1, since we need to see everything
 	if (geom_render_level == 1)

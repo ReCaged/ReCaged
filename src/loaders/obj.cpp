@@ -19,40 +19,52 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/trimesh.hpp"
+#include <SDL/SDL.h>
 
-#include "../shared/printlog.hpp"
-
+#include "shared/trimesh.hpp"
+#include "shared/printlog.hpp"
 #include "text_file.hpp"
 
 
+char *FindRelPath(const char *start, const char *file)
+{
+	char *filename = new char[strlen(start)+strlen(file)+1]; //enough to hold both obj and mtl path+filename
+	strcpy(filename, start); //copy obj path+filename
+	char *last = strrchr(filename, '/'); //last slash in obj filename
+
+	if (last) //if obj file had a path before filename (most likely):
+	{
+		last[1]='\0'; //indicate end at end of path (after /)
+		strcat(filename, file); //add mtl filename/path to obj path
+	}
+	else //just what's requested
+		strcpy(filename, file); //overwrite with mtl filename
+
+	return filename;
+}
+
 bool Trimesh::Load_OBJ(const char *f)
 {
-	printlog(2, "Loading trimesh from OBJ file %s", f);
+	printlog(2, "Loading trimesh from OBJ file \"%s\"", f);
 
 	Text_File file;
 
 	//check if ok...
 	if (!file.Open(f))
+	{
+		printlog(-1, "ERROR: Unable to open 3D file \"%s\": %s", f, SDL_GetError());
 		return false;
-	
-	//set name to filename
-	name=f;
-
-	//empty old data (if any)
-	vertices.clear();
-	//texcoords.clear();
-	normals.clear();
-	materials.clear();
+	}
 
 	//
 	//ok, start processing
 	//
 	Vector_Float vector;
+	Vector2_Float vector2;
 	Triangle_Uint triangle; //for building a triangle
 	unsigned int matnr = INDEX_ERROR; //keep track of current material (none right now)
 	unsigned int tmpmatnr;
-	unsigned int vi, ni;
+	unsigned int vi, ti, ni; //vertex, uv, normal index
 	int count;
 
 	while (file.Read_Line())
@@ -74,6 +86,13 @@ bool Trimesh::Load_OBJ(const char *f)
 
 			normals.push_back(vector); //add to list
 		} // "f" index and more than 3 words (needs at least 3 indices)
+		else if (file.words[0][0]=='v' && file.words[0][1]=='t' && file.words[0][2]=='\0' && file.word_count==3)
+		{
+			vector2.x=atof(file.words[1]);
+			vector2.y=-atof(file.words[2]); //needs to reverse this one (counteract opengl weirdness)
+
+			texcoords.push_back(vector2); //add to list
+		} // "f" index and more than 3 words (needs at least 3 indices)
 		else if (file.words[0][0]=='f' && file.words[0][1]=='\0' && file.word_count>3)
 		{
 			//no material right now, warn and create default:
@@ -89,8 +108,9 @@ bool Trimesh::Load_OBJ(const char *f)
 				// - format: v/(t)/(n) - vertex, texture, normal
 				// only v is absolutely needed, and not optional
 				// t ignored for now
-				ni = INDEX_ERROR;
-				count = sscanf(file.words[i], "%u/%*u/%u", &vi, &ni);
+				ti = 0; //default
+				ni = INDEX_ERROR; //default
+				count = sscanf(file.words[i], "%u/%u/%u", &vi, &ti, &ni);
 
 				if (count == 0) //nothing read
 				{
@@ -101,15 +121,16 @@ bool Trimesh::Load_OBJ(const char *f)
 				{
 					--vi; //obj starts count on 1, change to 0
 
-					if (count == 2) //read everything - v,t,n
+					if (count == 3) //read everything - v,t,n
 					{
-						--ni; //1->0
+						//starts at 0, not 1:
+						--ti;
+						--ni;
 					}
-					else if (count == 1) //only v, not t (not provided), parhaps n is stil there
-					{
-						if (sscanf(file.words[i], "%*u//%u", &ni) == 1)
-							--ni; //1->0
-					}
+					else if (count == 2) //no normal, but uv
+						--ti; //like above, but not normals
+					else if (count == 1 && sscanf(file.words[i], "%*u//%u", &ni) == 1) //not t, perhaps n is stil there?
+						--ni;
 				}
 
 				//now we got indices, see what to do with them
@@ -119,10 +140,12 @@ bool Trimesh::Load_OBJ(const char *f)
 				{
 					//move latest to second latest
 					triangle.vertex[1]=triangle.vertex[2]; //vertex
+					triangle.texcoord[1]=triangle.texcoord[2]; //uv
 					triangle.normal[1]=triangle.normal[2]; //normal
 
 					//add new
 					triangle.vertex[2]=vi; //vertex
+					triangle.texcoord[2]=ti; //uv
 					triangle.normal[2]=ni; //normal
 
 					//store
@@ -131,11 +154,13 @@ bool Trimesh::Load_OBJ(const char *f)
 				else if (i==2) //second time
 				{
 					triangle.vertex[2]=vi;
+					triangle.texcoord[2]=ti;
 					triangle.normal[2]=ni;
 				}
 				else //first time
 				{
 					triangle.vertex[0]=vi;
+					triangle.texcoord[0]=ti;
 					triangle.normal[0]=ni;
 				}
 			}
@@ -153,21 +178,10 @@ bool Trimesh::Load_OBJ(const char *f)
 		}
 		else if (!strcmp(file.words[0], "mtllib") && file.word_count==2)
 		{
-			char filename[strlen(f)+strlen(file.words[1])]; //enough to hold both obj and mtl path+filename
-			strcpy(filename, f); //copy obj path+filename
-			char *last = strrchr(filename, '/'); //last slash in obj filename
-
-			if (last) //if obj file had a path before filename (most likely):
-			{
-				last[1]='\0'; //indicate end at end of path (after /)
-				strcat(filename, file.words[1]); //add mtl filename/path to obj path
-			}
-			else //just what's requested
-			{
-				strcpy(filename, file.words[1]); //overwrite with mtl filename
-			}
-				
+			//rewrite path to be relative to this file
+			char *filename=FindRelPath(f, file.words[1]);
 			Load_Material(filename); //if not succesfull, continue - might not need any materials anyway?
+			delete[] filename;
 		}
 	}
 
@@ -180,16 +194,27 @@ bool Trimesh::Load_OBJ(const char *f)
 
 	//ok, lets just make sure all data is good:
 
+	//safety check if no uv maps at all
+	if (texcoords.empty())
+	{
+		printlog(1, "WARNING: obj does not have UV coordinates!");
+		vector2.x=0.0;
+		vector2.y=0.0;
+		texcoords.push_back(vector2); //add to list
+	}
+
 	//check so vertex indices are ok (not outside valid range)
 	//takes a little time, but is good for safety
 	size_t triangle_count = 0;
 	size_t ml=materials.size();
 	size_t vl=vertices.size();
+	size_t tl=texcoords.size();
 	size_t nl=normals.size();
-	for (size_t mat=0; mat<ml; ++mat) //all materials
+	size_t mat, tricount, tri;
+	for (mat=0; mat<ml; ++mat) //all materials
 	{
-		size_t tl=materials[mat].triangles.size();
-		for (size_t tri=0; tri<tl; ++tri) //all triangles
+		tricount=materials[mat].triangles.size();
+		for (tri=0; tri<tricount; ++tri) //all triangles
 		{
 			//points at triangle
 			Triangle_Uint *trip=&materials[mat].triangles[tri];
@@ -197,7 +222,18 @@ bool Trimesh::Load_OBJ(const char *f)
 			if (trip->vertex[0] >= vl || trip->vertex[1] >= vl || trip->vertex[2] >= vl)
 			{
 				printlog(0, "ERROR: vertex index out of range, trying to bypass problem (not rendering)");
-				trip->vertex[0] = trip->vertex[1] = trip->vertex[2] = 0; //set them all to 0
+				trip->vertex[0] = 0;
+				trip->vertex[1] = 0;
+				trip->vertex[2] = 0; 
+			}
+			if (	(trip->texcoord[0] >= tl) ||
+				(trip->texcoord[1] >= tl) ||
+				(trip->texcoord[2] >= tl) )
+			{
+				printlog(-1, "ERROR: UV index out of range, trying to bypass problem (by ignoring)");
+				trip->texcoord[0] = 0;
+				trip->texcoord[1] = 0;
+				trip->texcoord[2] = 0;
 			}
 			if (	(trip->normal[0] >= nl && trip->normal[0] != INDEX_ERROR) ||
 				(trip->normal[1] >= nl && trip->normal[1] != INDEX_ERROR) ||
@@ -207,7 +243,7 @@ bool Trimesh::Load_OBJ(const char *f)
 				trip->normal[0] = trip->normal[1] = trip->normal[2] = INDEX_ERROR; //set them all to 0
 			}
 		}
-		triangle_count+=tl; //count triangles (for info output later on)
+		triangle_count+=tricount; //count triangles (for info output later on)
 	}
 
 	Normalize_Normals();
@@ -252,7 +288,7 @@ bool Trimesh::Load_MTL(const char *f)
 			material=&materials[mat_nr].material;
 
 			//material properties:
-			if (file.words[0][0] == 'K') //colours?
+			if (file.words[0][0] == 'K') //K=colours?
 			{
 				if (file.words[0][1] == 'a' && file.word_count == 4) //ambient
 				{
@@ -299,6 +335,13 @@ bool Trimesh::Load_MTL(const char *f)
 						printlog(0, "ERROR: mtl file got Ns>128, please tell me (Mats) to fix the mtl loader!");
 					}
 				}
+			}
+			else if (!strcmp(file.words[0], "map_Kd") &&file.word_count == 2) //textures (K=colours?)
+			{
+				char *name = FindRelPath(f, file.words[1]);
+				materials[mat_nr].diffusetex = name;
+				delete[] name;
+				//TODO: Ka, Ks, Ke, Ns, bump mapping...
 			}
 
 

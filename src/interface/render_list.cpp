@@ -37,9 +37,6 @@
 bool culling=false;
 bool fog=false;
 
-//offset for vbo
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
 
 //just normal (component) list for now:
 
@@ -325,6 +322,9 @@ void Render_List_Render()
 	float radius;
 
 	GLuint bound_vbo = 0; //keep track of which vbo is bound
+	GLuint texture; //which texture to use
+	GLuint bound_texture = 0; //keep track of which texture is bound
+	bool texture_enabled = true; //keep track of if textures enabled or not
 
 	//data needed to eliminate models not visible by camera:
 	float dir_proj, up_proj, right_proj; //model position relative to camera
@@ -345,6 +345,9 @@ void Render_List_Render()
 	glDepthFunc (GL_LESS);
 	glEnable (GL_DEPTH_TEST);
 
+	//texture
+	glEnable (GL_TEXTURE_2D);
+
 	//
 	//options:
 	//
@@ -357,10 +360,9 @@ void Render_List_Render()
 	if (fog)
 		glEnable(GL_FOG);
 
-
-
 	//enable rendering of vertices and normals
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
 
 	//NOTE: new opengl vbo rendering commands (2.0 I think). For compatibility lets stick to 1.5 instead
@@ -412,8 +414,6 @@ void Render_List_Render()
 			{
 				//bind and configure the new vbo
 				glBindBuffer(GL_ARRAY_BUFFER, model->vbo_id);
-				glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
-				glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
 
 				//indicate this is used now
 				bound_vbo = model->vbo_id;
@@ -424,6 +424,27 @@ void Render_List_Render()
 			{
 				//pointer for less clutter
 				material = &materials[m_loop].material;
+
+				//texture enable/disable
+				texture = materials[m_loop].diffusetex;
+				if (texture)
+				{
+					if (!texture_enabled)
+					{
+						glEnable(GL_TEXTURE_2D);
+						texture_enabled=true;
+					}
+					if (texture != bound_texture)
+					{
+						glBindTexture(GL_TEXTURE_2D, texture);
+						bound_texture=texture;
+					}
+				}
+				else if (texture_enabled)
+				{
+					glDisable(GL_TEXTURE_2D);
+					texture_enabled=false;
+				}
 
 				//set
 				glMaterialfv(GL_FRONT, GL_AMBIENT, material->ambient);
@@ -439,8 +460,9 @@ void Render_List_Render()
 		glPopMatrix();
 	}
 
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+	glEnableClientState(GL_NORMAL_ARRAY);
 
 	//new/not used (see above)
 	//glDisableVertexAttribArray(0);

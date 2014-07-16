@@ -30,10 +30,15 @@
 #include <ode/ode.h>
 
 #include "racetime_data.hpp"
+#include "loaders/image.hpp"
 
 //definitions:
 struct Vector_Float{
 	float x, y, z;
+};
+
+struct Vector2_Float{
+	float x, y;
 };
 
 //each triangle is 6 indices: 3=vertices, 3=normals
@@ -41,7 +46,7 @@ struct Vector_Float{
 struct Triangle_Uint
 {
 	unsigned int vertex[3];
-	//unsigned int texcoord[3];
+	unsigned int texcoord[3];
 	unsigned int normal[3];
 };
 
@@ -84,14 +89,17 @@ class Trimesh_3D: public Racetime_Data
 		struct Vertex
 		{
 			GLfloat x,y,z;
+			GLfloat u,v;
 			GLfloat nx,ny,nz;
 		};
 
-		//material (all lements are grouped by materials for performance)
+		//material (all elements are grouped by materials for performance)
 		struct Material
 		{
 			GLuint start; //where in vbo this material is used
 			GLsizei size; //how much to render
+			GLuint diffusetex;
+			//TODO: ambient, normal texture, emission texture, specular exponent/highlight texture...
 
 			Material_Float material;
 		};
@@ -99,6 +107,7 @@ class Trimesh_3D: public Racetime_Data
 		Trimesh_3D(const char* n, float r, GLuint vbo, Material* m, unsigned int mc); //constructor
 		~Trimesh_3D(); //destructor
 		friend class Trimesh; //only Trimesh is allowed to create this...
+		friend class VBO; //...and VBO tracking (needs vertex definition)
 
 		//everything needed to render:
 		Material *materials;
@@ -182,6 +191,7 @@ class Trimesh
 		void Offset(float, float, float);
 		//check if name matches specified
 		bool Compare_Name(const char*);
+
 	private:
 		//like Load, for material files (private)
 		bool Load_Material(const char*);
@@ -210,7 +220,7 @@ class Trimesh
 
 		//all actual values (indexed below)
 		std::vector<Vector_Float> vertices;
-		//std::vector<Vector_Float> texcoords;
+		std::vector<Vector2_Float> texcoords;
 		std::vector<Vector_Float> normals;
 
 		//
@@ -225,6 +235,7 @@ class Trimesh
 			std::string name;
 
 			Material_Float material;
+			std::string diffusetex;
 
 			//all triangles with this material
 			std::vector<Triangle_Uint> triangles;

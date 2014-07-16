@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -53,6 +53,8 @@ extern struct internal_struct {
 	bool culling;
 	bool fullscreen;
 	float clipping[2];
+	int filter;
+	bool separate_specular;
 	float fog;
 	float dist;
 	float angle;
@@ -77,6 +79,8 @@ const struct internal_struct internal_defaults = {
 	true,
 	false,
 	{1.0, 1500.0},
+	1,
+	true,
 	500.0,
 	2800.0,
 	0};
@@ -108,6 +112,8 @@ const struct Conf_Index internal_index[] = {
 	{"backface_culling",	'b',1, offsetof(struct internal_struct, culling)},
 	{"fullscreen",		'b',1, offsetof(struct internal_struct, fullscreen)},
 	{"clipping",		'f',2, offsetof(struct internal_struct, clipping)},
+	{"texture:filter",	'i',1, offsetof(struct internal_struct, filter)},
+	{"texture:separate_specular",'b',1, offsetof(struct internal_struct, separate_specular)},
 	{"fog",			'f',1, offsetof(struct internal_struct, fog)},
 	{"eye_distance",	'f',1, offsetof(struct internal_struct, dist)},
 	{"view_angle",		'f',1, offsetof(struct internal_struct, angle)},

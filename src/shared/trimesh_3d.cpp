@@ -22,15 +22,19 @@
 //
 //for vbo 3d rendering trimesh:
 //
+#include <SDL/SDL.h>
 #include <GL/glew.h>
 #include "internal.hpp"
 #include "trimesh.hpp"
 #include "../loaders/conf.hpp"
+#include "../loaders/image.hpp"
 #include "printlog.hpp"
 
 //length of vector
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
 
+//offset for vbo
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 //keep track of VBOs (new generated if not enough room in already existing)
 class VBO: public Racetime_Data
@@ -69,9 +73,15 @@ class VBO: public Racetime_Data
 
 			//create and bind vbo:
 			GLuint target;
-			glGenBuffers(1, &target);
-			glBindBuffer(GL_ARRAY_BUFFER, target);
-			glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW);
+			glGenBuffers(1, &target); //create buffer
+			glBindBuffer(GL_ARRAY_BUFFER, target); //bind
+			glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW); //fill/allocate
+
+			//set up interleaved mode:
+			glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
+			glTexCoordPointer(2, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+			glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*5));
+
 			//
 
 			//check if allocated ok:
@@ -298,7 +308,7 @@ Trimesh_3D *Trimesh::Create_3D()
 	unsigned int vcount_old=0; //keep track of last block of vertices
 
 	//points at current indices:
-	unsigned int *vertexi, *normali;
+	unsigned int *vertexi, *texcoordi, *normali;
 
 	//loop through all materials, and for each used, loop through all triangles
 	//(removes indedexing -make copies- and interleaves the vertices+normals)
@@ -314,12 +324,17 @@ Trimesh_3D *Trimesh::Create_3D()
 			{
 				//store indices:
 				vertexi = materials[m].triangles[t].vertex;
+				texcoordi = materials[m].triangles[t].texcoord;
 				normali = materials[m].triangles[t].normal;
 
 				//vertex
 				vertex_list[vcount].x = vertices[vertexi[0]].x;
 				vertex_list[vcount].y = vertices[vertexi[0]].y;
 				vertex_list[vcount].z = vertices[vertexi[0]].z;
+
+				//texcoord
+				vertex_list[vcount].u = texcoords[texcoordi[0]].x;
+				vertex_list[vcount].v = texcoords[texcoordi[0]].y;
 
 				//normal
 				vertex_list[vcount].nx = normals[normali[0]].x;
@@ -334,6 +349,10 @@ Trimesh_3D *Trimesh::Create_3D()
 				vertex_list[vcount].y = vertices[vertexi[1]].y;
 				vertex_list[vcount].z = vertices[vertexi[1]].z;
 
+				//texcoord
+				vertex_list[vcount].u = texcoords[texcoordi[1]].x;
+				vertex_list[vcount].v = texcoords[texcoordi[1]].y;
+
 				//normal
 				vertex_list[vcount].nx = normals[normali[1]].x;
 				vertex_list[vcount].ny = normals[normali[1]].y;
@@ -347,6 +366,10 @@ Trimesh_3D *Trimesh::Create_3D()
 				vertex_list[vcount].y = vertices[vertexi[2]].y;
 				vertex_list[vcount].z = vertices[vertexi[2]].z;
 
+				//texcoord
+				vertex_list[vcount].u = texcoords[texcoordi[2]].x;
+				vertex_list[vcount].v = texcoords[texcoordi[2]].y;
+
 				//normal
 				vertex_list[vcount].nx = normals[normali[2]].x;
 				vertex_list[vcount].ny = normals[normali[2]].y;
@@ -358,8 +381,32 @@ Trimesh_3D *Trimesh::Create_3D()
 			//
 			//copy material data:
 			//
-			//boooooooorrrriiiiinnnngggg....
 			material_list[mcount].material = materials[m].material;
+
+			//
+			//textures (disabled by default):
+			//
+			material_list[mcount].diffusetex = 0;
+
+			//got (diffuse) texture, try to use
+			if (!materials[m].diffusetex.empty())
+			{
+				//check if already exists
+				if (Image_Texture *tmp=Racetime_Data::Find<Image_Texture>(materials[m].diffusetex.c_str()))
+					material_list[mcount].diffusetex=tmp->GetID();
+
+				//no, load
+				Image image;
+
+				//if we could load, try to create texture
+				if (image.Load(materials[m].diffusetex.c_str()))
+				{
+					Image_Texture *texture = image.Create_Texture();
+
+					if (texture)
+						material_list[mcount].diffusetex=texture->GetID();
+				}
+			}
 
 			//set up rendering tracking:
 			material_list[mcount].start=vcount_old;

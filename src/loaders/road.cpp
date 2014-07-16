@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -349,6 +349,9 @@ void GenNormalsAndIndices(std::vector<Triangle_Uint> *triangles,
 			triangle.normal[0]=nstart+(x+0)+nstride*(y+0);
 			triangle.normal[1]=nstart+(x+1)+nstride*(y+0);
 			triangle.normal[2]=nstart+(x+0)+nstride*(y+1);
+			triangle.texcoord[0]=0;
+			triangle.texcoord[1]=0;
+			triangle.texcoord[2]=0;
 			triangles->push_back(triangle);
 
 			triangle.vertex[0]=start+xstride*(x+1)+ystride*(y+0);
@@ -357,6 +360,9 @@ void GenNormalsAndIndices(std::vector<Triangle_Uint> *triangles,
 			triangle.normal[0]=nstart+(x+1)+nstride*(y+0);
 			triangle.normal[1]=nstart+(x+1)+nstride*(y+1);
 			triangle.normal[2]=nstart+(x+0)+nstride*(y+1);
+			triangle.texcoord[0]=0;
+			triangle.texcoord[1]=0;
+			triangle.texcoord[2]=0;
 			triangles->push_back(triangle);
 
 			triangle_count+=2;
@@ -418,15 +424,6 @@ bool Trimesh::Load_Road(const char *f)
 	//check if ok...
 	if (!file.Open(f))
 		return false;
-	
-	//set name to filename
-	name=f;
-
-	//empty old data (if any)
-	vertices.clear();
-	//texcoords.clear();
-	normals.clear();
-	materials.clear();
 
 	//configuration variables:
 	//
@@ -715,6 +712,10 @@ bool Trimesh::Load_Road(const char *f)
 
 	//make sure all normals are unit
 	Normalize_Normals();
+
+	//add dummy UV mapping, TODO: generate UV map!
+	Vector2_Float tmpuv={0,0};
+	texcoords.push_back(tmpuv);
 
 	printlog(1, "ROAD generation info: %u triangles, %u materials", triangle_count, materials.size());
 

@@ -1,7 +1,7 @@
 #
 # ReCaged - a Free Software, Futuristic, Racing Game
 #
-# Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+# Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
 #
 # This file is part of ReCaged.
 #
@@ -32,7 +32,7 @@ FLAGS	:= $(shell pkg-config --cflags $(LIBLST))
 #gcc options:
 #generate dependecy files, optimization level 2, all warnings,
 #optimization for architecture and inclusion of library compiler flags
-ARGS	= -MD -O2 -pipe -Wall -march=native -mtune=native $(FLAGS)
+ARGS	= -I. -MD -O2 -pipe -Wall -march=native -mtune=native $(FLAGS)
 
 #good default rule name, "all"
 all: ../recaged
@@ -73,7 +73,7 @@ w32:
 	@make \
 		LIBS='`sdl-config --static-libs --libs` `ode-config --libs` -L/usr/lib -lglew32 -lopengl32 -static -lstdc++ -lwinmm -lgdi32' \
 		FLAGS='`sdl-config --cflags` `ode-config --cflags` -I/usr/include' \
-		ARGS='-MD -O2 -pipe -Wall -march=i686 -mtune=i686 $$(FLAGS) -Dwindows -DGLEW_STATIC'
+		ARGS='-I. -MD -O2 -pipe -Wall -march=i686 -mtune=i686 $$(FLAGS) -Dwindows -DGLEW_STATIC'
 	@strip ../recaged.exe
 
 #these rules don't generate any files

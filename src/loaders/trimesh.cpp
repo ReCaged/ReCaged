@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -31,6 +31,15 @@ bool Trimesh::Load(const char *file)
 {
 	printlog(1, "Loading trimesh from file \"%s\"", file);
 	printlog(2, "determining file type from suffix");
+
+	//empty old data (if any)
+	vertices.clear();
+	texcoords.clear();
+	normals.clear();
+	materials.clear();
+
+	//set name to filename
+	name=file;
 
 	if (file == NULL)
 	{
