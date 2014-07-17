@@ -31,7 +31,7 @@ tyre Slick #by world or track)
 rim Split #by team or car)
 #todo: automatic spawning position instead of
 #manual x and y coords relative to track start
-#position -8 0
+position -8 0
 
 #another player joins the cage
 team Nemesis
