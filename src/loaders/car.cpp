@@ -51,7 +51,7 @@ Car_Template *Car_Template::Load (const char *path)
 		return NULL;
 
 	//geoms.lst
-	char lst[strlen(path)+9+1];
+	char lst[strlen(path)+10+1];
 	strcpy (lst, path);
 	strcat (lst, "/geoms.lst");
 
@@ -122,7 +122,7 @@ Car_Template *Car_Template::Load (const char *path)
 					tmp_geom.type = 3;
 
 					//create complete path+filename
-					char model[strlen(path)+1+strlen(file.words[1])];
+					char model[strlen(path)+1+strlen(file.words[1])+1];
 					strcpy(model, path);
 					strcat(model, "/");
 					strcat(model, file.words[1]);

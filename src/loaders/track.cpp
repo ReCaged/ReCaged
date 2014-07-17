@@ -340,7 +340,7 @@ bool load_track (const char *path)
 			if (file.word_count==2 && !strcmp(file.words[0], ">"))
 			{
 				printlog(2, "object load request: %s", file.words[1]);
-				char obj_name[13+strlen(file.words[1])+1];
+				char obj_name[8+strlen(file.words[1])+1];
 				strcpy (obj_name, "objects/");
 				strcat (obj_name, file.words[1]);
 

@@ -153,7 +153,7 @@ bool Trimesh::Load_OBJ(const char *f)
 		}
 		else if (!strcmp(file.words[0], "mtllib") && file.word_count==2)
 		{
-			char filename[strlen(f)+strlen(file.words[1])]; //enough to hold both obj and mtl path+filename
+			char filename[strlen(f)+strlen(file.words[1])+1]; //enough to hold both obj and mtl path+filename
 			strcpy(filename, f); //copy obj path+filename
 			char *last = strrchr(filename, '/'); //last slash in obj filename
 
