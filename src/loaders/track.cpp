@@ -104,12 +104,6 @@ bool load_track (const char *path)
 	glLightfv (GL_LIGHT0, GL_SPECULAR, track.specular);
 	glLightfv (GL_LIGHT0, GL_POSITION, track.position);
 
-	//this seems like a good place to configure lighting model:
-	if (internal.separate_specular) //calculate specular lighting _without_ texture
-		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SEPARATE_SPECULAR_COLOR);
-	else
-		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
-
 	//set track specific global ode params:
 	dWorldSetGravity (world, track.gravity[0], track.gravity[1], track.gravity[2]);
 
