@@ -348,6 +348,10 @@ void Render_List_Render()
 	//texture
 	glEnable (GL_TEXTURE_2D);
 
+	//enable anti aliasing?
+	if (internal.msaa)
+		glEnable(GL_MULTISAMPLE);
+
 	//
 	//options:
 	//

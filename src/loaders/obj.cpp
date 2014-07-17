@@ -180,6 +180,7 @@ bool Trimesh::Load_OBJ(const char *f)
 		{
 			//rewrite path to be relative to this file
 			char *filename=FindRelPath(f, file.words[1]);
+
 			Load_Material(filename); //if not succesfull, continue - might not need any materials anyway?
 			delete[] filename;
 		}

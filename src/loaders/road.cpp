@@ -669,7 +669,7 @@ bool Trimesh::Load_Road(const char *f)
 		else if (!strcmp(file.words[0], "material_file") && file.word_count == 2)
 		{
 			//directly copied from obj.cpp
-			char filename[strlen(f)+strlen(file.words[1])];
+			char filename[strlen(f)+strlen(file.words[1])+1];
 			strcpy(filename, f);
 			char *last = strrchr(filename, '/');
 

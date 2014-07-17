@@ -27,6 +27,7 @@
 #include "../shared/geom.hpp"
 #include "../shared/racetime_data.hpp"
 #include "../shared/printlog.hpp"
+#include "shared/internal.hpp"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 int geom_render_level = 0;
@@ -581,6 +582,10 @@ void Geom_Render()
 
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_FOG);
+
+	//disable here, if enabled
+	if (internal.msaa)
+		glDisable(GL_MULTISAMPLE);
 
 	//(I wounder if this is deprecated in latest ogl?)
 	glLineWidth(2.0); //wide lines

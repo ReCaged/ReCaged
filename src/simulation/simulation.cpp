@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -71,6 +71,9 @@ bool Simulation_Init(void)
 	//joint softness
 	dWorldSetERP (world, internal.erp);
 	dWorldSetCFM (world, internal.cfm);
+
+	//surface layer depth
+	dWorldSetContactSurfaceLayer(world, internal.surface_layer);
 
 	return true;
 }
