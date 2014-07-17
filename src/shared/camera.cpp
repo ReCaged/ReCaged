@@ -118,7 +118,7 @@ void Camera::Set_Pos(float px, float py, float pz, float tx, float ty, float tz)
 	//ok, find up direction (might be tricky)
 	//along z, set up to right...
 	float new_right[3], new_up[3];
-	if (new_dir[0] == 0 && new_dir[2] == 0)
+	if (new_dir[0] == 0 && new_dir[1] == 0)
 	{
 		new_up[0] = 1; new_up[1] = 0; new_up[2] = 0; 
 	}
