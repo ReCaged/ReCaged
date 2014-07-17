@@ -78,6 +78,8 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/geoms.lst \
 	worlds/Sandbox/tracks/Box/in_a_spin.road \
 	worlds/Sandbox/tracks/Box/objects.lst \
+	worlds/Sandbox/tracks/Box/ramp.obj \
+	worlds/Sandbox/tracks/Box/ramp.mtl \
 	worlds/Sandbox/tracks/Box/README \
 	worlds/Sandbox/tracks/Box/superbowl.road \
 	worlds/Sandbox/tracks/Box/surfaces.mtl \

@@ -88,11 +88,7 @@
 0 -25 0  0 0 0 in_a_spin.road
 
 #fun 8-shaped road
-<<<<<<< HEAD
 0 0 0 0 0 0 figure_8.road
-=======
-0 0 0 0 0 0 "figure 8.road"
 
 #ramp
 0 0 0 0 0 0 ramp.obj
->>>>>>> master

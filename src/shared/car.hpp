@@ -30,6 +30,7 @@
 #include "body.hpp"
 #include "geom.hpp"
 #include "trimesh.hpp"
+#include "surface.hpp"
 #include "../loaders/conf.hpp"
 
 #include <vector>

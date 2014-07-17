@@ -269,14 +269,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
-<<<<<<< HEAD
-	Log_Add(1, "NOTE: wheels will not collide with each others unless ODE was built with \"--enable-libccd\"");
-
-	Log_Add(1, "TODO: proper antigravity and downforce (only test implementation right now!)");
-
-
-=======
->>>>>>> master
 	//begin copying of needed configuration data
 	Car *car = new Car();
 

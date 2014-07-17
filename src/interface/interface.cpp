@@ -182,7 +182,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 			internal.msaa=0; //make sure rest of code knows it's disabled
-			screen = SDL_SetVideoMode (width, height, bpp, flags);
+			screen = SDL_SetVideoMode (x, y, bpp, flags);
 		}
 
 		if (!screen)

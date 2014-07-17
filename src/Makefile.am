@@ -79,6 +79,8 @@ recaged_SOURCES =	./recaged.cpp \
 			shared/script.hpp \
 			shared/space.cpp \
 			shared/space.hpp \
+			shared/surface.cpp \
+			shared/surface.hpp \
 			shared/threads.cpp \
 			shared/threads.hpp \
 			shared/track.cpp \
