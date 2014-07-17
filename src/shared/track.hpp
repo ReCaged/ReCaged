@@ -39,10 +39,10 @@ extern struct Track_Struct {
 	//placeholder for stuff like if it's raining/snowing and lightsources
 	float sky[4]; //background/fog colour
 
+	float position[4]; //light position
 	float ambient[4];
 	float diffuse[4];
 	float specular[4];
-	float position[4]; //light position
 	
 	dReal gravity[3];
 
@@ -61,18 +61,18 @@ extern struct Track_Struct {
 //index:
 
 const struct Track_Struct track_defaults = {
-	{0.5,0.8,0.8 ,1.0},
+	{0.5,0.7,0.8 ,1.0},
+	{-1.0,0.5,1.0,0.0},
 	{0.0,0.0,0.0 ,1.0},
 	{1.0,1.0,1.0 ,1.0},
 	{1.0,1.0,1.0 ,1.0},
-	{-1.0,0.5,1.0,0.0},
 	{0, 0, -9.82},
 	1.29,
 	{0.5,1.0,0.0},
-	{0,-20,1.5},
-	{15,8,15},
+	{0,-50,1.5},
+	{50,-100,5},
 	{0,0,0},
-	0.0};
+	-20.0};
 
 const struct Conf_Index track_index[] = {
 	{"sky",		'f',3,	offsetof(Track_Struct, sky[0])},
