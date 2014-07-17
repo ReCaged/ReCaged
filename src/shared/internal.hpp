@@ -38,6 +38,7 @@ extern struct internal_struct {
 	int iterations;
 	int multiplier;
 	int contact_points;
+	dReal surface_layer;
 	dReal erp,cfm;
 	dReal linear_drag, angular_drag;
 
@@ -67,6 +68,7 @@ const struct internal_struct internal_defaults = {
 	5,
 	4,
 	20,
+	0.001,
 	0.8, 0.00001,
 	5.0,5.0,
 	0.05,0.10,0.5,
@@ -94,6 +96,7 @@ const struct Conf_Index internal_index[] = {
 	{"iterations",		'i',1, offsetof(struct internal_struct, iterations)},
 	{"multiplier",		'i',1, offsetof(struct internal_struct, multiplier)},
 	{"contact_points",	'i',1, offsetof(struct internal_struct, contact_points)},
+	{"surface_layer",	'R',1, offsetof(struct internal_struct, surface_layer)},
 	{"default_erp",		'R',1, offsetof(struct internal_struct, erp)},
 	{"default_cfm",		'R',1, offsetof(struct internal_struct, cfm)},
 	{"default_linear_drag",	'R',1, offsetof(struct internal_struct, linear_drag)},
