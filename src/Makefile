@@ -27,7 +27,7 @@ LIBLST	= gl glew sdl ode
 
 #library flag and inclusion arguments
 LIBS	:= $(shell pkg-config --libs $(LIBLST))
-FLAGS	:= $(shell pkg-config --cflags $(LIBLST))
+FLAGS	:= -I. $(shell pkg-config --cflags $(LIBLST))
 
 #gcc options:
 #generate dependecy files, optimization level 2, all warnings,
@@ -72,7 +72,7 @@ w32:
 	@echo "Compiling \"release\" (static+stripped) windows binary..."
 	@make \
 		LIBS='`sdl-config --static-libs --libs` `ode-config --libs` -L/usr/lib -lglew32 -lopengl32 -static -lstdc++ -lwinmm -lgdi32' \
-		FLAGS='`sdl-config --cflags` `ode-config --cflags` -I/usr/include' \
+		FLAGS='-I. `sdl-config --cflags` `ode-config --cflags` -I/usr/include' \
 		ARGS='-MD -O2 -pipe -Wall -march=i686 -mtune=i686 $$(FLAGS) -Dwindows -DGLEW_STATIC'
 	@strip ../recaged.exe
 

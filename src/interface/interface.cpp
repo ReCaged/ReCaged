@@ -135,6 +135,11 @@ bool Interface_Init(void)
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1); //make sure double-buffering
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16); //good default (Z buffer)
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0); //not used yet
+	if (internal.msaa)
+	{
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, internal.msaa);
+	}
 	const SDL_VideoInfo *info = SDL_GetVideoInfo(); //for native resolution&bpp
 
 	//not sure if this can fail, but just in case:
@@ -146,6 +151,7 @@ bool Interface_Init(void)
 
 	//store current bpp as global
 	bpp = info->vfmt->BitsPerPixel;
+	int width, height;
 
 	//try to create window
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
@@ -153,15 +159,34 @@ bool Interface_Init(void)
 	if (internal.fullscreen) //fullscreen, use native resolution
 	{
 		flags |= SDL_FULLSCREEN; //add fullscreen flag
-		screen = SDL_SetVideoMode (info->current_w, info->current_h, bpp, flags);
+		width=info->current_w;
+		height=info->current_h;
 	}
 	else //windowed mode
-		screen = SDL_SetVideoMode (internal.res[0], internal.res[1], bpp, flags);
+	{
+		width=internal.res[0];
+		height=internal.res[1];
+	}
 
+	screen = SDL_SetVideoMode (width, height, bpp, flags);
+
+	//failuer
 	if (!screen)
 	{
-		printlog(0, "Error: couldn't set video mode: %s", SDL_GetError());
-		return false;
+		if (internal.msaa)
+		{
+			printlog(0, "ERROR: couldn't set video mode, will try again without MSAA: %s", SDL_GetError());
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+			internal.msaa=0; //make sure rest of code knows it's disabled
+			screen = SDL_SetVideoMode (width, height, bpp, flags);
+		}
+
+		if (!screen)
+		{
+			printlog(0, "ERROR: couldn't set video mode: %s", SDL_GetError());
+			return false;
+		}
 	}
 
 	//check if graphics is good enough

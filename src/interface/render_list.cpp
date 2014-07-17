@@ -345,6 +345,9 @@ void Render_List_Render()
 	glDepthFunc (GL_LESS);
 	glEnable (GL_DEPTH_TEST);
 
+	//enable anti aliasing?
+	if (internal.msaa)
+		glEnable(GL_MULTISAMPLE);
 	//
 	//options:
 	//
