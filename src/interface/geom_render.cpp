@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -27,6 +27,7 @@
 #include "../shared/geom.hpp"
 #include "../shared/racetime_data.hpp"
 #include "../shared/log.hpp"
+#include "shared/internal.hpp"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 int geom_render_level = 0;
@@ -580,6 +581,10 @@ void Geom_Render()
 
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_FOG);
+
+	//disable here, if enabled
+	if (internal.msaa)
+		glDisable(GL_MULTISAMPLE);
 
 	//(I wounder if this is deprecated in latest ogl?)
 	glLineWidth(2.0); //wide lines

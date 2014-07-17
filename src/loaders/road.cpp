@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -669,7 +669,7 @@ bool Trimesh::Load_Road(const char *f)
 		else if (!strcmp(file.words[0], "material_file") && file.word_count == 2)
 		{
 			//directly copied from obj.cpp
-			char filename[strlen(f)+strlen(file.words[1])];
+			char filename[strlen(f)+strlen(file.words[1])+1];
 			strcpy(filename, f);
 			char *last = strrchr(filename, '/');
 

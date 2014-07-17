@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -447,7 +447,7 @@ void Object_Template::Spawn (dReal x, dReal y, dReal z)
 
 	//set spring surface for beachball (should be bouncy)
 	data->surface.spring = 5000.0; //springy (soft)
-	data->surface.damping = 0.0; //no damping
+	data->surface.damping = 0.0; //no damping (air drag is enough)
 
 	//Next, Graphics
 	data->model=model[0];

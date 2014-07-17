@@ -134,6 +134,11 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1); //make sure double-buffering
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 16); //good default (Z buffer)
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0); //not used yet
+	if (internal.msaa)
+	{
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, internal.msaa);
+	}
 	const SDL_VideoInfo *info = SDL_GetVideoInfo(); //for native resolution&bpp
 
 	//not sure if this can fail, but just in case:
@@ -161,16 +166,30 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	else //windowed mode
 	{
 		//set resolution from conf or as forced by args
-		if (xres > 0) x=xres; else x=internal.res[0];
-		if (yres > 0) y=yres; else y=internal.res[1];
+		x= (xres > 0)? xres : internal.res[0];
+		y= (yres > 0)? yres : internal.res[1];
 	}
 
+	//try to set video
 	screen = SDL_SetVideoMode (x, y, bpp, flags);
 
+	//failure
 	if (!screen)
 	{
-		Log_Add(-1, "Could not set video mode: \"%s\"", SDL_GetError());
-		return false;
+		if (internal.msaa)
+		{
+			Log_Add(-1, "ERROR: Could not set video mode, will try again without MSAA: %s", SDL_GetError());
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+			internal.msaa=0; //make sure rest of code knows it's disabled
+			screen = SDL_SetVideoMode (width, height, bpp, flags);
+		}
+
+		if (!screen)
+		{
+			Log_Add(-1, "ERROR: Could not set video mode: %s", SDL_GetError());
+			return false;
+		}
 	}
 
 	//check if graphics is good enough

@@ -28,6 +28,8 @@ nobase_dist_objects_DATA = \
 	objects/misc/beachball/sphere.obj \
 	objects/misc/box/box.mtl \
 	objects/misc/box/box.obj \
+	objects/misc/box/carbon.bmp \
+	objects/misc/box/rcx.bmp \
 	objects/misc/box/object.script \
 	objects/misc/box/README \
 	objects/misc/building/pillar.mtl \

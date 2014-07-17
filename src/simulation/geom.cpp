@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -86,6 +86,34 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 	//might be needed
 	int mcount;
 
+	//OR: do this for all geoms? this is cheapest and most important
+	bool wheel1=false, wheel2=false;
+	if (geom1->wheel)
+	{
+		if (!geom2->wheel && b1)
+			wheel1=true;
+	}
+	else if (geom2->wheel && b2)
+		wheel2=true;
+
+	dReal wheelaxle[3];
+	if (wheel1)
+	{
+		const dReal *rot = dBodyGetRotation(b1);
+		wheelaxle[0] = rot[2];
+		wheelaxle[1] = rot[6];
+		wheelaxle[2] = rot[10];
+		count=geom1->wheel->Merge_Doubles(contact, wheelaxle, count);
+	}
+	else if (wheel2)
+	{
+		const dReal *rot = dBodyGetRotation(b2);
+		wheelaxle[0] = rot[2];
+		wheelaxle[1] = rot[6];
+		wheelaxle[2] = rot[10];
+		count=geom2->wheel->Merge_Doubles(contact, wheelaxle, count);
+	}
+
 	//loop through all collision points and configure surface settings for each
 	for (int i=0; i<count; ++i)
 	{
@@ -146,24 +174,38 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		//does both components want to collide for real? (not "ghosts"/"sensors")
 		//if any geom got a spring of 0, it doesn't want/need to collide:
 		//TODO: bitfield indication for sensors (geoms with spring=0)!
-		if (!surf1->spring || !surf2->spring)
+		if (surf1->spring==0 || surf2->spring==0)
 			continue; //check next collision/stop checking is last
 
 
 		//sett surface options:
 		//enable mu overriding and good friction approximation
 		contact[i].surface.mode = dContactApprox1;
+
 		contact[i].surface.mu = (surf1->mu)*(surf2->mu); //friction
 
 		//optional or not even/rarely used by rc, set to 0 to prevent compiler warnings:
-		contact[i].surface.bounce = 0.0;
-		contact[i].surface.bounce_vel = 0.0; //not used by rc right now, perhaps for future tweaking?
 		contact[i].surface.mu2 = 0.0; //only for tyre
+		contact[i].surface.bounce = 0.0;
+		contact[i].surface.bounce_vel = 0.0;
 		contact[i].surface.motion1 = 0.0; //for conveyor belt?
 		contact[i].surface.motion2 = 0.0; //for conveyor belt?
 		contact[i].surface.motionN = 0.0; //what _is_ this for?
 		contact[i].surface.slip1 = 0.0; //not used
 		contact[i].surface.slip2 = 0.0; //not used
+
+		//
+		//simulation of wheel or normal geom?
+		//modify contacts according to slip and similar
+		//
+		//determine if _one_ of the geoms is a wheel
+		if (wheel1)
+			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
+		else if (wheel2)
+			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
+		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
+		//if (geom1->wheel&&geom2->wheel)
+		//	?...
 
 		//
 		//optional features:
@@ -176,6 +218,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 
 			//use sum
 			contact[i].surface.bounce = (surf1->bounce)+(surf2->bounce);
+			contact[i].surface.bounce_vel = 0.0; //not used by rc right now, perhaps for future tweaking?
 		}
 
 		//optional spring+damping erp+cfm override
@@ -183,49 +226,23 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		{
 			//should be good
 			dReal spring = 1/( 1/(surf1->spring) + 1/(surf2->spring) );
-			//sum
-			dReal damping = surf1->damping + surf2->damping;
+			//similar
+			dReal damping = 1/( 1/(surf1->damping) + 1/surf2->damping );
 
 			//recalculate erp+cfm from stepsize, spring and damping values:
-			contact[i].surface.mode |= dContactSoftERP | dContactSoftCFM; //enable local
+			contact[i].surface.mode |= dContactSoftERP | dContactSoftCFM; //enable local erp/cfm settings
 			contact[i].surface.soft_erp = (stepsize*spring)/(stepsize*spring +damping);
 			contact[i].surface.soft_cfm = 1.0/(stepsize*spring +damping);
 		}
 		//end of optional features
 
-
-		//if any of the geoms responds to forces or got a body that responds to force, enable force feedback
-		Geom *g1=NULL, *g2=NULL;
-		if (geom1->buffer_event || geom2->buffer_event || geom1->force_to_body || geom2->force_to_body)
-		{
-			g1=geom1;
-			g2=geom2;
-		}
-
-		//
-		//simulation of wheel or normal geom?
-		//
-		//determine if _one_ of the geoms is a wheel
-		if (geom1->wheel&&!geom2->wheel && geom1->wheel->Prepare_Contact(b1, b2, g1, g2, surf2, true, &contact[i], count, stepsize))
-			continue; //nothing more to do
-		else if (!geom1->wheel&&geom2->wheel && geom2->wheel->Prepare_Contact(b1, b2, g1, g2, surf1, false, &contact[i], count, stepsize))
-			continue; //nothing more to do
-
-		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
-		//if (geom1->wheel&&geom2->wheel)
-		//	?...
-
-		//
-		//
-		//
-
-		//finally, we create the contactjoints
+		//now we create the contactjoints
 		dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
 		dJointAttach (c,b1,b2);
 
-		//if responding to forces
-		if (g1 && g2)
-			new Collision_Feedback(c, g1, g2);
+		//if any of the geoms responds to forces or got a body that responds to force, enable force feedback
+		if (geom1->buffer_event || geom2->buffer_event || geom1->force_to_body || geom2->force_to_body)
+			new Collision_Feedback(c, geom1, geom2);
 	}
 }
 

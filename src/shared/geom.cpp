@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -131,20 +131,5 @@ Surface *Geom::Find_Material_Surface(const char *name)
 	}
 	else
 		return &material_surfaces[i];
-}
-
-//set defaults:
-Surface::Surface()
-{
-	//collision contactpoint data
-	mu = 0.0;
-	spring = dInfinity; //infinite spring constant (disabled)
-	damping = 0.0; //no collision damping (only with spring)
-	bounce = 0.0; //no bouncyness
-
-	//normal friction scaling for tyre
-	tyre_pos_scale = 1.0;
-	tyre_sharp_scale = 1.0;
-	tyre_rollres_scale = 1.0;
 }
 

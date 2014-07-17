@@ -227,12 +227,10 @@ bool load_track (const char *path)
 							surface->spring = strtod(file.words[++pos], (char**)NULL);
 						else if (!strcmp(file.words[pos], "damping"))
 							surface->damping = atof(file.words[++pos]);
-						else if (!strcmp(file.words[pos], "position"))
-							surface->tyre_pos_scale = atof(file.words[++pos]);
-						else if (!strcmp(file.words[pos], "sharpness"))
-							surface->tyre_sharp_scale = atof(file.words[++pos]);
-						else if (!strcmp(file.words[pos], "rollingres"))
-							surface->tyre_rollres_scale = atof(file.words[++pos]);
+						else if (!strcmp(file.words[pos], "sensitivity"))
+							surface->sensitivity = atof(file.words[++pos]);
+						else if (!strcmp(file.words[pos], "rollres"))
+							surface->rollres = atof(file.words[++pos]);
 						else
 							Log_Add(0, "WARNING: trimesh surface option \"%s\" unknown", file.words[pos]);
 
@@ -344,7 +342,7 @@ bool load_track (const char *path)
 			if (file.word_count==2 && !strcmp(file.words[0], ">"))
 			{
 				Log_Add(2, "object load request: %s", file.words[1]);
-				char obj_name[13+strlen(file.words[1])+1];
+				char obj_name[8+strlen(file.words[1])+1];
 				strcpy (obj_name, "objects/");
 				strcat (obj_name, file.words[1]);
 

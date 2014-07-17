@@ -21,6 +21,8 @@
 
 #ifndef _RC_GEOM_H
 #define _RC_GEOM_H
+#include "ode/ode.h"
+#include "surface.hpp"
 #include "component.hpp"
 #include "body.hpp"
 #include "object.hpp"
@@ -32,18 +34,6 @@
 //Geom: (meta)data for geometrical shape (for collision detection), for: 
 //contactpoint generation (friction and saftness/hardness). also contains
 //rendering data for geom
-
-//surface properties:
-class Surface
-{
-	public:
-		Surface(); //just sets default values
-
-		//options
-		dReal mu, bounce;
-		dReal spring, damping;
-		dReal tyre_pos_scale, tyre_sharp_scale, tyre_rollres_scale;
-};
 
 //geom tracking class
 class Geom: public Component
@@ -74,7 +64,7 @@ class Geom: public Component
 
 		//special kind of geoms:
 		//wheel: points at a wheel simulation class, or NULL if not a wheel
-		Wheel *wheel;
+		class Wheel *wheel;
 
 		//gets surface-per-triangle-per-material
 		//also enables this functionality when first run.
