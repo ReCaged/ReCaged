@@ -1,7 +1,7 @@
 #
 # ReCaged - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2012 Mats Wahlberg
+# Copyright (C) 2012, 2014 Mats Wahlberg
 #
 # This file is part of ReCaged.
 #
@@ -19,15 +19,19 @@
 # along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+
 #
 #Custom macros for checking some common (but not OS level) libraries.
-#Some inspiration taken from the "PKG_*" macros
 #
+
+
 
 #
 # RC_LIBS_INIT()
+#
 # Basic tests before starting
 #
+
 AC_DEFUN([RC_LIBS_INIT],
 [
 
@@ -59,9 +63,6 @@ AC_ARG_ENABLE(
 	[CONSOLE="$enableval"],
 	[CONSOLE="no"] )
 
-#pkg-config might exist?
-AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
-
 #need windres if on w32
 if test "$ON_W32" != "no"; then
 	AC_PATH_TOOL([WINDRES], [windres])
@@ -73,107 +74,62 @@ fi
 ])
 
 
+
 #
-# RC_LIBS_CHECK(PKG_NAME, CUSTOM_CONFIG, HEADER, LIB_NAMES_LIST)
-# Check for specified library using pkg_config and other if possible
+# RC_CHECK_PROG(PROGRAM, FLAG_ARGS, LIB_ARGS, [ACTION-ON-FAILURE]
+#
+# Find and configure library by running PROGRAM with arguments FLAG_ARGS and
+# LIB_ARGS, perform other action on failuer.
 #
 
-AC_DEFUN([RC_LIBS_CHECK],
+AC_DEFUN([RC_CHECK_PROG],
 [
 
 FAILED="yes"
 
-if test "$PKG_CONFIG"; then
-	AC_MSG_CHECKING([for $1 usig pkg-config])
+if test "$1"; then
 
-	if test "$STATIC" = "no"; then
-		TMP_FLAGS=$($PKG_CONFIG --cflags $1 2>/dev/null)
-		TMP_LIBS=$($PKG_CONFIG --libs $1 2>/dev/null)
-	else
-		TMP_FLAGS=$($PKG_CONFIG --cflags --static $1 2>/dev/null)
-		TMP_LIBS=$($PKG_CONFIG --libs --static $1 2>/dev/null)
-	fi
-		
+	AC_MSG_CHECKING([for flags using $1 $2])
+	tmp_flags=$($1 $2 2>/dev/null)
 
-	if test "$TMP_FLAGS" || test "$TMP_LIBS"; then
-		AC_MSG_RESULT([yes]);
-		RC_FLAGS="$RC_FLAGS $TMP_FLAGS"
-		RC_LIBS="$RC_LIBS $TMP_LIBS"
+	if test "$tmp_flags"; then
 		FAILED="no"
+		AC_MSG_RESULT([$tmp_flags])
 	else
 		AC_MSG_RESULT([no])
-		FAILED="yes"
+	fi
+
+	AC_MSG_CHECKING([for libraries using $1 $3])
+	tmp_libs=$($1 $3 2>/dev/null)
+
+	if test "$tmp_libs"; then
+		FAILED="no"
+		AC_MSG_RESULT([$tmp_libs])
+	else
+		AC_MSG_RESULT([no])
 	fi
 fi
 
-#failed, and got fallback (if exists)
-if test "$FAILED" = "yes" && test "$2"; then
-	AC_PATH_TOOL($1_CONFIG, [$2])
-	TMP_CONFIG="$$1_CONFIG" #note: "$1" gets expanded first, before the whole string
-
-	if test TMP_CONFIG; then
-		AC_MSG_CHECKING([for $1 using fallback to $2])
-
-		TMP_FLAGS=$($TMP_CONFIG --cflags 2>/dev/null)
-
-		#little exception: if sdl-config&static, use "--static-libs" instead
-		if test "$STATIC" != "no" && test "$1" = "sdl"; then
-			TMP_LIBS=$($TMP_CONFIG --static-libs 2>/dev/null)
-		else
-			TMP_LIBS=$($TMP_CONFIG --libs 2>/dev/null)
-		fi
-
-
-		if test "$TMP_FLAGS" || test "$TMP_LIBS"; then
-			AC_MSG_RESULT([yes]);
-			RC_FLAGS="$RC_FLAGS $TMP_FLAGS"
-			RC_LIBS="$RC_LIBS $TMP_LIBS"
-			FAILED="no"
-		else
-			AC_MSG_RESULT([no])
-			FAILED="yes"
-		fi
-	fi
-fi
-
-#final fallback
-if test "$FAILED" = "yes"; then
-	AC_MSG_WARN([Attempting to guess files for $1 using ac_check_* macros])
-	if test "$1" = "ode"; then
-		AC_MSG_WARN([Quite Critical (ODE): Don't know if using double or single precision!... Assuming single...])
-		CPPFLAGS="$CPPFLAGS -DdSINGLE" #hackish: append to user variable, but should be fine...?
-	fi
-
-	AC_CHECK_HEADER([$3],, [ AC_MSG_ERROR([Headers for $1 appears to be missing, install lib$1-dev or similar]) ])
-
-	#why not "ac_search_libs"? because can only test for "main" in gl on windows
-	#(for some reason). And -search- quits upon finding "main" that already exists
-	#(LIBNAME expands to actual name, store in variable TRYLIB)
-	m4_foreach_w([LIBNAME], [$4], [
-		if test "$FAILED" = "yes"; then
-			TRYLIB="LIBNAME"
-			AC_CHECK_LIB([$TRYLIB], [main], [
-				FAILED="no"
-				RC_LIBS="$RC_LIBS -l$TRYLIB" ])
-		fi ])
-
-	#still nothing?
-	if test "$FAILED" = "yes"; then
-		AC_MSG_ERROR([Library $1 appears to be missing, install lib$1 or similar])
-	fi
-
+if test "$FAILED" = "no"; then
+	RC_FLAGS="$RC_FLAGS $tmp_flags"
+	RC_LIBS="$RC_LIBS $tmp_libs"
+else
+	$4
 fi
 
 ])
 
 
+
 #
 # RC_LIBS_CONFIG()
-# Check for needed libs
+#
+# Check and configure needed libraries
 #
 
 AC_DEFUN([RC_LIBS_CONFIG],
 [
+
 AC_REQUIRE([RC_LIBS_INIT])
 
 #make sure only enabling w32 options on w32
@@ -195,26 +151,102 @@ if test "$ON_W32" != "no"; then
 		AC_MSG_RESULT([yes])
 
 		RC_FLAGS="$RC_FLAGS -DGLEW_STATIC"
-		#TODO: static-lib* to LDFLAGS?
+		#TODO: move static-lib* to LDFLAGS?
 		RC_LIBS="$RC_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
+		pkg_static="--static"
 	else
 		AC_MSG_RESULT([no])
 	fi
 fi
 
+
+#
 #actual library checks:
-RC_LIBS_CHECK([ode], [ode-config], [ode/ode.h], [ode])
-RC_LIBS_CHECK([sdl], [sdl-config], [SDL/SDL.h], [SDL])
-RC_LIBS_CHECK([glew],, [GL/glew.h], [GLEW glew32])
-#lua5.2, 5.1, 5.0, ... best way to check?
+#
+
+AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
+
+#ODE:
+RC_CHECK_PROG([$PKG_CONFIG], [--cflags ode], [$pkg_static --libs ode],
+[
+	AC_PATH_TOOL([ODE_CONFIG], [ode-config])
+	RC_CHECK_PROG([$ODE_CONFIG], [--cflags], [--libs],
+	[
+		AC_MSG_WARN([Attempting to guess files for ODE using ac_check_* macros])
+		AC_MSG_WARN([Don't know if using double or single precision!... Assuming double...])
+		CPPFLAGS="$CPPFLAGS -DdDOUBLE" #hack: appends to user/global variable, but should be fine...?
+
+		AC_CHECK_HEADER([ode/ode.h],, [ AC_MSG_ERROR([Headers for ODE appears to be missing, install libode-dev or similar]) ])
+		AC_CHECK_LIB([ode], [dInitODE2],
+			[RC_LIBS="$RC_LIBS -lode"],
+			[AC_MSG_ERROR([ODE library appears to be missing, install libode1 or similar])])
+	])
+])
+
+#SDL:
+RC_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
+[
+	AC_PATH_TOOL([SDL_CONFIG], [sdl-config])
+
+	#normally "--libs", but might change in certain situation (w32+static)
+	if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
+		sdl_libs="--static-libs"
+	else
+		sdl_libs="--libs"
+	fi
+
+	RC_CHECK_PROG([$SDL_CONFIG], [--cflags], [$sdl_libs],
+	[
+		AC_MSG_WARN([Attempting to guess files for SDL using ac_check_* macros])
+		AC_CHECK_HEADER([SDL/SDL.h],, [ AC_MSG_ERROR([Headers for SDL appears to be missing, install libsdl-dev or similar]) ])
+		AC_CHECK_LIB([SDL], [SDL_Init],
+			[RC_LIBS="$RC_LIBS -lSDL"],
+			[AC_MSG_ERROR([SDL library appears to be missing, install libsdl-1.2 or similar])])
+	])
+])
+
+#GLEW:
+RC_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
+[
+	AC_MSG_WARN([Attempting to guess configuraton for GLEW using ac_check_* macros])
+	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Headers for GLEW appears to be missing, install libglew-dev or similar]) ])
+
+	if test "$ON_W32" = "no"; then
+		AC_CHECK_LIB([GLEW], [glewInit],
+			[RC_LIBS="$RC_LIBS -lGLEW"],
+			[AC_MSG_ERROR([SDL library appears to be missing, install libglew or similar])])
+	else
+		AC_CHECK_LIB([glew32], [glewInit],
+			[RC_LIBS="$RC_LIBS -lglew32"],
+			[AC_MSG_ERROR([SDL library appears to be missing, install libglew or similar])])
+	fi
+
+])
 
 #static stop (if enabled and on w32)
 if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
 	RC_LIBS="$RC_LIBS -Wl,-Bdynamic"
 fi
 
-#gl never static anyway
-RC_LIBS_CHECK([gl],, [GL/gl.h], [GL opengl32])
+#GL (never static):
+RC_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
+[
+	AC_MSG_WARN([Attempting to guess configuraton for GL using ac_check_* macros])
+	AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
+
+	#note: w32 likes to brake naming conventions (opengl32).
+	#also GL libraries got unreliable symbols (so just check for dummy main)
+	if test "$ON_W32" = "no"; then
+		AC_CHECK_LIB([GL], [main],
+			[RC_LIBS="$RC_LIBS -lGL"],
+			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
+	else
+		AC_CHECK_LIB([opengl32], [main],
+			[RC_LIBS="$RC_LIBS -lopengl32"],
+			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
+	fi
+
+])
 
 #make available
 AC_SUBST(RC_FLAGS)

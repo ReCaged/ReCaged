@@ -22,14 +22,14 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 
-#include "../shared/internal.hpp"
-#include "../shared/track.hpp"
-#include "../shared/runlevel.hpp"
-#include "../shared/threads.hpp"
-#include "../shared/log.hpp"
-#include "../shared/profile.hpp"
+#include "shared/internal.hpp"
+#include "shared/track.hpp"
+#include "shared/runlevel.hpp"
+#include "shared/threads.hpp"
+#include "shared/log.hpp"
+#include "shared/profile.hpp"
 
-#include "../shared/camera.hpp"
+#include "shared/camera.hpp"
 #include "render_list.hpp"
 #include "geom_render.hpp"
 
@@ -178,7 +178,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	{
 		if (internal.msaa)
 		{
-			Log_Add(-1, "ERROR: Could not set video mode, will try again without MSAA: %s", SDL_GetError());
+			Log_Add(-1, "Could not set video mode, will try again without MSAA: %s", SDL_GetError());
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 			internal.msaa=0; //make sure rest of code knows it's disabled
@@ -187,7 +187,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 
 		if (!screen)
 		{
-			Log_Add(-1, "ERROR: Could not set video mode: %s", SDL_GetError());
+			Log_Add(-1, "Could not set video mode: %s", SDL_GetError());
 			return false;
 		}
 	}
