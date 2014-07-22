@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -21,7 +21,8 @@
 
 //#include "../shared/shared.hpp"
 #include "../shared/profile.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
+#include "../shared/directories.hpp"
 #include "text_file.hpp"
 //#include "loaders.hpp"
 
@@ -55,25 +56,21 @@ SDLKey & operator++ (SDLKey & key)
 //translate button name to key number
 SDLKey get_key (char *name)
 {
-	printlog(2, "translating key name");
 	SDLKey key;
 
 	for (key=SDLK_FIRST; key<SDLK_LAST; ++key)
 		if (strcmp(SDL_GetKeyName(key), name) == 0)
-		{
-			printlog(2, "name match found");
 			return key;
-		}
 
 	//we only get here if no match found
-	printlog(0, "ERROR: Key name %s didn't match any known key!", name);
+	Log_Add(-1, "Key name %s didn't match any known key!", name);
 	return SDLK_UNKNOWN;
 }
 
 //load profile (conf and key list)
 Profile *Profile_Load (const char *path)
 {
-	printlog(1, "Loading profile: %s", path);
+	Log_Add(1, "Loading profile: %s", path);
 
 	//create
 	Profile *prof = new Profile; //allocate
@@ -85,48 +82,48 @@ Profile *Profile_Load (const char *path)
 
 	*prof = profile_defaults; //set all to defaults
 
+	//for finding
+	Directories dirs;
+
 	//load personal conf
 	char conf[strlen(path)+13+1];//+1 for \0
 	strcpy (conf,path);
 	strcat (conf,"/profile.conf");
 
-	load_conf(conf, (char *)prof, profile_index); //try to load conf
+	if (dirs.Find(conf, CONFIG, READ)) Load_Conf(dirs.Path(), (char *)prof, profile_index); //try to load conf
 
 	//set camera
 	if (prof->camera >0 && prof->camera <5)
 		camera.Set_Settings (&(prof->cam[prof->camera -1]));
 	else
-		printlog(0, "ERROR: default camera should be a value between 1 and 4!");
+		Log_Add(-1, "Default camera should be a value between 1 and 4!");
 
 	//load key list
 	char list[strlen(path)+9+1];
 	strcpy (list,path);
 	strcat (list,"/keys.lst");
 
-	printlog(1, "Loading key list: %s", list);
+	Log_Add(2, "Loading key list: %s", list);
 	Text_File file;
 
-	if (file.Open(list))
+	if (dirs.Find(list, CONFIG, READ), file.Open(dirs.Path()))
 	{
 		while (file.Read_Line())
 		{
-			printlog(2, "action: %s", file.words[0]);
 
 			//find match
-			int i;
-			for (i=0; i<9; ++i)
+			for (int i=0; i<9; ++i)
 			{
 				//match!
 				if (!strcmp(profile_input_list[i], file.words[0]))
 				{
 					//these are rather crude, but doesn't matter:
 					//they're safe and will be replaced when moving to lua
-					printlog(2, "match found");
 					if (file.word_count == 3 && !strcmp(file.words[1], "key")) //keyboard
 					{
 						prof->input[i].key = get_key(file.words[2]);
 						if (prof->input[i].key == SDLK_UNKNOWN)
-							printlog(0, "ERROR: ignoring invalid keyboard button \"%s\"", file.words[2]);
+							Log_Add(-1, "Ignoring invalid keyboard button \"%s\"", file.words[2]);
 					}
 					else if (file.word_count == 5 && !strcmp(file.words[1], "axis")) //joystick axis
 					{
@@ -153,11 +150,11 @@ Profile *Profile_Load (const char *path)
 						else
 						{
 							prof->input[i].hat=255;
-							printlog(0, "ERROR: ignoring invalid joystick hat direction \"%s\"", file.words[2]);
+							Log_Add(-1, "Ignoring invalid joystick hat direction \"%s\"", file.words[2]);
 						}
 					}
 					else
-						printlog(0, "ERROR: invalid/malformed input action \"%s\"", file.words[0]);
+						Log_Add(-1, "Invalid/malformed input action \"%s\"", file.words[0]);
 				}
 			}
 		}

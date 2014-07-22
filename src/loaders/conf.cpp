@@ -22,7 +22,7 @@
 #include "conf.hpp"
 
 #include "text_file.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 
 #include <string.h>
 #include <stdlib.h>
@@ -32,9 +32,9 @@
 #include <ode/ode.h>
 
 //loads configuration file to memory (using index)
-bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
+bool Load_Conf (const char *name, char *memory, const struct Conf_Index index[])
 {
-	printlog(1, "Loading conf file: %s", name);
+	Log_Add(2, "Loading conf file: %s", name);
 
 	Text_File file;
 	if (!file.Open(name))
@@ -57,7 +57,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 
 		if (index[i].type==0) //not match, got to end
 		{
-			printlog(0, "WARNING: parameter \"%s\" does not match any parameter name!", file.words[0]);
+			Log_Add(0, "WARNING: parameter \"%s\" does not match any parameter name!", file.words[0]);
 			continue;
 		}
 		//else, we have a match
@@ -66,7 +66,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 		//argument name+values == words
 		if (index[i].length+1 != file.word_count)
 		{
-			printlog(0, "WARNING: parameter \"%s\" has wrong ammount of args: expected: %i, got %i!",file.words[0], index[i].length, file.word_count-1);
+			Log_Add(0, "WARNING: parameter \"%s\" has wrong ammount of args: expected: %i, got %i!",file.words[0], index[i].length, file.word_count-1);
 			continue;
 		}
 
@@ -81,7 +81,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 					tmpf = strtof(file.words[argnr+1], &strleft);
 
 					if (strleft == file.words[argnr+1])
-						printlog(0, "WARNING: \"%s\" is invalid for \"floating point\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
+						Log_Add(0, "WARNING: \"%s\" is invalid for \"floating point\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
 					else //ok
 						*( ((float*)(memory+index[i].offset))+argnr ) = tmpf;
 				break;
@@ -91,7 +91,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 					tmpd = strtod(file.words[argnr+1], &strleft);
 
 					if (strleft == file.words[argnr+1])
-						printlog(0, "WARNING: \"%s\" is invalid for \"double precision floating point\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
+						Log_Add(0, "WARNING: \"%s\" is invalid for \"double precision floating point\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
 					else //ok
 						*( ((double*)(memory+index[i].offset))+argnr ) = tmpd;
 				break;
@@ -103,7 +103,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 					tmpr = strtod(file.words[argnr+1], &strleft);
 
 					if (strleft == file.words[argnr+1])
-						printlog(0, "WARNING: \"%s\" is invalid for \"dReal floating point\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
+						Log_Add(0, "WARNING: \"%s\" is invalid for \"dReal floating point\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
 					else
 						*( ((dReal*)(memory+index[i].offset))+argnr ) = tmpr;
 				break;
@@ -123,7 +123,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 						(!strcmp(file.words[argnr+1], "0"))	)
 						*(((bool*)(memory+index[i].offset))+argnr) = false;
 					else //failure (unknown word)
-						printlog(0, "WARNING: \"%s\" is invalid for \"boolean\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
+						Log_Add(0, "WARNING: \"%s\" is invalid for \"boolean\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
 				break;
 
 				//integer
@@ -131,7 +131,7 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 					tmpi = strtol (file.words[argnr+1], &strleft, 0);
 
 					if (strleft == file.words[argnr+1])
-						printlog(0, "WARNING: \"%s\" is invalid for \"integer\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
+						Log_Add(0, "WARNING: \"%s\" is invalid for \"integer\" parameter \"%s\"!", file.words[argnr+1], index[i].name);
 					else
 						*( ((int*)(memory+index[i].offset))+argnr ) = tmpi;
 				break;
@@ -140,14 +140,14 @@ bool load_conf (const char *name, char *memory, const struct Conf_Index index[])
 				case 's':
 					//check length
 					if (strlen(file.words[argnr+1]) >= Conf_String_Size) //equal or bigger than max size
-						printlog(0, "WARNING: word in conf file was too big for direct string copy!");
+						Log_Add(0, "WARNING: word in conf file was too big for direct string copy!");
 					else //ok, just copy
 						strcpy(*( ((Conf_String*)(memory+index[i].offset))+argnr ),    file.words[argnr+1] );
 				break;
 
 				//unknown
 				default:
-					printlog(0, "WARNING: parameter \"%s\" is of unknown type (\"%c\")!", file.words[0], index[i].type);
+					Log_Add(0, "WARNING: parameter \"%s\" is of unknown type (\"%c\")!", file.words[0], index[i].type);
 				break;
 			}
 		}

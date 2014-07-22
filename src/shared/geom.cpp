@@ -21,7 +21,7 @@
 
 #include <ode/ode.h>
 #include "geom.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 #include "track.hpp"
 #include "internal.hpp"
 #include "../simulation/event_buffers.hpp"
@@ -33,21 +33,13 @@ Geom *Geom::head = NULL;
 //ads it to the component list, and ads the data to specified geom (assumed)
 Geom::Geom (dGeomID geom, Object *obj): Component(obj) //pass object argument to base class constructor
 {
-	printlog(2, "configuring Geom class");
-
 	//increase object activity counter
 	object_parent->Increase_Activity();
 
 	//parent object
-	if (obj->selected_space)
-	{
-		printlog(2, "(adding to selected space)");
-		dSpaceAdd (obj->selected_space, geom);
-	}
+	if (obj->selected_space) dSpaceAdd (obj->selected_space, geom);
 	else //add geom to global space
-	{
 		dSpaceAdd (space, geom);
-	}
 
 	//add it to the geom list
 	next = Geom::head;
@@ -55,10 +47,7 @@ Geom::Geom (dGeomID geom, Object *obj): Component(obj) //pass object argument to
 	prev = NULL;
 
 	//one more geom after this
-	if (next)
-		next->prev = this;
-	else
-		printlog(2, "(first registered)");
+	if (next) next->prev = this;
 
 	//add it to the geom
 	dGeomSetData (geom, (void*)(Geom*)(this));
@@ -89,9 +78,6 @@ Geom::Geom (dGeomID geom, Object *obj): Component(obj) //pass object argument to
 //destroys a geom, and removes it from the list
 Geom::~Geom ()
 {
-	//lets just hope the given pointer is ok...
-	printlog(2, "clearing Geom class");
-
 	//remove all events
 	Event_Buffer_Remove_All(this);
 
@@ -119,14 +105,14 @@ Surface *Geom::Find_Material_Surface(const char *name)
 	//is possible at all?
 	if (!material_count)
 	{
-		printlog(0, "WARNING: tried to use per-material surfaces for non-trimesh geom");
+		Log_Add(0, "WARNING: tried to use per-material surfaces for non-trimesh geom");
 		return NULL;
 	}
 
 	//firtst of all, check if enabled?
 	if (!material_surfaces)
 	{
-		printlog(2, "enabling per-material surfaces");
+		Log_Add(2, "enabling per-material surfaces for trimesh geom");
 		material_surfaces = new Surface[material_count];
 
 		//set default (set to out global surface)
@@ -140,7 +126,7 @@ Surface *Geom::Find_Material_Surface(const char *name)
 
 	if (i==material_count)
 	{
-		printlog(0, "WARNING: could not find material \"%s\" for trimesh", name);
+		Log_Add(0, "WARNING: could not find material \"%s\" for trimesh", name);
 		return NULL;
 	}
 	else

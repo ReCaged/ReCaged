@@ -45,7 +45,7 @@ extern bool render_models;
 extern bool render_geoms;
 
 //functions
-bool Interface_Init(void);
+bool Interface_Init(bool window, bool fullscreen, int xres, int yres);
 void Interface_Quit(void);
 bool Simulation_Init(void);
 void Simulation_Quit (void);

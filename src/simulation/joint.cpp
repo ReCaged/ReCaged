@@ -28,7 +28,6 @@ void Joint::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{
-		printlog(2, "setting Joint event");
 		feedback=new dJointFeedback;
 		dJointSetFeedback (joint_id, feedback);
 
@@ -43,7 +42,6 @@ void Joint::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 	}
 	else
 	{
-		printlog(2, "disabling Joint event");
 		buffer_event=false;
 		//remove feedback data
 		if (feedback)

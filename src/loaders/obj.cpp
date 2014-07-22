@@ -22,7 +22,7 @@
 #include <SDL/SDL.h>
 
 #include "shared/trimesh.hpp"
-#include "shared/printlog.hpp"
+#include "shared/log.hpp"
 #include "text_file.hpp"
 
 
@@ -45,14 +45,14 @@ char *FindRelPath(const char *start, const char *file)
 
 bool Trimesh::Load_OBJ(const char *f)
 {
-	printlog(2, "Loading trimesh from OBJ file \"%s\"", f);
+	Log_Add(2, "Loading trimesh from OBJ file \"%s\"", f);
 
 	Text_File file;
 
 	//check if ok...
 	if (!file.Open(f))
 	{
-		printlog(-1, "ERROR: Unable to open 3D file \"%s\": %s", f, SDL_GetError());
+		Log_Add(-1, "Unable to open 3D file \"%s\": %s", f, SDL_GetError());
 		return false;
 	}
 
@@ -98,7 +98,7 @@ bool Trimesh::Load_OBJ(const char *f)
 			//no material right now, warn and create default:
 			if (matnr == INDEX_ERROR)
 			{
-				printlog(0, "ERROR: obj file did not specify material to use before index, using default\n");
+				Log_Add(-1, "\"%s\" did not specify material to use before index, using default", f);
 				materials.push_back(Material_Default); //add new material (with defaults)
 				matnr = 0;
 			}
@@ -114,7 +114,7 @@ bool Trimesh::Load_OBJ(const char *f)
 
 				if (count == 0) //nothing read
 				{
-					printlog(0, "ERROR: obj file got malformed index, ignoring");
+					Log_Add(-1, "\"%s\" got malformed index, ignoring", f);
 					break;
 				}
 				else //at least v read
@@ -170,7 +170,7 @@ bool Trimesh::Load_OBJ(const char *f)
 			tmpmatnr = Find_Material(file.words[1]);
 
 			if (tmpmatnr == INDEX_ERROR)
-				printlog(0, "WARNING: ignoring change of material (things will probably look wrong)");
+				Log_Add(0, "WARNING: ignoring change of material (things will probably look wrong)");
 			else
 				matnr = tmpmatnr;
 
@@ -189,7 +189,7 @@ bool Trimesh::Load_OBJ(const char *f)
 	//check that at least something got loaded:
 	if (materials.empty() || vertices.empty())
 	{
-		printlog(0, "ERROR: obj seems to exist, but empty?!");
+		Log_Add(-1, "\"%s\" seems to exist, but is empty?!", f);
 		return false;
 	}
 
@@ -198,7 +198,7 @@ bool Trimesh::Load_OBJ(const char *f)
 	//safety check if no uv maps at all
 	if (texcoords.empty())
 	{
-		printlog(1, "WARNING: obj does not have UV coordinates!");
+		Log_Add(1, "Note: obj does not have UV coordinates!");
 		vector2.x=0.0;
 		vector2.y=0.0;
 		texcoords.push_back(vector2); //add to list
@@ -222,7 +222,7 @@ bool Trimesh::Load_OBJ(const char *f)
 
 			if (trip->vertex[0] >= vl || trip->vertex[1] >= vl || trip->vertex[2] >= vl)
 			{
-				printlog(0, "ERROR: vertex index out of range, trying to bypass problem (not rendering)");
+				Log_Add(-1, "vertex index in \"%s\" out of range, trying to bypass problem (not rendering)", f);
 				trip->vertex[0] = 0;
 				trip->vertex[1] = 0;
 				trip->vertex[2] = 0; 
@@ -231,7 +231,7 @@ bool Trimesh::Load_OBJ(const char *f)
 				(trip->texcoord[1] >= tl) ||
 				(trip->texcoord[2] >= tl) )
 			{
-				printlog(-1, "ERROR: UV index out of range, trying to bypass problem (by ignoring)");
+				Log_Add(-1, "texture coordinate index in \"%s\" out of range, trying to bypass problem (by ignoring)", f);
 				trip->texcoord[0] = 0;
 				trip->texcoord[1] = 0;
 				trip->texcoord[2] = 0;
@@ -240,8 +240,10 @@ bool Trimesh::Load_OBJ(const char *f)
 				(trip->normal[1] >= nl && trip->normal[1] != INDEX_ERROR) ||
 				(trip->normal[2] >= nl && trip->normal[2] != INDEX_ERROR)	)
 			{
-				printlog(0, "ERROR: normal index out of range, trying to bypass problem (generating new)");
-				trip->normal[0] = trip->normal[1] = trip->normal[2] = INDEX_ERROR; //set them all to 0
+				Log_Add(-1, "normal index in \"%s\" out of range, trying to bypass problem (generating new)", f);
+				trip->normal[0] = INDEX_ERROR;
+				trip->normal[1] = INDEX_ERROR;
+				trip->normal[2] = INDEX_ERROR;
 			}
 		}
 		triangle_count+=tricount; //count triangles (for info output later on)
@@ -250,14 +252,14 @@ bool Trimesh::Load_OBJ(const char *f)
 	Normalize_Normals();
 	Generate_Missing_Normals(); //creates missing normals - unit, don't need normalizing
 
-	printlog(1, "OBJ info: %u triangles, %u materials", triangle_count, materials.size());
+	Log_Add(2, "OBJ loading info: %u triangles, %u materials", triangle_count, materials.size());
 
 	return true;
 }
 
 bool Trimesh::Load_MTL(const char *f)
 {
-	printlog(2, "Loading trimesh material(s) from MTL file %s", f);
+	Log_Add(2, "Loading trimesh material(s) from MTL file %s", f);
 
 	Text_File file;
 	Material_Float *material;
@@ -280,9 +282,7 @@ bool Trimesh::Load_MTL(const char *f)
 			materials[mat_nr].name = file.words[1]; //set name
 		}
 		else if (mat_nr == INDEX_ERROR)
-		{
-			printlog(0, "ERROR: mtl wants to specify material properties for unnamed material?! Ignoring");
-		}
+			Log_Add(-1, "\"%s\" wants to specify material properties for unnamed material?! Ignoring", f);
 		else
 		{
 			//direct pointer to material struct
@@ -333,7 +333,7 @@ bool Trimesh::Load_MTL(const char *f)
 					if (material->shininess > 128.0)
 					{
 						material->shininess=128.0;
-						printlog(0, "ERROR: mtl file got Ns>128, please tell me (Mats) to fix the mtl loader!");
+						Log_Add(-1, "\"%s\" file got Ns>128, please tell me (Mats) to fix the mtl loader!", f);
 					}
 				}
 			}
@@ -352,7 +352,7 @@ bool Trimesh::Load_MTL(const char *f)
 	//check if we got any data:
 	if (mat_nr == INDEX_ERROR)
 	{
-		printlog(0, "ERROR: mtl existed, but was empty?!");
+		Log_Add(-1, "\"%s\" seems to exist, but is empty?!", f);
 		return false;
 	}
 
@@ -364,7 +364,7 @@ bool Trimesh::Load_MTL(const char *f)
 			material->ambient[1] == 0 &&	
 			material->ambient[2] == 0	)
 		{
-			printlog(2, "NOTE: found material with ambient colour of 0, setting to diffuse instead");
+			Log_Add(2, "NOTE: found material with ambient colour of 0, setting to diffuse instead");
 			material->ambient[0] = material->diffuse[0];
 			material->ambient[1] = material->diffuse[1];
 			material->ambient[2] = material->diffuse[2];

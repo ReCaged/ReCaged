@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -27,7 +27,9 @@
 
 //important system configuration variables
 extern struct internal_struct {
-	int verbosity;
+	//log settings
+	int verbosity; //for stdout
+	bool logfile;
 
 	//for multithreading
 	bool sync_simulation, sync_interface;
@@ -63,7 +65,8 @@ extern struct internal_struct {
 } internal;
 
 const struct internal_struct internal_defaults = {
-	1, //verbosity 1 until cheanged
+	1, //verbosity 1 until changed
+	true,
 	true,true,
 	false,
 	0.01,
@@ -91,6 +94,8 @@ const struct internal_struct internal_defaults = {
 
 const struct Conf_Index internal_index[] = {
 	{"verbosity",		'i',1, offsetof(struct internal_struct, verbosity)},
+	{"logfile",		'b',1, offsetof(struct internal_struct, logfile)},
+
 	{"sync_simulation",	'b',1, offsetof(struct internal_struct, sync_simulation)},
 	{"sync_interface",	'b',1, offsetof(struct internal_struct, sync_interface)},
 	{"spinning",		'b',1, offsetof(struct internal_struct, spinning)},

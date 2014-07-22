@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -20,17 +20,19 @@
  */ 
 
 //Required stuff:
-#include <SDL.h>
+#include <SDL/SDL.h>
+#include <getopt.h>
 
 //local stuff:
-#include "shared/info.hpp"
 #include "shared/internal.hpp"
 #include "shared/threads.hpp"
-#include "shared/printlog.hpp"
+#include "shared/log.hpp"
+#include "shared/directories.hpp"
 #include "shared/runlevel.hpp"
 #include "shared/profile.hpp"
 #include "shared/track.hpp"
 #include "shared/trimesh.hpp"
+#include "shared/directories.hpp"
 
 
 Uint32 starttime = 0;
@@ -41,7 +43,7 @@ Uint32 start_time = 0;
 void Run_Race(void)
 {
 	//start
-	printlog (0, "Starting Race");
+	Log_Add (0, "Starting Race");
 
 	ode_mutex = SDL_CreateMutex(); //create mutex for ode locking
 	sdl_mutex = SDL_CreateMutex(); //only use sdl in 1 thread
@@ -70,7 +72,7 @@ void Run_Race(void)
 	SDL_DestroyCond(sync_cond);
 
 	//done!
-	printlog(0, "Race Done!");
+	Log_Add(0, "Race Done!");
 
 	racetime = SDL_GetTicks() - starttime;
 	simtime = simulation_time - starttime;
@@ -85,19 +87,16 @@ void Run_Race(void)
 //try to load "tmp menu selections" for menu simulation
 //what we do is try to open this file, and then try to find menu selections in it
 //note: if selections are not found, will still fall back on safe defaults
-bool tmp_menus(const char *profiledir)
+bool tmp_menus()
 {
-	//initiate interface
-	if (!Interface_Init())
-		return false;
-
 	std::string sprofile, sworld, strack, steam, scar, sdiameter, styre, srim; //easy text manipulation...
+	Directories dirs; //for finding
 	Text_File file; //for parsing
-	file.Open("tmp menu selections"); //just assume it opens...
+	dirs.Find("tmp_menu_selections", CONFIG, READ);
+	file.Open(dirs.Path()); //just assume it opens (no harm if not)...
 
 	//MENU: welcome to rc, please select profile or create a new profile
-	sprofile = profiledir; //specified dir
-	sprofile += "/"; //and separator
+	sprofile = "profiles/";
 	if (file.Read_Line() && file.word_count == 2 && !strcmp(file.words[0], "profile"))
 		sprofile += file.words[1];
 	else
@@ -261,7 +260,7 @@ bool tmp_menus(const char *profiledir)
 		{
 			if (!car_template)
 			{
-				printlog(0, "ERROR in menu: specify car before position!");
+				Log_Add(-1, "Incorrect menu list: Specify car before position!");
 				return false;
 			}
 
@@ -302,120 +301,269 @@ bool tmp_menus(const char *profiledir)
 }
 
 //
-//
+// main()
 //
 
+//arguments
+static const struct option options[] = 
+{
+	{ "help", no_argument, NULL, 'h' },
+	{ "version", no_argument, NULL, 'V' },
+	{ "config", required_argument, NULL, 'c' },
+	{ "verbose", no_argument, NULL, 'v' },
+	{ "window", no_argument, NULL, 'w' },
+	{ "fullscreen", no_argument, NULL, 'f' },
+	{ "quiet", no_argument, NULL, 'q' },
+	{ "width", required_argument, NULL, 'x' },
+	{ "height", required_argument, NULL, 'y' },
+	{ "portable", optional_argument, NULL, 'p' },
+	{ "user", optional_argument, NULL, 'u' },
+	{ "installed", optional_argument, NULL, 'i' },
+	//
+	//TODO (for lua)
+	//run script.lua instead
+	//-- end of normal options, followed by lua args
+	//-- help for lua options
+	//
+	{ NULL, 0, NULL, 0 }
+};
 
-//default options (paths)
-const char profiledefault[] = "profiles";
-char *datadefault; //need to check path to rc before deciding this
 
 //main function, will change a lot in future versions...
 int main (int argc, char *argv[])
 {
-	//issue
-	printf("\n	-=[ Welcome to ReCaged version %s ]=-\n\n%s\n", VERSION, ISSUE);
-	//end
+	//make sure we can print (allocates a mutex before SDL_Init, but seems
+	//safe anyway, I think...)
+	Log_Init();
 
-	//attempt to generate default data path
-	//check if program was called with another pwd (got '/' in "name")
-	if (char *s = strrchr(argv[0], '/'))
-	{
-		//"<path to self - minus self>/data"
-		int length=strlen(argv[0])-strlen(s)+1;
-
-		datadefault=new char[length+5];
-
-		//copy the path to self (first part of argv0)
-		strncpy(datadefault, argv[0], length);
-		//add null termination (for strcat)
-		datadefault[length]='\0';
-		//append data instead of self
-		strcat(datadefault, "data");
-	}
-	else
-	{
-		//just change into "data"
-		datadefault=new char[5];
-		strcpy(datadefault, "data");
-	}
-
-	//set default values:
-	const char *datadir = datadefault;
-	const char *profiledir = profiledefault;
-
-	//use getopt to parse options to to allow overide defaults:
+	//use getopt_long to parse options to override defaults:
 	char c;
-	while ( (c = getopt(argc, argv, "d:p:")) != -1 )
+	bool window=false, fullscreen=false;
+	int xres=0, yres=0;
+	char *port_overr=NULL, *inst_overr=NULL, *user_overr=NULL, *conf_overr=NULL;
+	bool inst_force=false, port_force=false;
+
+	//TODO: might want to compare optind and argc afterwards to detect missing or extra arguments (like file)
+	while ( (c = getopt_long(argc, argv, "hVc:vqwfx:y:p::u::i::", options, NULL)) != -1 )
 	{
 		switch(c)
 		{
-			case 'd': //data directory
-				printf("Alternative path to data directory specified (\"%s\")\n", optarg);
-				datadir = optarg;
+			case 'V': //data directory
+				Log_puts(1, "ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\")\nCopyright (C) " PACKAGE_YEAR " Mats Wahlberg\n");
+				exit(0); //stop execution
 				break;
 
-			case 'p': //profile directory
-				printf("Alternative path to profile directory specified (\"%s\")\n", optarg);
-				profiledir = optarg;
+			case 'c':
+				conf_overr=optarg;
 				break;
 
-			default:
-				puts(HELP); //print help output
-				exit(-1); //stop execution
+			case 'v':
+				Log_Change_Verbosity(+1);
+				break;
+
+			case 'q':
+				Log_Change_Verbosity(-1);
+				break;
+
+			case 'w':
+				window=true;
+				fullscreen=false;
+				break;
+
+			case 'f':
+				fullscreen=true;
+				window=false;
+				break;
+
+			case 'x':
+				xres=atoi(optarg);
+				if (xres <= 0)
+				{
+					Log_Add(-1, "Window width requires a positive integer");
+					exit(-1);
+				}
+				break;
+
+			case 'y':
+				yres=atoi(optarg);
+				if (yres <= 0)
+				{
+					Log_Add(-1, "Window height requires a positive integer");
+					exit(-1);
+				}
+				break;
+
+			case 'p':
+				port_force=true;
+				inst_force=false;
+				port_overr=optarg;
+				user_overr=NULL;
+				inst_overr=NULL;
+				break;
+
+			case 'u':
+				port_force=false;
+				inst_force=true;
+				port_overr=NULL;
+				user_overr=optarg;
+				inst_overr=NULL;
+				break;
+
+			case 'i':
+				port_force=false;
+				inst_force=true;
+				port_overr=NULL;
+				user_overr=NULL;
+				inst_overr=optarg;
+				break;
+
+			default: //print help output
+				//TODO: "Usage: %s [OPTION]... -- [LUA OPTIONS]\n"
+				Log_puts(0, "\
+Usage: recaged [OPTION]...\n\
+  -h, --help		display help and exit\n\
+  -V, --version		display version and exit\n\
+  -c, --config FILE	load settings from FILE\n\
+  -v, --verbose		increase stdout verbosity\n\
+  -q, --quiet		decrease stdout verbosity\n\
+\n\
+Options for overriding window creation:\n\
+  -w, --window		render in window\n\
+  -f, --fullscreen	render in fullscreen\n\
+  -x, --width PIXELS	render with PIXELS width\n\
+  -y, --height PIXELS	render with PIXELS height\n\
+\n\
+Options for overriding normal (automatic) directory detection:\n\
+  -p[DIR], --portable[=DIR] Force \"portable\" mode: read/write all files in a\n\
+			single directory, located around the executable if not\n\
+			specified. Overrides any earlier -u and -i\n\n\
+  -u[DIR], --user[=DIR]	Force \"installed\" mode: write files in home directory\n\
+			and read from home and global directories. Optionally\n\
+			overrides the user directory. Overrides any earlier -p\n\n\
+  -i[DIR], --installed[=DIR] Force \"installed\" mode: just like -u above, but\n\
+  			optionally overrides the installed (global) directory.\n\
+			Both can be combined in order to specify both paths\n");
+
+				exit(0); //stop execution
+				break;
 		}
 	}
 
-	//ok, try to get into the data directory
-	if (chdir (datadir))
-	{
-		printf("Failed to cd into data directory...\n");
+	//welcome message
+	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
 
-		//lets see if this was not the default (and the default works):
-		if ( (datadir != datadefault) && !chdir(datadefault) )
-			printf("Using default directory (\"%s\") instead\n", datadefault);
-		else
-			printf("Will try to load from current directory instead...\n");
+	//start SDL (also init timers when at it)
+	if (SDL_Init(SDL_INIT_TIMER))
+	{
+		Log_Add(-1, "Could not initiate SDL: \"%s\"", SDL_GetError());
+		return -1;
 	}
 
-	//not needed anymore (used or not, will not be needed any more)
-	delete[] datadefault;
+	//unlikely to fail, but still possible (if incorrect path overriding or something)
+	if (!Directories::Init(argv[0], inst_force, port_force, inst_overr, user_overr, port_overr))
+		return -1;
+
+	//for finding some files
+	Directories dirs;
+
+	//load conf file if found
+	if (conf_overr)
+		Load_Conf (conf_overr, (char*)&internal, internal_index);
+	else if (dirs.Find("internal.conf", CONFIG, READ)) //try find by default
+		Load_Conf (dirs.Path(), (char *)&internal, internal_index);
+
+	//only enable file logging if requested
+	if (internal.logfile)
+	{
+		if (dirs.Find("log.txt", CACHE, WRITE))
+			Log_File(dirs.Path());
+		else
+			Log_Add(-1, "Unable to find/create writeable log file");
+	}
+	else
+		Log_Add(1, "File logging disabled");
+
+	//now disable storage of files in ram (not used for anything more)
+	//(and no on ringbuffer - can resize dynamically during log writes)
+	Log_RAM(false);
+
+	//update log verbosity according to settings in conf _and_ any arguments)
+	Log_Change_Verbosity((internal.verbosity-1));
+
+	//TODO: rotate credits/libraries order/descriptions
+	Log_puts(0, " ReCaged is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n");
+
+Log_puts(1, "\
+\n\
+ ReCaged is free software: you can redistribute it and/or modify\n\
+ it under the terms of the GNU General Public License as published by\n\
+ the Free Software Foundation, either version 3 of the License, or\n\
+ (at your option) any later version.\n\
+\n\
+ ReCaged is distributed in the hope that it will be useful,\n\
+ but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
+ GNU General Public License for more details.\n\
+\n\
+ You should have received a copy of the GNU General Public License\n\
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
+\n\n\
+				-=[ Credits ]=-\n\n\
+  * Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
+  * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
+  * \"Spontificus\"			-	Testing, hacks and various fixes\n\n\
+\n		-=[ Other Projects that made RC possible ]=-\n\n\
+  * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
+  * \"The GNU Project\"			-	For Developing a Free OS\n\
+  * \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
+  * \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
+  * \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\n\n\
+ Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
+ More keys exists for debug/testing/demo, see README if you are interested.\n\n\
+ - See README for more info -\n\n");
 
 
 	//ok, start loading
-	printlog(0, "Loading...\n");
+	Log_Add(1, "Loading...");
 	runlevel = loading;
 
-	load_conf ("internal.conf", (char *)&internal, internal_index);
+	//initiate interface
+	if (!Interface_Init(window, fullscreen, xres, yres))
+		return -1;
 
 	//
 	//TODO: there should be menus here, but menu/osd system is not implemented yet... also:
 	//on failure, rc should not just terminate but instead abort the race and warn the user
-	if (!tmp_menus(profiledir))
+	if (!tmp_menus())
 	{
-		printlog(0, "One or more errors, can not start!");
+		Log_Add(-1, "One or more errors, can not start!");
 		return -1; //just quit if failure
 	}
 	//
 
 	//might be interesting
-	printlog(1, "\n\n   <[ Info ]>");
-	printlog(1, "Startup time:		%ums", starttime);
-	printlog(1, "Race time:			%ums", racetime);
+	Log_puts(1, "\n\n   <[ Info ]>\n");
+	Log_Add(1, "Startup time:		%ums", starttime);
+	Log_Add(1, "Race time:			%ums", racetime);
 
-	printlog(1, "Simulated time:		%ums (%u%% of real time)",
+	Log_Add(1, "Simulated time:		%ums (%u%% of real time)",
 						simtime, (100*simtime)/racetime);
 
-	printlog(1, "Average simulations/second:	%u steps/second (%u in total)",
+	Log_Add(1, "Average simulations/second:	%u steps/second (%u in total)",
 						(1000*simulation_count)/racetime, simulation_count);
 
-	printlog(1, "Simulation lag:		%u%% of steps (%u in total)",
+	Log_Add(1, "Simulation lag:		%u%% of steps (%u in total)",
 						(100*simulation_lag)/simulation_count, simulation_lag);
 
-	printlog(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
+	Log_Add(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
 						(1000*interface_count)/racetime, (100*interface_count)/simulation_count);
 
-	printf("\nBye!\n\n");
+	Log_puts(1, "\n Bye!\n\n");
+
+	//close
+	Directories::Quit();
+	Log_Quit();
+	SDL_Quit();
 
 	return 0;
 }

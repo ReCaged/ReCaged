@@ -4,12 +4,12 @@
 
   A Free Software, Futuristic, Racing Game
 
----
  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg
 
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
- notice and this notice are preserved.
+ notice and this notice are preserved. This file is offered as-is,
+ without any warranty.
 ---
 
 
@@ -51,9 +51,10 @@ You should have received a copy of the GNU General Public License
 along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
-Information on the licensing of the included media/"binary" files is
-specified in README files located in the same directory as each media file.
+Licensing information of binary media files is specified in a README file in
+the same directory as the relevant media file. However, all files are released
+under the same terms as above (GPL version 3), unless stated otherwise inside
+the file or in an accompanying README file.
 
 
 
@@ -77,6 +78,9 @@ Path to profile directory ("-p"), default: "profiles" inside the data dir.
 Example: use the read only _data_ directory "/opt/recaged/data", and "profile"
 directory the user has read/write access to (in home):
 > recaged -d /opt/recaged/data -p /home/slinger/recaged
+
+
+TODO: running as installed, portable. explanation (longer than --help), examples
 
 
 
@@ -191,32 +195,51 @@ needed libraries):
 
 First of all, you will need the libraries mentioned above (gl, glew, sdl and
 ode). Also check if your distro provides development libraries in separate
-packages and if so, install them too (look for packages and/or meta-packages
-named like lib<name>-dev). Also make sure you got at least a Make program and
-a C++ compiler (such as GNU Make and the GNU C++ Compiler, g++) and the usual
-libraries.
+packages and if so, install them too (look for packages named like
+lib<name>-dev). Also make sure you got the usual development tools (Make, C++
+compiler, Autotools, libraries etc).
 
-RC currently does not use autoconf, but only a custom makefile, so in order
-to compile, just cd into the src directory and type "make".
+The build process is the standard autoconf routine: run "./configure" and
+"make". "make install" will install (but it's not needed to run, you could just
+start "recaged" from the src directory). If you're building a development (git)
+version first run "autoreconf -fi" to generate the configure script and other
+required files. Remember to set "CPPFLAGS" and "LDFLAGS" if necessary.
 
 
 On windows things will be more difficult: since there is no package manager,
-you will have to install all requirements manually.
+you would have to install all requirements manually. There is however a script
+called "make_w32.sh" included to help automate this process.
 
 First of all, install MinGW (a minimal port of GNU for windows - it provides
-compilers and standard libraries for compilation), make sure to install make,
-autoconf and g++. Msys is also recommended (as it provides a user interface to
-MinGW).
+compilers and standard libraries for compilation). The latest version can be
+downloaded here:
+http://sourceforge.net/projects/mingw/files/latest/download?source=files
 
-Then you must compile and install the SDL, ODE and GLEW libraries. This
-process will not be covered in detail here. Once you have downloaded and
-extracted a tarball, cd into the appropriate directory and use:
-./configure && make && make install
-(exception for GLEW: it doesn't use autoconf, just "make" and make install").
+The only installation option really recommended to choose here is the "MSYS
+Basic System", which provides a bash shell suitable for working with MinGW. It's
+not necessarily needed but working without it is much harder and you will not be
+able to use the automated script.
 
-Then cd into the src directory of rc and use "make w32" to compile a static
-binary, called "recaged.exe", which includes the needed libraries (for easy
-redistribution).
+Now you can run the provided script "make_w32.sh" with the wanted arguments to
+install the necessary libraries and compile (run "make_w32.sh help" for more
+details). Running "./make_w32.sh dependencies" will install the necessary
+libraries and tools for compiling releases. If you want to compile development
+versions run "./make_w32.sh extras" as well (or instead, as it will also pull
+all other dependencies if missing) to get autotools, git and the vim editor.
+
+Finally: running "./make_w32.sh installer" should configure and build ReCaged
+for w32 with the necessary libraries statically linked (and strip out debug
+symbols and 
+
+Alternatively you can compile and install the SDL, ODE and GLEW libraries
+manually, and install NSIS. This process will not be covered in detail here.
+Then cd into the src directory of rc and run "./configure && make" to compile.
+But if you want to create a complete installer, instead run "./configure
+--enable-w32static --enable-w32console && make" to compile and then build the
+NSIS installer. Or just use "./make_w32.sh installer". The "--enable-w32static"
+option makes sure all libraries that would normally have to be included as dlls
+are linked into the exe, and "--enable-w32console" enables console log output
+(requires SDL to have been built with "--disable-stdio-redirect").
 
 
 

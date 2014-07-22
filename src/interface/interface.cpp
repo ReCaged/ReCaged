@@ -22,15 +22,14 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 
-#include "../shared/internal.hpp"
-#include "../shared/info.hpp"
-#include "../shared/track.hpp"
-#include "../shared/runlevel.hpp"
-#include "../shared/threads.hpp"
-#include "../shared/printlog.hpp"
-#include "../shared/profile.hpp"
+#include "shared/internal.hpp"
+#include "shared/track.hpp"
+#include "shared/runlevel.hpp"
+#include "shared/threads.hpp"
+#include "shared/log.hpp"
+#include "shared/profile.hpp"
 
-#include "../shared/camera.hpp"
+#include "shared/camera.hpp"
 #include "render_list.hpp"
 #include "geom_render.hpp"
 
@@ -64,7 +63,7 @@ void Resize (int new_w, int new_h)
 
 	if (!screen)
 	{
-		printlog(0, "Warning: Could not update video mode on resize!");
+		Log_Add(0, "Warning: Could not update video mode on resize!");
 		return; //can't really quit here, just don't do anything
 	}
 	int w=screen->w;
@@ -86,11 +85,11 @@ void Resize (int new_w, int new_h)
 	{
 		//angle between w/2 (distance from center of screen to right edge) and players eye distance
 		angle = atan( (((GLfloat) w)/2.0)/internal.dist );
-		printlog(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
+		Log_Add(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
 	}
 	else //bad...
 	{
-		printlog(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
+		Log_Add(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
 		angle = ( (internal.angle/2.0) * M_PI/180);;
 	}
 
@@ -115,19 +114,19 @@ void Resize (int new_w, int new_h)
 	glLoadIdentity();
 }
 
-bool Interface_Init(void)
+bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 {
-	printlog(0, "Initiating interface");
+	Log_Add(0, "Initiating interface");
 
 	//initiate sdl
-	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK))
+	if (SDL_InitSubSystem (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK))
 	{
-		printlog(0, "Error: couldn't initiate SDL: %s", SDL_GetError());
+		Log_Add(-1, "Could not initiate video or joystick: %s", SDL_GetError());
 		return false;
 	}
 
 	//set title:
-	SDL_WM_SetCaption (TITLE, "ReCaged");
+	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\") (C) " PACKAGE_YEAR " Mats Wahlberg", "ReCaged");
 
 	//TODO: set icon (SDL_WM_SetIcon, from embedded into the executable?)
 
@@ -145,46 +144,50 @@ bool Interface_Init(void)
 	//not sure if this can fail, but just in case:
 	if (!info)
 	{
-		printlog(0, "Error: Could not get video info: %s\n", SDL_GetError());
+		Log_Add(-1, "Could not get video info: %s", SDL_GetError());
 		return false;
 	}
 
 	//store current bpp as global
 	bpp = info->vfmt->BitsPerPixel;
-	int width, height;
 
 	//try to create window
 	//TODO: when SDL 1.3 is released, SDL_CreateWindow is deprecated in favor of:
 	//SDL_CreateWindow and SDL_GL_CreateContext
-	if (internal.fullscreen) //fullscreen, use native resolution
+	//ALSO (sdl>1.2): try setting core context for gl 3.x. If possible: unlegacy rendering
+	int x, y;
+	if (!window && (fullscreen || internal.fullscreen)) //fullscreen (and not forcing window)
 	{
 		flags |= SDL_FULLSCREEN; //add fullscreen flag
-		width=info->current_w;
-		height=info->current_h;
+		//set resolution from screen info
+		x = info->current_w;
+		y = info->current_h;
 	}
 	else //windowed mode
 	{
-		width=internal.res[0];
-		height=internal.res[1];
+		//set resolution from conf or as forced by args
+		x= (xres > 0)? xres : internal.res[0];
+		y= (yres > 0)? yres : internal.res[1];
 	}
 
-	screen = SDL_SetVideoMode (width, height, bpp, flags);
+	//try to set video
+	screen = SDL_SetVideoMode (x, y, bpp, flags);
 
-	//failuer
+	//failure
 	if (!screen)
 	{
 		if (internal.msaa)
 		{
-			printlog(0, "ERROR: couldn't set video mode, will try again without MSAA: %s", SDL_GetError());
+			Log_Add(-1, "Could not set video mode, will try again without MSAA: %s", SDL_GetError());
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
 			internal.msaa=0; //make sure rest of code knows it's disabled
-			screen = SDL_SetVideoMode (width, height, bpp, flags);
+			screen = SDL_SetVideoMode (x, y, bpp, flags);
 		}
 
 		if (!screen)
 		{
-			printlog(0, "ERROR: couldn't set video mode: %s", SDL_GetError());
+			Log_Add(-1, "Could not set video mode: %s", SDL_GetError());
 			return false;
 		}
 	}
@@ -197,13 +200,15 @@ bool Interface_Init(void)
 		{
 			//should check ARB extensions if GL<1.5, but since this only affects old
 			//systems (the 1.5 standard was released in 2003), I'll ignore it...
-			printlog(0, "Error: you need GL 1.5 or later");
+			Log_Add(-1, "You need OpenGL version 1.5 or later. Your version is: \"%s\"", glGetString(GL_VERSION));
+			//TODO: Log_Add "Or GL 1.? with extensions: EXT_?
+			//(yes/no), EXT_? (yes/no) etc..."
 			return false;
 		}
 	}
 	else
 	{
-		printlog(0, "Error: couldn't init glew");
+		Log_Add(-1, "Could not initiate GLEW");
 		return false;
 	}
 
@@ -218,14 +223,14 @@ bool Interface_Init(void)
 	if (joysticks != 0)
 	{
 		joystick = new SDL_Joystick*[joysticks];
-		printlog(1, "Detected %i joystick(s). Opening:", joysticks);
+		Log_Add(1, "Detected %i joystick(s). Opening:", joysticks);
 
 		for (int i=0; i<joysticks; ++i)
 		{
-			printlog(1, "Device %i: \"%s\"", i, SDL_JoystickName(i));
+			Log_Add(1, "Device %i: \"%s\"", i, SDL_JoystickName(i));
 			joystick[i]= SDL_JoystickOpen(i);
 			if (!joystick[i])
-				printlog(0, "Failed to open joystick %i", i);
+				Log_Add(0, "Failed to open joystick %i", i);
 		}
 	}
 	//
@@ -268,7 +273,7 @@ bool Interface_Init(void)
 
 int Interface_Loop ()
 {
-	printlog(1, "Starting interface loop");
+	Log_Add(1, "Starting interface loop");
 
 	//just make sure not rendering geoms yet
 	geom_render_level = 0;
@@ -315,7 +320,7 @@ int Interface_Loop ()
 
 				case SDL_ACTIVEEVENT:
 					if (event.active.gain == 0)
-						printlog(1, "(FIXME: pause when losing focus (or being iconified)!)");
+						Log_Add(1, "(FIXME: pause when losing focus (or being iconified)!)");
 				break;
 
 				//check for special key presses (tmp debug/demo keys)
@@ -496,7 +501,7 @@ int Interface_Loop ()
 
 void Interface_Quit(void)
 {
-	printlog(1, "Quit interface");
+	Log_Add(1, "Quit interface");
 
 	//close all joysticks
 	for (int i=0; i<joysticks; ++i)
@@ -504,6 +509,6 @@ void Interface_Quit(void)
 			SDL_JoystickClose(joystick[i]);
 	delete[] joystick;
 
-	SDL_Quit();
+	SDL_QuitSubSystem(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK);
 }
 

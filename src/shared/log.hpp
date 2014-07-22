@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -19,32 +19,31 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include <stdarg.h>
-#include "internal.hpp"
-#include "printlog.hpp"
+//print text to logs
 
-//verbosity indicators
-const char *indicator[] = {"=> ", " > ", " * "};
+#ifndef _RC_PRINTLOG_H
+#define _RC_PRINTLOG_H
 
-//print log message - if it's below or equal to the current verbosity level
-void printlog (int level, const char *text, ...)
-{
-	if (level <= internal.verbosity)
-	{
-		if (level==0)
-			putchar('\n');
+//starting size for lines, also for logging to RAM
+//(increased dynamically if needed)
+#define LOG_BUFFER_SIZE 1024
 
-		//print verbosity indicator
-		fputs(indicator[level], stdout); //puts adds newline, fputs instead
+//configuration
+void Log_Init();
+//enable/disable storing of log in ram
+void Log_RAM(bool);
+//enable/disable log file
+bool Log_File(const char *file);
+//set verbosity level (relative to current)
+void Log_Change_Verbosity(int);
+//Log_File();
+void Log_Quit();
 
-		//print message
-		va_list list;
-		va_start (list, text);
-		vprintf (text, list);
-		va_end (list);
+//normal append to log
+void Log_Add (int, const char*, ...);
 
-		//put newline
-		putchar('\n');
-	}
-}
+//wrappers for popular text output functions
+void Log_printf (int, const char*, ...);
+void Log_puts (int, const char*);
 
+#endif

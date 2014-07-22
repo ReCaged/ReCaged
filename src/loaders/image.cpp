@@ -25,7 +25,7 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 #include "shared/internal.hpp"
-#include "shared/printlog.hpp"
+#include "shared/log.hpp"
 #include "image.hpp"
 
 
@@ -44,15 +44,15 @@ Image::~Image()
 //may I present the main event:
 bool Image::Load (const char *file)
 {
-	printlog(1, "Loading image from file \"%s\"", file);
-	printlog(2, "determining file type from suffix");
+	Log_Add(1, "Loading image from file \"%s\"", file);
+	Log_Add(2, "determining file type from suffix");
 
 	name = file;
 	delete[] pixels;
 
 	if (file == NULL)
 	{
-		printlog(0, "WARNING: empty file path+name for image");
+		Log_Add(0, "WARNING: empty file path+name for image");
 		return false;
 	}
 
@@ -61,7 +61,7 @@ bool Image::Load (const char *file)
 	//in case something really wrong
 	if (!suffix)
 	{
-		printlog(0, "ERROR: no suffix for file \"%s\"", file);
+		Log_Add(-1, "no suffix for file \"%s\"", file);
 		return false;
 	}
 
@@ -70,38 +70,38 @@ bool Image::Load (const char *file)
 		return Load_BMP(file);
 
 	//else, no match
-	printlog(0, "ERROR: unknown image file suffix for \"%s\"", file);
+	Log_Add(-1, "unknown image file suffix for \"%s\"", file);
 	return false;
 }
 
 //and here's the real work for now:
 bool Image::Load_BMP(const char *file)
 {
-	printlog(2, "Loading image from BMP file \"%s\"", file);
+	Log_Add(2, "Loading image from BMP file \"%s\"", file);
 
 	SDL_Surface *surface = SDL_LoadBMP(file);
 
 	if (!surface)
 	{
-		printlog(-1, "ERROR: Unable to open image file \"%s\": %s", file, SDL_GetError());
+		Log_Add(-1, "Unable to open image file \"%s\": %s", file, SDL_GetError());
 		return false;
 	}
 
 	width=surface->w;
 	height=surface->h;
-	printlog(2, "resolution: %ix%i", width, height);
+	Log_Add(2, "resolution: %ix%i", width, height);
 
 	if (surface->format->BytesPerPixel == 4) //32b = alpha
 	{
 		//check order
 		if (surface->format->Rmask == 0x000000ff)
 		{
-			printlog(2, "format: RGBA, 32 bits");
+			Log_Add(2, "format: RGBA, 32 bits");
 			format = RGBA;
 		}
 		else
 		{
-			printlog(2, "format: BGRA, 32 bits");
+			Log_Add(2, "format: BGRA, 32 bits");
 			format = BGRA;
 		}
 	}
@@ -109,18 +109,18 @@ bool Image::Load_BMP(const char *file)
 	{
 		if (surface->format->Rmask == 0x000000ff)
 		{
-			printlog(2, "format: RGB, 24 bits");
+			Log_Add(2, "format: RGB, 24 bits");
 			format = RGB;
 		}
 		else
 		{
-			printlog(2, "format: BGR, 24 bits");
+			Log_Add(2, "format: BGR, 24 bits");
 			format = BGR;
 		}
 	}
 	else
 	{
-		printlog(-1, "ERROR: Unsupported image format in \"%s\"!", file);
+		Log_Add(-1, "Unsupported image format in \"%s\"!", file);
 		SDL_FreeSurface(surface);
 		return false;
 	}
@@ -135,18 +135,18 @@ bool Image::Load_BMP(const char *file)
 }
 Image_Texture *Image::Create_Texture()
 {
-	printlog(2, "Creating texture from image");
+	Log_Add(2, "Creating texture from image");
 
 	//heigh, width power of two?
 	if ( (width == 0) || width & (width-1) )
 	{
-		printlog(0, "ERROR: Unsupported image width (%i) in \"%s\" (not power of 2)!", width, name.c_str());
+		Log_Add(-1, "Unsupported image width (%i) in \"%s\" (not power of 2)!", width, name.c_str());
 		return NULL;
 	}
  
 	if ( (height == 0) || height & (height-1) )
 	{
-		printlog(0, "ERROR: Unsupported image height (%i) in \"%s\" (not power of 2)!", height, name.c_str());
+		Log_Add(-1, "Unsupported image height (%i) in \"%s\" (not power of 2)!", height, name.c_str());
 		return NULL;
 	}
 
@@ -172,13 +172,13 @@ Image_Texture *Image::Create_Texture()
 			internal_format=GL_RGB8; //or RGBA8?
 			break;
 		default:
-			printlog(-1, "ERROR: Unsupported image format in \"%s\"!", name.c_str());
+			Log_Add(-1, "Unsupported image format in \"%s\"!", name.c_str());
 			return NULL;
 			break;
 	}
 
 	//create:
-	printlog(2, "Generating gpu texture");
+	Log_Add(2, "Generating gpu texture");
 	GLuint id;
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
@@ -198,7 +198,7 @@ Image_Texture *Image::Create_Texture()
 	}
 
 	//upload:
-	printlog(2, "Uploading texture to gpu");
+	Log_Add(2, "Uploading texture to gpu");
 	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, pixel_format, GL_UNSIGNED_BYTE, pixels);
 
 	return new Image_Texture(name.c_str(), id);
@@ -219,7 +219,7 @@ GLuint Image_Texture::GetID()
 //remove texture
 Image_Texture::~Image_Texture()
 {
-	printlog(2, "Removing texture image");
+	Log_Add(2, "Removing texture image");
 	glDeleteTextures(1, &id);
 }
 

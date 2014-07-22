@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -24,7 +24,7 @@
 
 #include "../shared/threads.hpp"
 #include "../shared/internal.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/trimesh.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/body.hpp"
@@ -148,7 +148,7 @@ void Render_List_Update()
 			//if buffer full...
 			if (buffer_generate->count == buffer_generate->size)
 			{
-				printlog(2, "Render list was too small, resizing");
+				Log_Add(2, "Render list was too small, resizing");
 
 				//copy to new memory
 				list_element *oldlist = buffer_generate->list;
@@ -199,7 +199,7 @@ void Render_List_Update()
 			//if buffer full...
 			if (buffer_generate->count == buffer_generate->size)
 			{
-				printlog(2, "Render list was too small, resizing");
+				Log_Add(2, "Render list was too small, resizing");
 
 				//copy to new memory
 				list_element *oldlist = buffer_generate->list;

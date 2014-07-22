@@ -20,7 +20,7 @@
  */ 
 
 #include "car.hpp"
-#include "printlog.hpp"
+#include "log.hpp"
 Car_Template::Car_Template(const char *name) :Racetime_Data(name)
 {
 	conf = car_conf_defaults; //set conf values to default
@@ -33,7 +33,7 @@ Car *Car::head = NULL;
 //allocates car, add to list...
 Car::Car(void)
 {
-	printlog(2, "configuring Car class");
+	Log_Add(2, "configuring Car class");
 
 	//default values
 	dir = 1; //initiate to 1 for default
@@ -58,7 +58,7 @@ Car::Car(void)
 //run _before_ starting full erase of object/component lists (at race end)
 Car::~Car()
 {
-	printlog(2, "clearing Car class");
+	Log_Add(2, "clearing Car class");
 
 	//remove from list
 	if (!prev) //head

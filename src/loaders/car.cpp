@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -23,17 +23,18 @@
 #include "../shared/racetime_data.hpp"
 #include "../shared/car.hpp"
 #include "../shared/camera.hpp"
-#include "../shared/printlog.hpp"
+#include "../shared/log.hpp"
 #include "../shared/track.hpp"
 #include "../shared/geom.hpp"
 #include "../shared/body.hpp"
 #include "../shared/joint.hpp"
 #include "text_file.hpp"
+#include "../shared/directories.hpp"
 
 
 Car_Template *Car_Template::Load (const char *path)
 {
-	printlog(1, "Loading car: %s", path);
+	Log_Add(1, "Loading car: %s", path);
 
 	//see if already loaded
 	if (Car_Template *tmp=Racetime_Data::Find<Car_Template>(path))
@@ -47,7 +48,8 @@ Car_Template *Car_Template::Load (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/car.conf");
 
-	if (!load_conf(conf, (char *)&target->conf, car_conf_index)) //try to load conf
+	Directories dirs;
+	if (!(dirs.Find(conf, DATA, READ) && Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
 		return NULL;
 
 	//geoms.lst
@@ -56,7 +58,7 @@ Car_Template *Car_Template::Load (const char *path)
 	strcat (lst, "/geoms.lst");
 
 	Text_File file;
-	if (file.Open(lst))
+	if (dirs.Find(lst, DATA, READ) && file.Open(dirs.Path()))
 	{
 		//default surface parameters
 		Surface surface;
@@ -86,7 +88,7 @@ Car_Template *Car_Template::Load (const char *path)
 						surface.rollres = atof(file.words[++pos]);
 					else
 					{
-						printlog(0, "WARNING: surface option \"%s\" unknown", file.words[pos]);
+						Log_Add(0, "WARNING: surface option \"%s\" unknown", file.words[pos]);
 					}
 
 					//one step forward
@@ -132,7 +134,7 @@ Car_Template *Car_Template::Load (const char *path)
 					//failed to load
 					if (!tmp_geom.mesh)
 					{
-						printlog(0, "ERROR: trimesh geom in car geom list could not be loaded!");
+						Log_Add(-1, "Trimesh geom in car geom list could not be loaded!");
 						continue; //don't add
 					}
 
@@ -140,7 +142,7 @@ Car_Template *Car_Template::Load (const char *path)
 				}
 				else
 				{
-					printlog(0, "ERROR: geom \"%s\" in car geom list not recognized/malformed!", file.words[0]);
+					Log_Add(-1, "Geom \"%s\" in car geom list not recognized/malformed!", file.words[0]);
 					continue; //go to next line
 				}
 
@@ -179,7 +181,7 @@ Car_Template *Car_Template::Load (const char *path)
 		}
 	}
 	else
-		printlog(0, "WARNING: can not open list of car geoms (%s)!", lst);
+		Log_Add(0, "WARNING: can not open list of car geoms (%s)!", lst);
 
 	//helper datas:
 
@@ -219,14 +221,14 @@ Car_Template *Car_Template::Load (const char *path)
 	//steering distribution
 	if (target->conf.dist_steer >1.0 || target->conf.dist_steer <0.0 )
 	{
-		printlog(0, "ERROR: front/rear steering distribution should be range 0 to 1! (enabling front)");
+		Log_Add(-1, "Front/rear steering distribution should be range 0 to 1! (enabling front)");
 		target->conf.dist_steer = 1.0;
 	}
 
 	//check if neither front or rear drive
 	if ( (!target->conf.dist_motor[0]) && (!target->conf.dist_motor[1]) )
 	{
-		printlog(0, "ERROR: either front and rear motor distribution must be enabled! (enabling 4WD)");
+		Log_Add(-1, "Either front and rear motor distribution must be enabled! (enabling 4WD)");
 		target->conf.dist_motor[0] = true;
 		target->conf.dist_motor[1] = true;
 	}
@@ -234,7 +236,7 @@ Car_Template *Car_Template::Load (const char *path)
 	//braking distribution
 	if (target->conf.dist_brake>1.0 || target->conf.dist_brake<0.0 )
 	{
-		printlog(0, "ERROR: front/rear braking distribution should be range 0 to 1! (enabling rear)");
+		Log_Add(-1, "Front/rear braking distribution should be range 0 to 1! (enabling rear)");
 		target->conf.dist_brake = 0.0;
 	}
 
@@ -242,7 +244,7 @@ Car_Template *Car_Template::Load (const char *path)
 	//load model if specified
 	if (target->conf.model[0] == '\0') //empty string
 	{
-		printlog(1, "WARNING: no car 3D model specified\n");
+		Log_Add(1, "WARNING: no car 3D model specified\n");
 		target->model=NULL;
 	}
 	else
@@ -265,7 +267,7 @@ Car_Template *Car_Template::Load (const char *path)
 
 Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D *rim)
 {
-	printlog(1, "spawning car at: %f %f %f", x,y,z);
+	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
 	//begin copying of needed configuration data
 	Car *car = new Car();
@@ -527,7 +529,7 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 
 void Car::Respawn (dReal x, dReal y, dReal z)
 {
-	printlog(1, "respawning car at: %f %f %f", x,y,z);
+	Log_Add(1, "respawning car at: %f %f %f", x,y,z);
 
 	//remember old car position
 	const dReal *pos = dBodyGetPosition(bodyid);

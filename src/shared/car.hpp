@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -30,6 +30,7 @@
 #include "body.hpp"
 #include "geom.hpp"
 #include "trimesh.hpp"
+#include "surface.hpp"
 #include "../loaders/conf.hpp"
 
 #include <vector>
