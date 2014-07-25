@@ -53,6 +53,7 @@ class Wheel
 		dReal x_min_denom, y_min_denom;
 
 		dReal x_min_combine, y_min_combine;
+		dReal x_scale_combine, y_scale_combine;
 
 		//extra tyre data:
 		dReal rim_dot;

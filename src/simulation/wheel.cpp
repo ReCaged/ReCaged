@@ -106,6 +106,8 @@ Wheel::Wheel()
 
 	x_min_combine = 0.0;
 	y_min_combine = 0.0;
+	x_scale_combine = 1.0;
+	y_scale_combine = 1.0;
 
 	rim_dot = 1.0;
 	rollres = 0.0;
@@ -376,11 +378,12 @@ void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2
 	denom=(Vsx<x_min_combine)? x_min_combine: Vsx;
 
 	//Vsx/Vs=Vsx/sqrt(Vsx²+Vsy²)=1/sqrt(1+Vsy²/Vsx²), Vsx>x_combine_vel:
-	x_mu*=1/sqrt(1+Vsy*Vsy/(denom*denom));
+	//(x_scale_combine changes how much impact the slip should have)
+	x_mu/=sqrt(1.0+x_scale_combine*Vsy*Vsy/(denom*denom));
 
 	//same for y:
 	denom=(Vsy<y_min_combine)? y_min_combine: Vsy;
-	y_mu*=1/sqrt(1+Vsx*Vsx/(denom*denom));
+	y_mu/=sqrt(1.0+y_scale_combine*Vsx*Vsx/(denom*denom));
 
 	//
 	//2.3) set new friction values

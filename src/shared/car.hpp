@@ -76,6 +76,7 @@ struct Car_Conf
 	bool xaltdenom, yaltdenom;
 	dReal xmindenom, ymindenom;
 	dReal xmincombine, ymincombine;
+	dReal xscalecombine, yscalecombine;
 
 	Conf_String model; //filename+path for model
 	float resize, rotate[3], offset[3];
@@ -121,6 +122,7 @@ const struct Car_Conf car_conf_defaults = {
 	false, false,
 	0, 0,
 	0, 0,
+	1.0, 1.0,
 
 	"",
 	1.0, {0,0,0}, {0,0,0},
@@ -191,6 +193,8 @@ const struct Conf_Index car_conf_index[] = {
 
 	{"tyre:x.min_combine",	'R',1, offsetof(struct Car_Conf, xmincombine)},
 	{"tyre:y.min_combine",	'R',1, offsetof(struct Car_Conf, ymincombine)},
+	{"tyre:x.scale_combine",'R',1, offsetof(struct Car_Conf, xscalecombine)},
+	{"tyre:y.scale_combine",'R',1, offsetof(struct Car_Conf, yscalecombine)},
 
 	{"model",		's',1, offsetof(struct Car_Conf, model)},
 	{"model:resize",	'f',1, offsetof(struct Car_Conf, resize)},

@@ -215,6 +215,8 @@ Car_Template *Car_Template::Load (const char *path)
 	target->wheel.y_min_denom = target->conf.ymindenom;
 	target->wheel.x_min_combine = target->conf.xmincombine;
 	target->wheel.y_min_combine = target->conf.ymincombine;
+	target->wheel.x_scale_combine = target->conf.xscalecombine;
+	target->wheel.y_scale_combine = target->conf.yscalecombine;
 
 
 	//make sure the values are correct
