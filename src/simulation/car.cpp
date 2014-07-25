@@ -78,7 +78,7 @@ void Car::Physics_Step(dReal step)
 		{
 			if (ground)
 			{
-				dReal relgrav[3];
+				dVector3 relgrav;
 				dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
 				dReal grav=-relgrav[2]*carp->dir;
 				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
@@ -94,7 +94,7 @@ void Car::Physics_Step(dReal step)
 
 					if (carp->down_aero > 0)
 					{
-						dReal relvel[3];
+						dVector3 relvel;
 
 						dBodyVectorFromWorld(carp->bodyid,
 								vel[0]-track.wind[0], vel[1]-track.wind[1], vel[2]-track.wind[2],
@@ -121,7 +121,7 @@ void Car::Physics_Step(dReal step)
 						force-=elevate;
 
 						//apply 1/4 of this force to each wheel
-						dReal wheelforce[3];
+						dVector3 wheelforce;
 						dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
 						for (i=0; i<4; ++i)
 							dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
@@ -223,20 +223,33 @@ void Car::Physics_Step(dReal step)
 			A[3] = front;
 		}
 
+		dReal steer[4] = {
+			A[0]-carp->fwtoe,
+			A[1]-carp->rwtoe,
+			A[2]+carp->rwtoe,
+			A[3]+carp->fwtoe};
+
 		//apply steering
 		if (carp->turn)
 		{
-			dJointSetHinge2Param (carp->joint[0],dParamLoStop,A[0]-carp->fwtoe);
-			dJointSetHinge2Param (carp->joint[0],dParamHiStop,A[0]-carp->fwtoe);
-			dJointSetHinge2Param (carp->joint[1],dParamLoStop,A[1]-carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[1],dParamHiStop,A[1]-carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[2],dParamLoStop,A[2]+carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[2],dParamHiStop,A[2]+carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[3],dParamLoStop,A[3]+carp->fwtoe);
-			dJointSetHinge2Param (carp->joint[3],dParamHiStop,A[3]+carp->fwtoe);
+			for (i=0; i<4; ++i)
+			{
+				dJointSetHinge2Param (carp->joint[i],dParamLoStop,steer[i]);
+				dJointSetHinge2Param (carp->joint[i],dParamHiStop,steer[i]);
+			}
 		}
 		//
 
+		//finite rotation
+		if (carp->finiterot)
+		{
+			dVector3 axle;
+			for (i=0; i<4; ++i)
+			{
+				dBodyVectorToWorld(carp->bodyid, cos(steer[i]), -sin(steer[i]), 0.0, axle);
+				dBodySetFiniteRotationAxis(carp->wheel_body[i], axle[0], axle[1], axle[2]);
+			}
+		}
 		//braking/accelerating:
 
 		//the torque we want to apply

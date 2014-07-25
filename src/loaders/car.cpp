@@ -312,6 +312,8 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->fwtoe = conf.toe[0]*M_PI/180.0;
 	car->rwtoe = conf.toe[1]*M_PI/180.0;
 
+	car->finiterot = conf.finiterot;
+
 	car->diff = conf.diff;
 	car->adapt_steer = conf.adapt_steer;
 	car->adapt_redist = conf.adapt_redist;
@@ -434,6 +436,9 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 		if (!conf.gyro)
 			dBodySetGyroscopicMode(wheel_body[i], 0);
 
+		//enable finite rotation?
+		if (conf.finiterot)
+			dBodySetFiniteRotationMode(wheel_body[i], 1);
 
 		//set mass
 		dBodySetMass (wheel_body[i], &m);

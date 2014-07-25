@@ -68,6 +68,7 @@ struct Car_Conf
 	bool suspension_elevation;
 	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
 	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, merge_angle;
+	bool finiterot;
 	dReal down_max, down_aero, down_mass;
 	bool down_air;
 
@@ -114,6 +115,7 @@ const struct Car_Conf car_conf_defaults = {
 	true,
 	{3.0,1.0,5.0}, 10.0, 0.0, 0.5,
 	400000.0, 1000.0, 0.1, 50.0, 0.1, 10,
+	true,
 	0, 0, 0,
 	true,
 
@@ -171,6 +173,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"wheel:angular_drag",	'R',1, offsetof(struct Car_Conf, wheel_angular_drag)},
 	{"wheel:spring",	'R',1, offsetof(struct Car_Conf, wheel_spring)},
 	{"wheel:damping",	'R',1, offsetof(struct Car_Conf, wheel_damping)},
+	{"wheel:finite_rotation",'b',1, offsetof(struct Car_Conf, finiterot)},
 	{"wheel:rollres",	'R',1, offsetof(struct Car_Conf, rollres)},
 	{"wheel:rim_angle",	'R',1, offsetof(struct Car_Conf, rim_angle)},
 	{"wheel:rim_mu",	'R',1, offsetof(struct Car_Conf, rim_mu)},
@@ -281,6 +284,7 @@ class Car:public Object
 		dReal redist_force;
 		dReal dsteer, dbrake;
 		dReal fwtoe, rwtoe;
+		bool finiterot;
 
 		dReal offset;
 
