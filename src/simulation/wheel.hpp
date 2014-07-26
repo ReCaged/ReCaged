@@ -59,6 +59,7 @@ class Wheel
 		dReal rim_dot;
 		dReal rollres;
 		dReal mix_dot;
+		bool alt_load, alt_load_damp;
 
 		//tmp:
 		dReal inertia;

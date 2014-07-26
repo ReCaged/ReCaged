@@ -112,6 +112,8 @@ Wheel::Wheel()
 	rim_dot = 1.0;
 	rollres = 0.0;
 	mix_dot = 1.0;
+	alt_load = true;
+	alt_load_damp = true;
 
 	inertia = 1.0;
 }
@@ -271,6 +273,23 @@ void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2
 	//as defined (and convert to degrees)
 	slip_angle = (180.0/M_PI)* atan(Vsy/denom);
 
+	//manually calculate Fz?
+	dReal Fz=0;
+	if (alt_load)
+	{
+		dReal spring=contact->surface.soft_erp/(contact->surface.soft_cfm*stepsize);
+		Fz=spring*contact->geom.depth;
+
+		if (alt_load_damp)
+		{
+			dReal damping=(1.0-contact->surface.soft_erp)/contact->surface.soft_cfm;
+			dReal Vz=VDot(Z, Vpoint);
+			Fz-=damping*Vz;
+		}
+
+		if (Fz < 0.0)
+			Fz=0.0;
+	}
 	//
 	//2.1) compute output values (almost):
 	//
@@ -354,6 +373,12 @@ void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2
 	contact->surface.mu = x_mu*surface->mu;
 	contact->surface.mu2 = y_mu*surface->mu;
 
+	if (alt_load)
+	{
+		contact->surface.mode ^= dContactApprox1;
+		contact->surface.mu *= Fz;
+		contact->surface.mu2 *= Fz;
+	}
 
 	//
 	//3) rolling resistance (braking torque based on normal force)

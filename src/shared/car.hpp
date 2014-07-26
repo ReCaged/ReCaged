@@ -68,7 +68,7 @@ struct Car_Conf
 	bool suspension_elevation;
 	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
 	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, mix_angle;
-	bool finiterot;
+	bool finiterot, alt_load, alt_load_damp;
 	dReal down_max, down_aero, down_mass;
 	bool down_air;
 
@@ -115,7 +115,7 @@ const struct Car_Conf car_conf_defaults = {
 	true,
 	{3.0,1.0,5.0}, 10.0, 0.0, 0.5,
 	400000.0, 1000.0, 0.1, 50.0, 0.1, 10,
-	true,
+	true, true, true,
 	0, 0, 0,
 	true,
 
@@ -179,6 +179,8 @@ const struct Conf_Index car_conf_index[] = {
 	{"wheel:rim_mu",	'R',1, offsetof(struct Car_Conf, rim_mu)},
 
 	{"tyre:mix_angle",	'R',1, offsetof(struct Car_Conf, mix_angle)},
+	{"tyre:alt_load",	'b',1, offsetof(struct Car_Conf, alt_load)},
+	{"tyre:alt_load_damp",	'b',1, offsetof(struct Car_Conf, alt_load_damp)},
 
 	{"tyre:x.static",	'R',1, offsetof(struct Car_Conf, xstatic)},
 	{"tyre:x.peak",		'R',2, offsetof(struct Car_Conf, xpeak)},

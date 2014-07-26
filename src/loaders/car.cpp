@@ -192,6 +192,8 @@ Car_Template *Car_Template::Load (const char *path)
 	//cylinder moment of inertia tensor for Z = (mass*r²)/2
 	target->wheel.inertia = target->conf.wheel_mass*target->conf.w[0]*target->conf.w[0]/2.0; 
 	target->wheel.rollres = target->conf.rollres;
+	target->wheel.alt_load = target->conf.alt_load;
+	target->wheel.alt_load_damp = target->conf.alt_load_damp;
 
 	//check and copy data from conf to wheel class
 	//x

@@ -231,15 +231,17 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		//determine if _one_ of the geoms is a wheel
 		if (wheel1)
 		{
-			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
 			//divide spring&damping values by wheeldivide
 			//(ironically, multiplying  cfm accomplishes that)
 			contact[i].surface.soft_cfm *= wheeldivide[i];
+
+			//configures friction values based on slip and similar
+			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
 		}
 		else if (wheel2)
 		{
-			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
 			contact[i].surface.soft_cfm *= wheeldivide[i];
+			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
 		}
 		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
 		//if (geom1->wheel&&geom2->wheel)
