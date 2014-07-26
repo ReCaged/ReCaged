@@ -10,19 +10,36 @@ TODO: more info in header!
 ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
 ----------------------------------------------
  * Move to Autotools (Automake, Autoconf) for building
+
  * Detect if running in "installed" or "portable" mode
- * Logging to file
- * NSIS installer for w32
+   * Uses xdg or platform-specific paths when installed
+
+ * New logging system
+   * Colour indication of importance/verbosity
+   * Writes full log output to file
+   * Errors written to stderr (and displayed in message box on windows)
+
+ * NSIS installer for windows
+
  * Joystick (gamepad) support
+
  * More reliable window creation (native BPP, better fullscreen support)
+
  * Use native screen resolution for fullscreen mode
+
  * Fixed various insufficient memory allocations
+
  * Anti-Aliasing support (multisample)
+
  * Increased simulation stability
+
  * Car improvements:
+   * Major reconfiguration
    * New tyre friction simulation model (more stable, easier to configure)
    * New tyre combined slip/grip model
    * New tyre/rim contact point evaluation
    * New soft-brake/rolling-resistance code (more reliable at low speeds)
    * Less bending of wheel axles at high speeds
    *..... TODO!
+
+ * TODO!

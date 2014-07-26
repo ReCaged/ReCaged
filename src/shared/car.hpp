@@ -67,7 +67,7 @@ struct Car_Conf
 	dReal suspension_spring, suspension_damping;
 	bool suspension_elevation;
 	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
-	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, merge_angle;
+	dReal wheel_spring, wheel_damping, rollres, rim_angle, rim_mu, mix_angle;
 	bool finiterot;
 	dReal down_max, down_aero, down_mass;
 	bool down_air;
@@ -178,7 +178,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"wheel:rim_angle",	'R',1, offsetof(struct Car_Conf, rim_angle)},
 	{"wheel:rim_mu",	'R',1, offsetof(struct Car_Conf, rim_mu)},
 
-	{"tyre:merge_angle",	'R',1, offsetof(struct Car_Conf, merge_angle)},
+	{"tyre:mix_angle",	'R',1, offsetof(struct Car_Conf, mix_angle)},
 
 	{"tyre:x.static",	'R',1, offsetof(struct Car_Conf, xstatic)},
 	{"tyre:x.peak",		'R',2, offsetof(struct Car_Conf, xpeak)},

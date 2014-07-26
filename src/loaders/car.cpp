@@ -187,7 +187,7 @@ Car_Template *Car_Template::Load (const char *path)
 
 	//wheel simulation class (friction + some custom stuff):
 	//target->wheel.join_d2 = target->conf.join_dist*target->conf.join_dist;
-	target->wheel.merge_dot = cos(target->conf.merge_angle*M_PI/180.0);
+	target->wheel.mix_dot = cos(target->conf.mix_angle*M_PI/180.0);
 	target->wheel.rim_dot = sin(target->conf.rim_angle*M_PI/180.0);
 	//cylinder moment of inertia tensor for Z = (mass*r²)/2
 	target->wheel.inertia = target->conf.wheel_mass*target->conf.w[0]*target->conf.w[0]/2.0; 

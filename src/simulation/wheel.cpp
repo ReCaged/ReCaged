@@ -111,22 +111,19 @@ Wheel::Wheel()
 
 	rim_dot = 1.0;
 	rollres = 0.0;
-	merge_dot = 1.0;
+	mix_dot = 1.0;
 
 	inertia = 1.0;
 }
 
 //find similar, close contact points and merge them
 //assumes same geom order
-int Wheel::Merge_Doubles(dContact *contact, dReal wheelaxle[], int count)
+void Wheel::Mix_Contacts(dContact contact[], int count, dReal wheelaxle[], dReal wheeldivide[])
 {
 	int i,j;
-	dReal normal[3], pos[3], depth;
 
-	int matches;
-	bool used[count];
 	for (i=0; i<count; ++i)
-		used[i]=true;
+		wheeldivide[i]=1.0;
 
 	bool rim[count];
 	for (i=0; i<count; ++i)
@@ -139,66 +136,21 @@ int Wheel::Merge_Doubles(dContact *contact, dReal wheelaxle[], int count)
 
 	for (i=0; i<count; ++i)
 	{
-		//"empty slot", move next to here
-		if (!used[i])
-		{
-			//find next used point
-			for (j=i+1; j<count; ++j)
-			{
-				if (used[j])
-				{
-					//move it here
-					contact[i] = contact[j];
-					rim[i] = rim[j];
-					used[i] = true;
-					used[j] = false;
-					break;
-				}
-			}
-
-			//still unused? nothing left to merge!
-			if (!used[i])
-				break;
-		}
-
+		//ignore rims
 		if (rim[i])
 			continue;
 
-		//store
-		depth=contact[i].geom.depth;
-		VCopy(pos, contact[i].geom.pos);
-		VCopy(normal, contact[i].geom.normal);
-
-		matches=1;
+		//check matches
 		for (j=i+1; j<count; ++j)
 		{
 			//normals are similar enough
-			if (used[j] && !rim[j] && (VDot(contact[j].geom.normal, contact[i].geom.normal) > merge_dot))
+			if (!rim[j] && (VDot(contact[j].geom.normal, contact[i].geom.normal) > mix_dot))
 			{
-				//adjust counters accordingly
-				++matches;
-				used[j]=false;
-
-				//contact.surface, .fdir1: don't copy, not set yet
-				//contact.geom: only merge pos, normal and depth
-				//contact.geom.g1, .g2: don't copy, always the same
-				VAdd(pos, pos, contact[j].geom.pos);
-				VAdd(normal, normal, contact[j].geom.normal);
-				depth+=contact[j].geom.depth;
+				wheeldivide[i]+=1.0;
+				wheeldivide[j]+=1.0;
 			}
 		}
-
-		if (matches>1)
-		{
-			VCopy(contact[i].geom.normal, normal); //set new normal (summed)
-			VNormalize(contact[i].geom.normal); //make unit
-			VMultiply(contact[i].geom.pos, pos, 1.0/matches); //set new position (average)
-			contact[i].geom.depth=depth/matches; //set new depth (average)
-		}
 	}
-
-	//i is at the end of list, new "count"
-	return i;
 }
 
 //simulation of wheel

@@ -97,13 +97,14 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		wheel2=true;
 
 	dReal wheelaxle[3];
+	dReal wheeldivide[internal.contact_points];
 	if (wheel1)
 	{
 		const dReal *rot = dBodyGetRotation(b1);
 		wheelaxle[0] = rot[2];
 		wheelaxle[1] = rot[6];
 		wheelaxle[2] = rot[10];
-		count=geom1->wheel->Merge_Doubles(contact, wheelaxle, count);
+		geom1->wheel->Mix_Contacts(contact, count, wheelaxle, wheeldivide);
 	}
 	else if (wheel2)
 	{
@@ -111,7 +112,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		wheelaxle[0] = rot[2];
 		wheelaxle[1] = rot[6];
 		wheelaxle[2] = rot[10];
-		count=geom2->wheel->Merge_Doubles(contact, wheelaxle, count);
+		geom2->wheel->Mix_Contacts(contact, count, wheelaxle, wheeldivide);
 	}
 
 	//loop through all collision points and configure surface settings for each
@@ -195,19 +196,6 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		contact[i].surface.slip2 = 0.0; //not used
 
 		//
-		//simulation of wheel or normal geom?
-		//modify contacts according to slip and similar
-		//
-		//determine if _one_ of the geoms is a wheel
-		if (wheel1)
-			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
-		else if (wheel2)
-			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
-		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
-		//if (geom1->wheel&&geom2->wheel)
-		//	?...
-
-		//
 		//optional features:
 		//
 		//optional bouncyness (good for wheels?)
@@ -235,6 +223,27 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 			contact[i].surface.soft_cfm = 1.0/(stepsize*spring +damping);
 		}
 		//end of optional features
+
+		//
+		//simulation of wheel or normal geom?
+		//modify contacts according to slip and similar
+		//
+		//determine if _one_ of the geoms is a wheel
+		if (wheel1)
+		{
+			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
+			//divide spring&damping values by wheeldivide
+			//(ironically, multiplying  cfm accomplishes that)
+			contact[i].surface.soft_cfm *= wheeldivide[i];
+		}
+		else if (wheel2)
+		{
+			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
+			contact[i].surface.soft_cfm *= wheeldivide[i];
+		}
+		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
+		//if (geom1->wheel&&geom2->wheel)
+		//	?...
 
 		//now we create the contactjoints
 		dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);

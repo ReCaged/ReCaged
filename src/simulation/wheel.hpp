@@ -30,7 +30,7 @@
 class Wheel
 {
 	public:
-		int Merge_Doubles(dContact *contact, dReal wheelaxle[], int oldcount);
+		void Mix_Contacts(dContact contact[], int count, dReal wheelaxle[], dReal wheeldivide[]);
 
 		void Configure_Contacts(dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2,
 					dReal wheelaxle[], Surface *surface, dContact *contact,
@@ -58,7 +58,7 @@ class Wheel
 		//extra tyre data:
 		dReal rim_dot;
 		dReal rollres;
-		dReal merge_dot;
+		dReal mix_dot;
 
 		//tmp:
 		dReal inertia;
