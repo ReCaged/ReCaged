@@ -171,6 +171,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"body:mass",		'R',1, offsetof(struct Car_Conf, body_mass)},
 	{"wheel",		'R',2, offsetof(struct Car_Conf, wheel)},
 	{"wheel:mass",		'R',1, offsetof(struct Car_Conf, wheel_mass)},
+	{"wheel:position",	'R',2, offsetof(struct Car_Conf, wheel_pos)},
 	{"wheel:sphere",	'b',1, offsetof(struct Car_Conf, wsphere)},
 	{"wheel:capsule",	'b',1, offsetof(struct Car_Conf, wcapsule)},
 
@@ -178,7 +179,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"body:angular_drag",	'R',1, offsetof(struct Car_Conf, body_angular_drag)},
 	{"wheel:linear_drag",	'R',1, offsetof(struct Car_Conf, wheel_linear_drag)},
 	{"wheel:angular_drag",	'R',1, offsetof(struct Car_Conf, wheel_angular_drag)},
-	{"sensor",		'R',1, offsetof(struct Car_Conf, sensor)},
+	{"sensor",		'R',4, offsetof(struct Car_Conf, sensor)},
 
 	{"suspension:position",	'R',1, offsetof(struct Car_Conf, suspension_pos)},
 	{"suspension:spring",	'R',1, offsetof(struct Car_Conf, suspension_spring)},
