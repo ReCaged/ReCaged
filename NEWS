@@ -33,6 +33,8 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
 
  * Increased simulation stability
 
+ * Simulation does not speed up to catch up with realtime (after lag) any more
+
  * Car improvements:
    * Major reconfiguration of Venom car
    * New tyre friction simulation model (more stable, easier to configure)

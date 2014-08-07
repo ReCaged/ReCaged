@@ -37,8 +37,6 @@
 
 Uint32 starttime = 0;
 Uint32 racetime = 0;
-Uint32 simtime = 0; 
-
 Uint32 start_time = 0;
 void Run_Race(void)
 {
@@ -75,7 +73,6 @@ void Run_Race(void)
 	Log_Add(0, "Race Done!");
 
 	racetime = SDL_GetTicks() - starttime;
-	simtime = simulation_time - starttime;
 }
 
 //
@@ -546,17 +543,17 @@ Log_puts(1, "\
 	Log_Add(1, "Startup time:		%ums", starttime);
 	Log_Add(1, "Race time:			%ums", racetime);
 
-	Log_Add(1, "Simulated time:		%ums (%u%% of real time)",
-						simtime, (100*simtime)/racetime);
+	Log_Add(1, "Average simulations/second:	%u steps/second (%u total steps)",
+						(1000*simulation_count)/racetime,
+						simulation_count);
 
-	Log_Add(1, "Average simulations/second:	%u steps/second (%u in total)",
-						(1000*simulation_count)/racetime, simulation_count);
-
-	Log_Add(1, "Simulation lag:		%u%% of steps (%u in total)",
-						(100*simulation_lag)/simulation_count, simulation_lag);
+	Log_Add(1, "Simulation lag:		%ums, %u steps (%u%% of total steps)",
+						simulation_lag_time, simulation_lag_count,
+						(100*simulation_lag_count)/simulation_count);
 
 	Log_Add(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
-						(1000*interface_count)/racetime, (100*interface_count)/simulation_count);
+						(1000*interface_count)/racetime,
+						(100*interface_count)/simulation_count);
 
 	Log_puts(1, "\n Bye!\n\n");
 

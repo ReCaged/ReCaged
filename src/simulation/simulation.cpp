@@ -41,8 +41,9 @@
 #include "../interface/render_list.hpp"
 
 
-unsigned int simulation_lag = 0;
 unsigned int simulation_count = 0;
+unsigned int simulation_lag_count = 0;
+Uint32 simulation_lag_time = 0;
 Uint32 simulation_time = 0;
 
 bool Simulation_Init(void)
@@ -93,7 +94,11 @@ int Simulation_Loop (void *d)
 	Log_Add(1, "Starting simulation loop");
 
 	simulation_time = SDL_GetTicks(); //set simulated time to realtime
-	Uint32 realtime; //real time (with possible delay since last update)
+	simulation_count=0;
+	simulation_lag_count=0;
+	simulation_lag_time=0;
+
+	Uint32 time; //real time
 	Uint32 stepsize_ms = (Uint32) (internal.stepsize*1000.0+0.0001);
 	dReal divided_stepsize = internal.stepsize/internal.multiplier;
 
@@ -155,19 +160,23 @@ int Simulation_Loop (void *d)
 		//sync simulation with realtime
 		if (internal.sync_simulation)
 		{
-			//get some time to while away?
-			realtime = SDL_GetTicks();
-			if (simulation_time > realtime)
+			//got some time to while away?
+			time = SDL_GetTicks();
+			if (simulation_time > time) //ahead of reality, wait
 			{
 				//busy-waiting:
 				if (internal.spinning)
 					while (simulation_time > SDL_GetTicks());
 				//sleep:
 				else
-					SDL_Delay (simulation_time - realtime);
+					SDL_Delay (simulation_time-time);
 			}
-			else
-				++simulation_lag;
+			else //oh no, we're lagging behind!
+			{
+				++simulation_lag_count; //increase lag step counter
+				simulation_lag_time+=time-simulation_time; //add lag time
+				simulation_time=time; //and pretend like nothing just hapened...
+			}
 		}
 
 		//count how many steps

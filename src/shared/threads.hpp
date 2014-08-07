@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -35,9 +35,9 @@ extern SDL_cond  *sync_cond;
 
 //prototypes for communication/statistic variables
 //simulation:
-extern unsigned int simulation_lag;
 extern unsigned int simulation_count;
-extern Uint32 simulation_time;
+extern unsigned int simulation_lag_count;
+extern unsigned int simulation_lag_time;
 
 //interface:
 extern unsigned int interface_count;
