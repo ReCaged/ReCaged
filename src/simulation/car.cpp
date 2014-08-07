@@ -30,8 +30,6 @@ void Car::Physics_Step(dReal step)
 	bool ground; //on ground (not in air)
 	while (carp != NULL)
 	{
-		//first flipover detection (+ antigrav forces)
-
 		//both sensors are triggered, not flipping, only downforce
 		if (carp->sensor1->colliding && carp->sensor2->colliding)
 			ground = true;
@@ -52,9 +50,10 @@ void Car::Physics_Step(dReal step)
 			ground = false;
 
 		//rotation speed of wheels
-		dReal rotv[4];
+		dReal rotv[4] = {0.0, 0.0, 0.0, 0.0};
 		for (i=0; i<4; ++i)
-			rotv[i] = dJointGetHinge2Angle2Rate (carp->joint[i]);
+			if (carp->gotwheel[i])
+				rotv[i] = dJointGetHinge2Angle2Rate (carp->joint[i]);
 
 		//get car velocity:
 		//TODO/IMPORTANT: need to find a reliable solution to this...
@@ -122,9 +121,17 @@ void Car::Physics_Step(dReal step)
 
 						//apply 1/4 of this force to each wheel
 						dVector3 wheelforce;
+						//const dReal *wheelpos;
 						dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
 						for (i=0; i<4; ++i)
-							dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
+							if (carp->gotwheel[i])
+							{
+								dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
+								//wheelpos = dBodyGetPosition(carp->wheel_body[i]);
+								//dBodyAddForceAtPos (carp->bodyid,
+										//-wheelforce[0], -wheelforce[1], -wheelforce[2],
+										//wheelpos[0], wheelpos[1], wheelpos[2]);
+							}
 					}
 
 					dBodyAddRelForce (carp->bodyid,0,0, -carp->dir*force);
@@ -233,10 +240,11 @@ void Car::Physics_Step(dReal step)
 		if (carp->turn)
 		{
 			for (i=0; i<4; ++i)
-			{
-				dJointSetHinge2Param (carp->joint[i],dParamLoStop,steer[i]);
-				dJointSetHinge2Param (carp->joint[i],dParamHiStop,steer[i]);
-			}
+				if (carp->gotwheel[i])
+				{
+					dJointSetHinge2Param (carp->joint[i],dParamLoStop,steer[i]);
+					dJointSetHinge2Param (carp->joint[i],dParamHiStop,steer[i]);
+				}
 		}
 		//
 
@@ -245,10 +253,11 @@ void Car::Physics_Step(dReal step)
 		{
 			dVector3 axle;
 			for (i=0; i<4; ++i)
-			{
-				dBodyVectorToWorld(carp->bodyid, cos(steer[i]), -sin(steer[i]), 0.0, axle);
-				dBodySetFiniteRotationAxis(carp->wheel_body[i], axle[0], axle[1], axle[2]);
-			}
+				if (carp->gotwheel)
+				{
+					dBodyVectorToWorld(carp->bodyid, cos(steer[i]), -sin(steer[i]), 0.0, axle);
+					dBodySetFiniteRotationAxis(carp->wheel_body[i], axle[0], axle[1], axle[2]);
+				}
 		}
 		//braking/accelerating:
 
@@ -257,7 +266,6 @@ void Car::Physics_Step(dReal step)
 
 
 		//useful values:
-		dReal kinertiatensor = carp->wheel->inertia; //moment of inertia tensor for wheel rotation
 		dReal kpower = carp->power*carp->throttle; //motor power
 		dReal krbrake = (1.0-carp->dbrake)*carp->max_brake*carp->throttle/2.0; //braking power for rear wheels
 		dReal kfbrake = carp->dbrake*carp->max_brake*carp->throttle/2.0; //braking power for front wheels
@@ -266,8 +274,10 @@ void Car::Physics_Step(dReal step)
 		//check if using the built-in hinge2 motor for handbraking, and release it
 		if (carp->hinge2_dbrakes)
 		{
-			dJointSetHinge2Param (carp->joint[1],dParamFMax2, 0.0);
-			dJointSetHinge2Param (carp->joint[2],dParamFMax2, 0.0);
+			if (carp->gotwheel[1])
+				dJointSetHinge2Param (carp->joint[1],dParamFMax2, 0.0);
+			if (carp->gotwheel[2])
+				dJointSetHinge2Param (carp->joint[2],dParamFMax2, 0.0);
 		}
 
 		//no fancy motor/brake solution, lock rear wheels to handbrake turn (oversteer)
@@ -276,16 +286,16 @@ void Car::Physics_Step(dReal step)
 			if (carp->hinge2_dbrakes) //use super-brake
 			{
 				//request ode to apply as much force as needed to completely lock wheels
-				dJointSetHinge2Param (carp->joint[1],dParamFMax2, dInfinity);
-				dJointSetHinge2Param (carp->joint[2],dParamFMax2, dInfinity);
+				if (carp->gotwheel[1])
+					dJointSetHinge2Param (carp->joint[1],dParamFMax2, dInfinity);
+				if (carp->gotwheel[2])
+					dJointSetHinge2Param (carp->joint[2],dParamFMax2, dInfinity);
 			}
 			else
 			{
 				//apply enough on rear wheels to theoretically "lock" them
 				//note: based on moment of inertia by rotation relative to car body...
 				//not the most reliable solution but should suffice
-				torque[1] = -rotv[1]*kinertiatensor/step;
-				torque[2] = -rotv[2]*kinertiatensor/step;
 			}
 		}
 		else
@@ -344,7 +354,7 @@ void Car::Physics_Step(dReal step)
 				}
 
 				//check if wanting to brake
-				dReal needed;
+				//dReal needed;
 				for (i=0; i<4; ++i)
 				{
 					//if rotating in the oposite way of wanted, use brakes
@@ -353,13 +363,12 @@ void Car::Physics_Step(dReal step)
 						//this much torque (in this direction) is needed to brake wheel
 						//not too reliable, since ignores the mass of the car body, and the fact
 						//that the brakeing will have to slow down the car movement too...
-						needed = -rotv[i]*kinertiatensor/step;
 
 						//to make transition between brakeing and acceleration smooth
 						//use different ways of calculate braking torque:
-						if ( needed/kbrake[i] < 1.0) //more braking than needed
-							torque[i] += needed; //brake as needed + keep possible motor
-						else //not enough brake to stop... full brake
+						//if ( needed/kbrake[i] < 1.0) //more braking than needed
+							//torque[i] += needed; //brake as needed + keep possible motor
+						//else //not enough brake to stop... full brake
 							torque[i] += kbrake[i]; //full brake + possible motor
 					}
 				}
@@ -455,11 +464,9 @@ void Car::Physics_Step(dReal step)
 		}
 
 		//apply torques
-		dJointAddHinge2Torques (carp->joint[0],0, torque[0]);
-		dJointAddHinge2Torques (carp->joint[1],0, torque[1]);
-		dJointAddHinge2Torques (carp->joint[2],0, torque[2]);
-		dJointAddHinge2Torques (carp->joint[3],0, torque[3]);
-
+		for (i=0; i<4; ++i)
+			if (carp->gotwheel[i])
+				dJointAddHinge2Torques (carp->joint[i],0, torque[i]);
 		//
 
 		//done, next car...

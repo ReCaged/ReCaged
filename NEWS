@@ -39,6 +39,9 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
    * New tyre combined slip/grip model
    * New tyre/rim contact point evaluation
    * New load/normal force calculations for tyre contact points
+   * Each wheel now stores its own set of parameters (independent of car, can
+     support unattached wheels, different front/rear wheel handling and imilar)
+   * Wheel axles can now break (more a proof-of-concept than actual gameplay)
    * New soft-brake/rolling-resistance code (more reliable at low speeds)
    * Less bending of wheel axles at high speeds
    *..... TODO!

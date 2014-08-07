@@ -83,9 +83,16 @@
 	(A)[1]=(B)[1]*(C); \
 	(A)[2]=(B)[2]*(C);}
 
+Wheel *Wheel::head = NULL;
 //just some default, crappy, values (to ensure safe simulations)
 Wheel::Wheel()
 {
+	//add to list:
+	next = head;
+	head = this;
+	prev = NULL;
+
+	//default (safe) values
 	x_static_mu = 0.0;
 	x_peak_pos = 0.0;
 	x_peak_mu = 0.0;
@@ -115,56 +122,90 @@ Wheel::Wheel()
 	alt_load = true;
 	alt_load_damp = true;
 
-	inertia = 1.0;
+	rollrestorque=0.0;
+}
+
+//safely remove from list
+Wheel::~Wheel()
+{
+	//element before?
+	if (prev)
+		prev->next=next;
+	else
+		head=next;
+
+	//element after?
+	if (next)
+		next->prev=prev;
 }
 
 //find similar, close contact points and merge them
 //assumes same geom order
-void Wheel::Mix_Contacts(dContact contact[], int count, dReal wheelaxle[], dReal wheeldivide[])
+void Wheel::Physics_Step()
 {
-	int i,j;
-
-	for (i=0; i<count; ++i)
-		wheeldivide[i]=1.0;
-
-	bool rim[count];
-	for (i=0; i<count; ++i)
+	int i,j, count;
+	dJointID c;
+	Geom *g1, *g2;
+	dContact *contact;
+	for (Wheel *wheel=head; wheel; wheel=wheel->next)
 	{
-		if (fabs(VDot(contact[i].geom.normal, wheelaxle)) > rim_dot)
-			rim[i]=true;
-		else
-			rim[i]=false;
-	}
+		count=wheel->points.size();
+		dReal wheeldivide[count];
+		for (i=0; i<count; ++i)
+			wheeldivide[i]=1.0;
 
-	for (i=0; i<count; ++i)
-	{
-		//ignore rims
-		if (rim[i])
-			continue;
-
-		//check matches
-		for (j=i+1; j<count; ++j)
+		for (i=0; i<count; ++i)
 		{
-			//normals are similar enough
-			if (!rim[j] && (VDot(contact[j].geom.normal, contact[i].geom.normal) > mix_dot))
+			//check matches
+			for (j=i+1; j<count; ++j)
 			{
-				wheeldivide[i]+=1.0;
-				wheeldivide[j]+=1.0;
+				//normals are similar enough
+				if (VDot(wheel->points[j].contact.geom.normal, wheel->points[i].contact.geom.normal) > wheel->mix_dot)
+				{
+					wheeldivide[i]+=1.0;
+					wheeldivide[j]+=1.0;
+				}
 			}
+
+			contact = &wheel->points[i].contact;
+
+			//divide spring&damping values by wheeldivide
+			//(ironically, multiplying  cfm accomplishes that)
+			contact->surface.soft_cfm *= wheeldivide[i];
+
+			//and scale friction
+			contact->surface.mu /= wheeldivide[i];
+			contact->surface.mu2 /= wheeldivide[i];
+
+			//create
+			c = dJointCreateContact (world, contactgroup, contact);
+			dJointAttach (c, wheel->points[i].b1, wheel->points[i].b2);
+
+			//check if reading collision data
+			g1 = wheel->points[i].g1;
+			g2 = wheel->points[i].g2;
+			if (g1->buffer_event || g2->buffer_event || g1->force_to_body || g2->force_to_body)
+				new Collision_Feedback(c, g1, g2);
 		}
+
+		//remove
+		wheel->points.clear();
 	}
 }
 
 //simulation of wheel
-void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2,
-				dReal wheelaxle[], Surface *surface, dContact *contact,
-				dReal stepsize)
+void Wheel::Add_Contact(	dBodyID b1, dBodyID b2, Geom *g1, Geom *g2,
+				bool wheelis1, dReal wheelaxle[], Surface *surface,
+				dContact *contact, dReal stepsize)
 {
 	//(copy the position (c++ doesn't allow vector assignment, right now...)
 	dReal pos[3]; //contact point position
 	pos[0] = contact->geom.pos[0];
 	pos[1] = contact->geom.pos[1];
 	pos[2] = contact->geom.pos[2];
+
+	dBodyID wbody= wheelis1? b1: b2;
+	dBodyID obody= wheelis1? b2: b1;
 
 	//the "not-so-magic formula":
 
@@ -194,7 +235,15 @@ void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2
 	//rim (outside range for tyre)
 	//(rim mu calculated as the already defaults)
 	if (fabs(VDot (Z, wheelaxle)) > rim_dot) //angle angle between normal and wheel axis
+	{
+		dJointID c = dJointCreateContact (world,contactgroup,contact);
+		dJointAttach (c,b1,b2);
+
+		if (g1->buffer_event || g2->buffer_event || g1->force_to_body || g2->force_to_body)
+			new Collision_Feedback(c, g1, g2);
+
 		return; //nothing more to do, rim mu already calculated
+	}
 
 	//
 	//ok, we can now calculate the correct Y!
@@ -380,12 +429,16 @@ void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2
 		contact->surface.mu2 *= Fz;
 	}
 
+	//store (applied later)
+	pointstore pstore={*contact, b1, b2, g1, g2};
+	points.push_back(pstore);
+
 	//
-	//3) rolling resistance (braking torque based on normal force)
+	//4) rolling resistance (braking torque based on normal force)
 	//
 	//(rolling speed is ignored, doesn't make much difference)
 	//
-	dReal torque = rollres*surface->rollres*contact->geom.depth; //braking torque
+	/*dReal torque = rollres*surface->rollres*contact->geom.depth; //braking torque
 
 	//rotation inertia (relative to ground if got body)
 	dReal rotation;
@@ -417,5 +470,6 @@ void Wheel::Configure_Contacts(	dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2
 	dBodyAddRelTorque(wbody, 0.0, 0.0, torque);
 	//TODO: if the ground has a body, perhaps the torque should affect it too?
 	//perhaps add the braking force (at the point of the wheel) to the ground body?
+	*/
 }
 

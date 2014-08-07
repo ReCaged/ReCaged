@@ -96,15 +96,14 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 	else if (geom2->wheel && b2)
 		wheel2=true;
 
+	//store wheel axle direction right once (instead of querying again)
 	dReal wheelaxle[3];
-	dReal wheeldivide[internal.contact_points];
 	if (wheel1)
 	{
 		const dReal *rot = dBodyGetRotation(b1);
 		wheelaxle[0] = rot[2];
 		wheelaxle[1] = rot[6];
 		wheelaxle[2] = rot[10];
-		geom1->wheel->Mix_Contacts(contact, count, wheelaxle, wheeldivide);
 	}
 	else if (wheel2)
 	{
@@ -112,7 +111,6 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		wheelaxle[0] = rot[2];
 		wheelaxle[1] = rot[6];
 		wheelaxle[2] = rot[10];
-		geom2->wheel->Mix_Contacts(contact, count, wheelaxle, wheeldivide);
 	}
 
 	//loop through all collision points and configure surface settings for each
@@ -230,30 +228,22 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		//
 		//determine if _one_ of the geoms is a wheel
 		if (wheel1)
-		{
-			//divide spring&damping values by wheeldivide
-			//(ironically, multiplying  cfm accomplishes that)
-			contact[i].surface.soft_cfm *= wheeldivide[i];
-
-			//configures friction values based on slip and similar
-			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
-		}
+			geom1->wheel->Add_Contact(b1, b2, geom1, geom2, true, wheelaxle, surf2, &contact[i], stepsize); //configures friction values based on slip and similar
 		else if (wheel2)
-		{
-			contact[i].surface.soft_cfm *= wheeldivide[i];
-			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
-		}
+			geom2->wheel->Add_Contact(b1, b2, geom1, geom2, false, wheelaxle, surf1, &contact[i], stepsize);
 		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
 		//if (geom1->wheel&&geom2->wheel)
 		//	?...
+		else
+		{
+			//create the contactjoints for normal collisions (not wheels)
+			dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+			dJointAttach (c,b1,b2);
 
-		//now we create the contactjoints
-		dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-		dJointAttach (c,b1,b2);
-
-		//if any of the geoms responds to forces or got a body that responds to force, enable force feedback
-		if (geom1->buffer_event || geom2->buffer_event || geom1->force_to_body || geom2->force_to_body)
-			new Collision_Feedback(c, geom1, geom2);
+			//if any of the geoms responds to forces or got a body that responds to force, enable force feedback
+			if (geom1->buffer_event || geom2->buffer_event || geom1->force_to_body || geom2->force_to_body)
+				new Collision_Feedback(c, geom1, geom2);
+		}
 	}
 }
 

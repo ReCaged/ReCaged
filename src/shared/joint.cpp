@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -42,6 +42,9 @@ Joint::Joint (dJointID joint, Object *obj): Component(obj)
 	buffer_event = false; //disables event testing
 	//TODO: send_to_body option?
 	feedback = NULL;
+
+	//not car suspension by default
+	carwheel=NULL;
 }
 
 //destroys a joint, and removes it from the list

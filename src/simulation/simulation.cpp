@@ -113,9 +113,10 @@ int Simulation_Loop (void *d)
 				dSpaceCollide (space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
 
 				//special
+				Wheel::Physics_Step();
+				Car::Physics_Step(divided_stepsize); //control, antigrav...
 				Geom::Physics_Step(); //sensor/radar handling
 				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
-				Car::Physics_Step(divided_stepsize); //control, antigrav...
 				camera.Physics_Step(divided_stepsize); //calculate velocity and move
 
 				//simulate

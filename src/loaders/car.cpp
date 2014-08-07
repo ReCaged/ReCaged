@@ -185,42 +185,6 @@ Car_Template *Car_Template::Load (const char *path)
 
 	//helper datas:
 
-	//wheel simulation class (friction + some custom stuff):
-	//target->wheel.join_d2 = target->conf.join_dist*target->conf.join_dist;
-	target->wheel.mix_dot = cos(target->conf.mix_angle*M_PI/180.0);
-	target->wheel.rim_dot = sin(target->conf.rim_angle*M_PI/180.0);
-	//cylinder moment of inertia tensor for Z = (mass*r²)/2
-	target->wheel.inertia = target->conf.wheel_mass*target->conf.w[0]*target->conf.w[0]/2.0; 
-	target->wheel.rollres = target->conf.rollres;
-	target->wheel.alt_load = target->conf.alt_load;
-	target->wheel.alt_load_damp = target->conf.alt_load_damp;
-
-	//check and copy data from conf to wheel class
-	//x
-	target->wheel.x_static_mu = target->conf.xstatic;
-	target->wheel.x_peak_pos = target->conf.xpeak[0];
-	target->wheel.x_peak_mu = target->conf.xpeak[1];
-	target->wheel.x_tail_pos = target->conf.xtail[0];
-	target->wheel.x_tail_mu = target->conf.xtail[1];
-
-	//y
-	target->wheel.y_static_mu = target->conf.ystatic;
-	target->wheel.y_peak_pos = target->conf.ypeak[0];
-	target->wheel.y_peak_mu = target->conf.ypeak[1];
-	target->wheel.y_tail_pos = target->conf.ytail[0];
-	target->wheel.y_tail_mu = target->conf.ytail[1];
-	//
-
-	target->wheel.x_alt_denom = target->conf.xaltdenom;
-	target->wheel.y_alt_denom = target->conf.yaltdenom;
-	target->wheel.x_min_denom = target->conf.xmindenom;
-	target->wheel.y_min_denom = target->conf.ymindenom;
-	target->wheel.x_min_combine = target->conf.xmincombine;
-	target->wheel.y_min_combine = target->conf.ymincombine;
-	target->wheel.x_scale_combine = target->conf.xscalecombine;
-	target->wheel.y_scale_combine = target->conf.yscalecombine;
-
-
 	//make sure the values are correct
 	//steering distribution
 	if (target->conf.dist_steer >1.0 || target->conf.dist_steer <0.0 )
@@ -275,8 +239,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 
 	//begin copying of needed configuration data
 	Car *car = new Car();
-
-	car->wheel = &wheel;
 
 	car->power = conf.power;
 
@@ -409,6 +371,43 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	dGeomSetBody (geom, car->bodyid);
 	dGeomSetOffsetPosition(geom,0,0,s[3]);
 
+	//wheel simulation class (friction + some custom stuff):
+	Wheel *wheel[4];
+	for (int i=0; i<4; ++i)
+	{
+		wheel[i]=new Wheel;
+		wheel[i]->mix_dot = cos(conf.mix_angle*M_PI/180.0);
+		wheel[i]->rim_dot = sin(conf.rim_angle*M_PI/180.0);
+		wheel[i]->rollres = conf.rollres;
+		wheel[i]->alt_load = conf.alt_load;
+		wheel[i]->alt_load_damp = conf.alt_load_damp;
+
+		//check and copy data from conf to wheel class
+		//x
+		wheel[i]->x_static_mu = conf.xstatic;
+		wheel[i]->x_peak_pos = conf.xpeak[0];
+		wheel[i]->x_peak_mu = conf.xpeak[1];
+		wheel[i]->x_tail_pos = conf.xtail[0];
+		wheel[i]->x_tail_mu = conf.xtail[1];
+
+		//y
+		wheel[i]->y_static_mu = conf.ystatic;
+		wheel[i]->y_peak_pos = conf.ypeak[0];
+		wheel[i]->y_peak_mu = conf.ypeak[1];
+		wheel[i]->y_tail_pos = conf.ytail[0];
+		wheel[i]->y_tail_mu = conf.ytail[1];
+		//
+
+		wheel[i]->x_alt_denom = conf.xaltdenom;
+		wheel[i]->y_alt_denom = conf.yaltdenom;
+		wheel[i]->x_min_denom = conf.xmindenom;
+		wheel[i]->y_min_denom = conf.ymindenom;
+		wheel[i]->x_min_combine = conf.xmincombine;
+		wheel[i]->y_min_combine = conf.ymincombine;
+		wheel[i]->x_scale_combine = conf.xscalecombine;
+		wheel[i]->y_scale_combine = conf.yscalecombine;
+	}
+
 	//wheels:
 	Geom *wheel_data[4];
 	dGeomID wheel_geom;
@@ -464,7 +463,7 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 		wheel_data[i]->surface.spring = conf.wheel_spring;
 		wheel_data[i]->surface.damping = conf.wheel_damping;
 		//points at our wheel simulation class (indicates wheel)
-		wheel_data[i]->wheel = &wheel;
+		wheel_data[i]->wheel = wheel[i];
 
 		//drag
 		bdata = new Body (wheel_body[i], car);
@@ -498,27 +497,44 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	dBodySetPosition (wheel_body[3], x-conf.wp[0], y+conf.wp[1], z);
 	dBodySetRotation (wheel_body[3], rot);
 
-	//tmp: might need these later on
+	//might need these later on
 	car->jx = conf.jx;
 	car->wx = conf.wp[0];
 	car->wy = conf.wp[1];
 
+	car->sthreshold = conf.suspension_threshold;
+	car->sbuffer = conf.suspension_buffer;
+
 	//create joints (hinge2) for wheels
 	dReal stepsize = internal.stepsize/internal.multiplier;
-	dReal sERP = stepsize*conf.suspension_spring/(stepsize*conf.suspension_spring+conf.suspension_damping);
-	dReal sCFM = 1.0/(stepsize*conf.suspension_spring+conf.suspension_damping);
+	car->sERP = stepsize*conf.suspension_spring/(stepsize*conf.suspension_spring+conf.suspension_damping);
+	car->sCFM = 1.0/(stepsize*conf.suspension_spring+conf.suspension_damping);
+	Joint *jointd;
 	for (int i=0; i<4; ++i)
 	{
 		car->joint[i]=dJointCreateHinge2 (world, 0);
-		new Joint(car->joint[i], car);
+		jointd = new Joint(car->joint[i], car);
+		jointd->carwheel = &car->gotwheel[i];
+
+		//wheel is not missing (yet)
+		car->gotwheel[i]=true;
+
+		//set damage settings: (if seems ok)
+		if (conf.suspension_threshold > 0 && isnormal(conf.suspension_threshold))
+		{
+			Log_Add(2, "enabling damageable wheel suspension");
+			jointd->Set_Buffer_Event(conf.suspension_threshold, conf.suspension_buffer,
+					(Script *)1337);
+		}
+
 		//body is still body of car main body
 		dJointAttach (car->joint[i], car->bodyid, wheel_body[i]);
 		dJointSetHinge2Axis1 (car->joint[i],0,0,1);
 		dJointSetHinge2Axis2 (car->joint[i],1,0,0);
 
 		//setup suspension
-		dJointSetHinge2Param (car->joint[i],dParamSuspensionERP,sERP);
-		dJointSetHinge2Param (car->joint[i],dParamSuspensionCFM,sCFM);
+		dJointSetHinge2Param (car->joint[i],dParamSuspensionERP,car->sERP);
+		dJointSetHinge2Param (car->joint[i],dParamSuspensionCFM,car->sCFM);
 
 		//lock steering axis on all wheels
 		dJointSetHinge2Param (car->joint[i],dParamLoStop,0);
@@ -526,7 +542,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	}
 
 	//to make it possible to tweak the hinge2 anchor x position:
-	
 	dJointSetHinge2Anchor (car->joint[0],x+conf.jx,y+conf.wp[1],z);
 	dJointSetHinge2Anchor (car->joint[1],x+conf.jx,y-conf.wp[1],z);
 	dJointSetHinge2Anchor (car->joint[2],x-conf.jx,y-conf.wp[1],z);
@@ -581,6 +596,47 @@ void Car::Respawn (dReal x, dReal y, dReal z)
 	dBodySetAngularVel(wheel_body[2], 0.0, 0.0, 0.0);
 	dBodySetLinearVel(wheel_body[3], 0.0, 0.0, 0.0);
 	dBodySetAngularVel(wheel_body[3], 0.0, 0.0, 0.0);
+
+	//repair broken suspensions
+	Joint *jointd;
+	for (int i=0; i<4; ++i)
+	{
+		if (!gotwheel[i])
+		{
+			joint[i]=dJointCreateHinge2 (world, 0);
+			jointd = new Joint(joint[i], this);
+			jointd->carwheel = &gotwheel[i];
+
+			//like before
+			if (sthreshold > 0 && isnormal(sthreshold))
+			{
+				Log_Add(2, "enabling damageable wheel suspension");
+				jointd->Set_Buffer_Event(sthreshold, sbuffer,
+						(Script *)1337);
+			}
+
+			//body is still body of car main body
+			dJointAttach (joint[i], bodyid, wheel_body[i]);
+			dJointSetHinge2Axis1 (joint[i],0,0,1);
+			dJointSetHinge2Axis2 (joint[i],1,0,0);
+
+			//setup suspension
+			dJointSetHinge2Param (joint[i],dParamSuspensionERP,sERP);
+			dJointSetHinge2Param (joint[i],dParamSuspensionCFM,sCFM);
+
+			//lock steering axis on all wheels
+			dJointSetHinge2Param (joint[i],dParamLoStop,0);
+			dJointSetHinge2Param (joint[i],dParamHiStop,0);
+
+			gotwheel[i]=true;
+		}
+	}
+
+	//refresh all anchors (doesn't hurt)
+	dJointSetHinge2Anchor (joint[0],x+jx,y+wy,z);
+	dJointSetHinge2Anchor (joint[1],x+jx,y-wy,z);
+	dJointSetHinge2Anchor (joint[2],x-jx,y-wy,z);
+	dJointSetHinge2Anchor (joint[3],x-jx,y+wy,z);
 
 	//set camera position (move it as much as we moved the car)
 	//TODO: in future (with multiple cameras), loop through them all and change those that looks at this car
