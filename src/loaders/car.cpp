@@ -265,7 +265,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->down_mass = conf.down_mass;
 
 	car->elevation = conf.suspension_elevation;
-	car->hinge2_dbrakes = conf.handbrake_lock;
 
 	car->dsteer = conf.dist_steer;
 	car->dbrake = conf.dist_brake;
@@ -282,8 +281,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	car->adapt_steer = conf.adapt_steer;
 	car->adapt_redist = conf.adapt_redist;
 	car->redist_force = conf.redist_force;
-
-	car->turn = conf.turn;
 
 	//start building
 	new Space(car);
@@ -432,10 +429,6 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 
 		//never disable wheel body
 		dBodySetAutoDisableFlag (wheel_body[i], 0);
-
-		//disable gyroscopic affect?
-		if (!conf.gyro)
-			dBodySetGyroscopicMode(wheel_body[i], 0);
 
 		//enable finite rotation?
 		if (conf.finiterot)

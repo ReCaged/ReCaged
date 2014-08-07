@@ -103,7 +103,7 @@ int Simulation_Loop (void *d)
 		//only if in active mode do we simulate
 		if (runlevel == running)
 		{
-			//technically, collision detection doesn't need this, but this is easier
+			//technically, collision detection doesn't need locking, but this is easier
 			SDL_mutexP(ode_mutex);
 
 			for (int i=0; i<internal.multiplier; ++i)

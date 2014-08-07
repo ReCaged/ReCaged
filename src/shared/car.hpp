@@ -51,7 +51,6 @@ struct Car_Conf
 	//brak
 	dReal max_brake;
 	dReal dist_brake;
-	bool handbrake_lock;
 
 	//steer
 	dReal max_steer;
@@ -84,7 +83,6 @@ struct Car_Conf
 	float resize, rotate[3], offset[3];
 
 	//debug
-	bool turn, gyro;
 	bool wsphere, wcapsule;
 	//debug sizes
 	dReal s[4],w[2],wp[2],jx;
@@ -101,7 +99,6 @@ const struct Car_Conf car_conf_defaults = {
 
 	40000.0,
 	0.5,
-	true,
 
 	35.0,
 	1.0,
@@ -131,7 +128,6 @@ const struct Car_Conf car_conf_defaults = {
 	"",
 	1.0, {0,0,0}, {0,0,0},
 
-	true, true,
 	false, false,
 
 	{4.8,3.6,1.6,1.25}, {1.25,1.4}, {2.4,1.8}, 2.05};
@@ -149,7 +145,6 @@ const struct Conf_Index car_conf_index[] = {
 
 	{"max_brake",		'R',1, offsetof(struct Car_Conf, max_brake)},
 	{"brake_distribution",	'R',1, offsetof(struct Car_Conf, dist_brake)},
-	{"handbrake_lock",	'b',1, offsetof(struct Car_Conf, handbrake_lock)},
 
 	{"max_steer",		'R',1, offsetof(struct Car_Conf, max_steer)},
 	{"steer_distribution",	'R',1, offsetof(struct Car_Conf, dist_steer)},
@@ -211,8 +206,6 @@ const struct Conf_Index car_conf_index[] = {
 	{"model:offset",	'f',3, offsetof(struct Car_Conf, offset)},
 
 	//debug options:
-	{"debug:turn",		'b',1, offsetof(struct Car_Conf, turn)},
-	{"debug:gyroscopic",	'b',1, offsetof(struct Car_Conf, gyro)},
 	{"debug:sphere_wheels",	'b',1, offsetof(struct Car_Conf, wsphere)},
 	{"debug:capsule_wheels",'b',1, offsetof(struct Car_Conf, wcapsule)},
 	
@@ -278,7 +271,6 @@ class Car:public Object
 
 		dReal max_steer, steerdecr, min_steer, limit_speed, oldsteerlimit;
 		dReal max_brake;
-		bool hinge2_dbrakes;
 
 		bool diff;
 		bool fwd, rwd;
@@ -307,9 +299,6 @@ class Car:public Object
 		bool drift_brakes;
 		dReal throttle, steering; //-1.0 to +1.0
 		dReal velocity; //keep track of car velocity
-
-		//debug options:
-		bool turn;
 
 		//tmp: wheel+hinge position...
 		dReal jx, wx, wy;
