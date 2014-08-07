@@ -354,19 +354,17 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	}
 
 	//side detection sensors:
-	dReal *s = conf.s;
-
-	geom = dCreateBox(0,s[0],s[1],s[2]);
+	geom = dCreateBox(0,conf.sensor[0],conf.sensor[1],conf.sensor[2]);
 	car->sensor1 = new Geom (geom, car);
 	car->sensor1->surface.spring = 0.0; //untouchable "ghost" geom - sensor
 	dGeomSetBody (geom, car->bodyid);
-	dGeomSetOffsetPosition(geom,0,0,-s[3]);
+	dGeomSetOffsetPosition(geom,0,0,-conf.sensor[3]);
 
-	geom = dCreateBox(0,s[0],s[1],s[2]);
+	geom = dCreateBox(0,conf.sensor[0],conf.sensor[1],conf.sensor[2]);
 	car->sensor2 = new Geom (geom, car);
 	car->sensor2->surface.spring = 0.0; //sensor
 	dGeomSetBody (geom, car->bodyid);
-	dGeomSetOffsetPosition(geom,0,0,s[3]);
+	dGeomSetOffsetPosition(geom,0,0,conf.sensor[3]);
 
 	//wheel simulation class (friction + some custom stuff):
 	Wheel *wheel[4];
@@ -411,17 +409,17 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	dBodyID wheel_body[4];
 
 	//3=z axis of cylinder
-	dMassSetCylinderTotal (&m, conf.wheel_mass, 3, conf.w[0], conf.w[1]);
+	dMassSetCylinderTotal (&m, conf.wheel_mass, 3, conf.wheel[0], conf.wheel[1]);
 
 	for (int i=0;i<4;++i)
 	{
 		//create cylinder
 		if (conf.wsphere)
-			wheel_geom = dCreateSphere (0, conf.w[0]);
+			wheel_geom = dCreateSphere (0, conf.wheel[0]);
 		else if (conf.wcapsule)
-			wheel_geom = dCreateCapsule (0, conf.w[0], conf.w[1]);
+			wheel_geom = dCreateCapsule (0, conf.wheel[0], conf.wheel[1]);
 		else //normal
-			wheel_geom = dCreateCylinder (0, conf.w[0], conf.w[1]);
+			wheel_geom = dCreateCylinder (0, conf.wheel[0], conf.wheel[1]);
 
 
 		//(body)
@@ -479,21 +477,21 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	//place and rotate wheels
 	//(does not care about toe, which will be set during simulation)
 	dRFromAxisAndAngle (rot, 0, 1, 0, M_PI/2);
-	dBodySetPosition (wheel_body[0], x+conf.wp[0], y+conf.wp[1], z);
+	dBodySetPosition (wheel_body[0], x+conf.wheel_pos[0], y+conf.wheel_pos[1], z);
 	dBodySetRotation (wheel_body[0], rot);
-	dBodySetPosition (wheel_body[1], x+conf.wp[0], y-conf.wp[1], z);
+	dBodySetPosition (wheel_body[1], x+conf.wheel_pos[0], y-conf.wheel_pos[1], z);
 	dBodySetRotation (wheel_body[1], rot);
 
 	dRFromAxisAndAngle (rot, 0, 1, 0, -M_PI/2);
-	dBodySetPosition (wheel_body[2], x-conf.wp[0], y-conf.wp[1], z);
+	dBodySetPosition (wheel_body[2], x-conf.wheel_pos[0], y-conf.wheel_pos[1], z);
 	dBodySetRotation (wheel_body[2], rot);
-	dBodySetPosition (wheel_body[3], x-conf.wp[0], y+conf.wp[1], z);
+	dBodySetPosition (wheel_body[3], x-conf.wheel_pos[0], y+conf.wheel_pos[1], z);
 	dBodySetRotation (wheel_body[3], rot);
 
 	//might need these later on
-	car->jx = conf.jx;
-	car->wx = conf.wp[0];
-	car->wy = conf.wp[1];
+	car->jx = conf.suspension_pos;
+	car->wx = conf.wheel_pos[0];
+	car->wy = conf.wheel_pos[1];
 
 	car->sthreshold = conf.suspension_threshold;
 	car->sbuffer = conf.suspension_buffer;
@@ -535,10 +533,10 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	}
 
 	//to make it possible to tweak the hinge2 anchor x position:
-	dJointSetHinge2Anchor (car->joint[0],x+conf.jx,y+conf.wp[1],z);
-	dJointSetHinge2Anchor (car->joint[1],x+conf.jx,y-conf.wp[1],z);
-	dJointSetHinge2Anchor (car->joint[2],x-conf.jx,y-conf.wp[1],z);
-	dJointSetHinge2Anchor (car->joint[3],x-conf.jx,y+conf.wp[1],z);
+	dJointSetHinge2Anchor (car->joint[0],x+conf.suspension_pos,y+conf.wheel_pos[1],z);
+	dJointSetHinge2Anchor (car->joint[1],x+conf.suspension_pos,y-conf.wheel_pos[1],z);
+	dJointSetHinge2Anchor (car->joint[2],x-conf.suspension_pos,y-conf.wheel_pos[1],z);
+	dJointSetHinge2Anchor (car->joint[3],x-conf.suspension_pos,y+conf.wheel_pos[1],z);
 
 	//return
 	return car;
