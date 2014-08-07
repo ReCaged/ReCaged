@@ -123,6 +123,9 @@ Wheel::Wheel()
 	alt_load_damp = true;
 
 	rollrestorque=0.0;
+	rollresjoint=dJointCreateAMotor(world, 0);
+	rollreswbody=NULL;
+	rollresobody=NULL;
 }
 
 //safely remove from list
@@ -137,6 +140,8 @@ Wheel::~Wheel()
 	//element after?
 	if (next)
 		next->prev=prev;
+
+	dJointDestroy(rollresjoint);
 }
 
 //find similar, close contact points and merge them
@@ -144,11 +149,12 @@ Wheel::~Wheel()
 void Wheel::Physics_Step()
 {
 	int i,j, count;
-	dJointID c;
+	dJointID joint;
 	Geom *g1, *g2;
 	dContact *contact;
 	for (Wheel *wheel=head; wheel; wheel=wheel->next)
 	{
+		//create contact points (and modify for similar joints)
 		count=wheel->points.size();
 		dReal wheeldivide[count];
 		for (i=0; i<count; ++i)
@@ -178,18 +184,41 @@ void Wheel::Physics_Step()
 			contact->surface.mu2 /= wheeldivide[i];
 
 			//create
-			c = dJointCreateContact (world, contactgroup, contact);
-			dJointAttach (c, wheel->points[i].b1, wheel->points[i].b2);
+			joint = dJointCreateContact (world, contactgroup, contact);
+			dJointAttach (joint, wheel->points[i].b1, wheel->points[i].b2);
 
 			//check if reading collision data
 			g1 = wheel->points[i].g1;
 			g2 = wheel->points[i].g2;
 			if (g1->buffer_event || g2->buffer_event || g1->force_to_body || g2->force_to_body)
-				new Collision_Feedback(c, g1, g2);
+				new Collision_Feedback(joint, g1, g2);
 		}
 
 		//remove
 		wheel->points.clear();
+
+
+		//create rolling resistance (using amotor joint)
+		if (wheel->rollrestorque > 0.0)
+		{
+			//attach to (possibly new) bodies
+			dJointAttach(wheel->rollresjoint, wheel->rollreswbody, wheel->rollresobody);
+			//enable (one axis)
+			dJointSetAMotorNumAxes(wheel->rollresjoint, 1);
+			//set axis direction, relative to wheel (since updates
+			//every step, doesn't matter that much)
+			dJointSetAMotorAxis(	wheel->rollresjoint, 0, 1,
+						wheel->rollresaxis[0],
+						wheel->rollresaxis[1],
+						wheel->rollresaxis[2]);
+			//and set wanted (max) resistance torque
+			dJointSetAMotorParam(wheel->rollresjoint, dParamFMax, wheel->rollrestorque);
+
+			//clear until next time
+			wheel->rollrestorque=0.0;
+		}
+		else //disable
+			dJointSetAMotorNumAxes(wheel->rollresjoint, 0); //0=disabled
 	}
 }
 
@@ -434,42 +463,24 @@ void Wheel::Add_Contact(	dBodyID b1, dBodyID b2, Geom *g1, Geom *g2,
 	points.push_back(pstore);
 
 	//
-	//4) rolling resistance (braking torque based on normal force)
+	//4) rolling resistance (surface/wheel braking torque)
 	//
-	//(rolling speed is ignored, doesn't make much difference)
+	//(rolling speed and compression is ignored
 	//
-	/*dReal torque = rollres*surface->rollres*contact->geom.depth; //braking torque
 
-	//rotation inertia (relative to ground if got body)
-	dReal rotation;
-	if (obody)
+	//wheel rolling resistance (scaled by surface)
+	dReal res = rollres*surface->rollres;
+
+	//if more than current detected rolling resistance
+	if (res > rollrestorque)
 	{
-		const dReal *orot = dBodyGetAngularVel(obody);
-		const dReal *wrot = dBodyGetAngularVel(wbody);
-		rotation =	wheelaxle[0]*(wrot[0]-orot[0])+
-				wheelaxle[1]*(wrot[1]-orot[1])+
-				wheelaxle[2]*(wrot[2]-orot[2]);
+		//store torque, axle direction and bodies
+		rollrestorque=res;
+		rollresaxis[0]=wheelaxle[0];
+		rollresaxis[1]=wheelaxle[1];
+		rollresaxis[2]=wheelaxle[2];
+		rollreswbody=wbody;
+		rollresobody=obody;
 	}
-	else //just rotation of wheel
-	{
-		const dReal *wrot = dBodyGetAngularVel(wbody);
-		rotation =	wheelaxle[0]*wrot[0]+
-				wheelaxle[1]*wrot[1]+
-				wheelaxle[2]*wrot[2];
-	}
-	dReal needed = -rotation*inertia/stepsize;
-
-	//same (negative/positive?) direction for torque
-	if (needed < 0.0)
-		torque = -torque;
-
-	//can brake in this step
-	if (torque/needed > 1.0) //torque bigger than needed
-		torque = needed; //decrease torque to needed
-
-	dBodyAddRelTorque(wbody, 0.0, 0.0, torque);
-	//TODO: if the ground has a body, perhaps the torque should affect it too?
-	//perhaps add the braking force (at the point of the wheel) to the ground body?
-	*/
 }
 

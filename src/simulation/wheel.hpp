@@ -75,7 +75,13 @@ class Wheel
 		};
 
 		std::vector<pointstore> points;
+
+		//rolling resistance
+		dJointID rollresjoint;
+		dReal rollresaxis[3];
 		dReal rollrestorque;
+		dBodyID rollreswbody;
+		dBodyID rollresobody;
 };
 
 #endif

@@ -43,7 +43,7 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
      support unattached wheels, different front/rear wheel handling and imilar)
    * Wheel axles can now break (more a proof-of-concept than actual gameplay)
    * New soft brake/brake-throttle transition code (more reliable at low speed)
-   * New rolling resistance code (more reliable at low speed/varying load)
+   * New rolling resistance code (more reliable at low speed/uneven terrain)
    * Less bending of wheel axles at high speeds
    *..... TODO!
 

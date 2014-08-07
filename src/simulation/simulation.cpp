@@ -113,7 +113,7 @@ int Simulation_Loop (void *d)
 				dSpaceCollide (space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
 
 				//special
-				Wheel::Physics_Step();
+				Wheel::Physics_Step(); //create contacts and rolling resistance
 				Car::Physics_Step(divided_stepsize); //control, antigrav...
 				Geom::Physics_Step(); //sensor/radar handling
 				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
@@ -121,7 +121,7 @@ int Simulation_Loop (void *d)
 
 				//simulate
 				dWorldQuickStep (world, divided_stepsize);
-				dJointGroupEmpty (contactgroup); //clean up
+				dJointGroupEmpty (contactgroup); //clean up collision joints
 
 				Joint::Physics_Step(divided_stepsize); //joint forces
 				Collision_Feedback::Physics_Step(divided_stepsize); //forces from collisions
