@@ -72,14 +72,17 @@ void Car::Physics_Step(dReal step)
 		//(not implemented yet. will need bitfield to mask away non-ground gepms)
 		//
 
-		//downforce
-		if (carp->down_max > 0)
+		//on ground
+		if (ground)
 		{
-			if (ground)
+			dReal force=0.0; //applied downforce
+			dVector3 relgrav;
+			dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
+			dReal grav=-relgrav[2]*carp->dir; //amount of gravity along down direction
+
+			//downforce
+			if (carp->down_max > 0)
 			{
-				dVector3 relgrav;
-				dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
-				dReal grav=-relgrav[2]*carp->dir;
 				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
 
 				dReal missing = carp->down_max - gravforce;
@@ -103,66 +106,67 @@ void Car::Physics_Step(dReal step)
 						available += (relvel[0]*relvel[0]+relvel[1]*relvel[1]) * track.density*carp->down_aero;
 					}
 
-					dReal force; //applied downforce
 					if (missing < available)
 						force=missing;
 					else
 						force=available;
 
-					//apply force to wheels ("elevate suspension")
-					//TODO: could add maximum ammount of force
-					//(prevent too weird elevations)
-					if (carp->elevation)
-					{
-						//compensate total force on body (not wheels) by gravity+downforce
-						dReal elevate=force+grav*carp->body_mass;
-						//remove this force from downforce
-						force-=elevate;
-
-						//apply 1/4 of this force to each wheel
-						dVector3 wheelforce;
-						//const dReal *wheelpos;
-						dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
-						for (i=0; i<4; ++i)
-							if (carp->gotwheel[i])
-							{
-								dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
-								//wheelpos = dBodyGetPosition(carp->wheel_body[i]);
-								//dBodyAddForceAtPos (carp->bodyid,
-										//-wheelforce[0], -wheelforce[1], -wheelforce[2],
-										//wheelpos[0], wheelpos[1], wheelpos[2]);
-							}
-					}
 
 					dBodyAddRelForce (carp->bodyid,0,0, -carp->dir*force);
 				}
 			}
-			else if (carp->down_air > 0 && carp->down_mass)
+
+			//apply force to wheels/body ("elevate suspension")
+			//TODO: could add maximum ammount of force
+			//(prevent too weird elevations)
+			if (carp->elevation)
 			{
-				dReal grav= sqrt(	track.gravity[0]*track.gravity[0]+
-							track.gravity[1]*track.gravity[1]+
-							track.gravity[2]*track.gravity[2]);
-				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
-				dReal missing = carp->down_max - gravforce;
+				//compensate total force on body (not wheels) by gravity+downforce
+				dReal elevate=force+grav*carp->body_mass;
 
-				if (missing > 0)
+				//apply 1/4 of this force to each wheel
+				dVector3 wheelforce;
+				const dReal *wheelpos;
+				dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
+				for (i=0; i<4; ++i)
+					if (carp->gotwheel[i])
+					{
+						//force on wheel
+						dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
+						//resulting force back on body
+						wheelpos = dBodyGetPosition(carp->wheel_body[i]);
+						dBodyAddForceAtPos (carp->bodyid,
+								-wheelforce[0], -wheelforce[1], -wheelforce[2],
+								wheelpos[0], wheelpos[1], wheelpos[2]);
+					}
+			}
+		}
+		//in air, but still want downforce?
+		else if (carp->down_air > 0 && carp->down_mass)
+		{
+			dReal grav= sqrt(	track.gravity[0]*track.gravity[0]+
+						track.gravity[1]*track.gravity[1]+
+						track.gravity[2]*track.gravity[2]);
+			dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
+			dReal missing = carp->down_max - gravforce;
+
+			if (missing > 0)
+			{
+				dReal available = grav*carp->down_mass;
+
+				if (missing < available)
 				{
-					dReal available = grav*carp->down_mass;
-
-					if (missing < available)
-					{
-						dBodyAddForce(	carp->bodyid,
-								missing/grav*track.gravity[0],
-								missing/grav*track.gravity[1],
-								missing/grav*track.gravity[2]);
-					}
-					else
-					{
-						dBodyAddForce(	carp->bodyid,
-								carp->down_mass*track.gravity[0],
-								carp->down_mass*track.gravity[1],
-								carp->down_mass*track.gravity[2]);
-					}
+					dBodyAddForce(	carp->bodyid,
+							missing/grav*track.gravity[0],
+							missing/grav*track.gravity[1],
+							missing/grav*track.gravity[2]);
+				}
+				else
+				{
+					dBodyAddForce(	carp->bodyid,
+							carp->down_mass*track.gravity[0],
+							carp->down_mass*track.gravity[1],
+							carp->down_mass*track.gravity[2]);
 				}
 			}
 		}
