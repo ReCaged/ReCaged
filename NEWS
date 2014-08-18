@@ -16,6 +16,7 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
 
  * New logging system
    * Colour indication of importance/verbosity
+   * Realtime log output now also on windows
    * Writes full log output to file
    * Errors written to stderr (and displayed in message box on windows)
 
@@ -36,13 +37,14 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
  * Simulation does not speed up to catch up with realtime (after lag) any more
 
  * Car improvements:
+   * New, more powerful, downforce
    * Major reconfiguration of Venom car
    * New tyre friction simulation model (more stable, easier to configure)
    * New tyre combined slip/grip model
    * New tyre/rim contact point evaluation
    * New load/normal force calculations for tyre contact points
    * Each wheel now stores its own set of parameters (independent of car, can
-     support unattached wheels, different front/rear wheel handling and imilar)
+     support unattached wheels, different front/rear wheel handling and so on)
    * Wheel axles can now break (more a proof-of-concept than actual gameplay)
    * New soft brake/brake-throttle transition code (more reliable at low speed)
    * New rolling resistance code (more reliable at low speed/uneven terrain)
