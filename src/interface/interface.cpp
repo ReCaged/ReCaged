@@ -126,7 +126,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	}
 
 	//set title:
-	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\") (C) " PACKAGE_YEAR " Mats Wahlberg", "ReCaged");
+	SDL_WM_SetCaption ("ReCaged " PACKAGE_VERSION " \"" PACKAGE_CODENAME "\"", "ReCaged");
 
 	//TODO: set icon (SDL_WM_SetIcon, from embedded into the executable?)
 
