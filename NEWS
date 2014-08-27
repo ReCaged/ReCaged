@@ -38,7 +38,7 @@ TODO:   * New drag simulation
 
  * Camera improvements:
    * More reliable movement (more responsive, bumper camera perfectly still)
-TODO:   * New drag simulation
+   * New damping/drag simulation
 
  * Car improvements:
    * New, more powerful, downforce

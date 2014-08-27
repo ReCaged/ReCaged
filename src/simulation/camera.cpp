@@ -208,38 +208,32 @@ void Camera::Damp(dReal step)
 	//damping of current velocity
 	//
 
-	float damping = 1-(step*settings->damping);
-
-	if (damping < 0)
-		damping=0;
-
+	//if relative damping, convert velocity
+	dVector3 a_vel; //anchor velocity
 	if (settings->relative_damping)
 	{
 		//damping (of relative movement)
-		dVector3 a_vel; //anchor velocity
 		dBodyGetRelPointVel (car->bodyid, settings->anchor[0], settings->anchor[1], settings->anchor[2]*car->dir, a_vel);
 
 		//make velocity relative car
 		vel[0]-=(float)a_vel[0];
 		vel[1]-=(float)a_vel[1];
 		vel[2]-=(float)a_vel[2];
+	}
 
-		//apply
-		vel[0]*=damping;
-		vel[1]*=damping;
-		vel[2]*=damping;
+	//apply to velocity
+	float damping=expf(-settings->damping*step);
+	vel[0]*=damping;
+	vel[1]*=damping;
+	vel[2]*=damping;
 
+	//and back (if relative)
+	if (settings->relative_damping)
+	{
 		//back to world velocity
 		vel[0]+=(float)a_vel[0];
 		vel[1]+=(float)a_vel[1];
 		vel[2]+=(float)a_vel[2];
-	}
-	else
-	{
-		//apply to world velocity
-		vel[0]*=damping;
-		vel[1]*=damping;
-		vel[2]*=damping;
 	}
 }
 
