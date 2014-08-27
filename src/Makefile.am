@@ -33,25 +33,25 @@ LDADD = $(RC_LIBS)
 bin_PROGRAMS = recaged
 
 recaged_SOURCES =	./recaged.cpp \
+			assets/car.cpp \
+			assets/conf.cpp \
+			assets/conf.hpp \
+			assets/image.cpp \
+			assets/image.hpp \
+			assets/obj.cpp \
+			assets/object.cpp \
+			assets/profile.cpp \
+			assets/road.cpp \
+			assets/text_file.cpp \
+			assets/text_file.hpp \
+			assets/track.cpp \
+			assets/trimesh.cpp \
 			interface/geom_render.cpp \
 			interface/geom_render.hpp \
 			interface/interface.cpp \
 			interface/profile.cpp \
 			interface/render_list.cpp \
 			interface/render_list.hpp \
-			loaders/car.cpp \
-			loaders/conf.cpp \
-			loaders/conf.hpp \
-			loaders/image.cpp \
-			loaders/image.hpp \
-			loaders/obj.cpp \
-			loaders/object.cpp \
-			loaders/profile.cpp \
-			loaders/road.cpp \
-			loaders/text_file.cpp \
-			loaders/text_file.hpp \
-			loaders/track.cpp \
-			loaders/trimesh.cpp \
 			shared/body.cpp \
 			shared/body.hpp \
 			shared/camera.cpp \

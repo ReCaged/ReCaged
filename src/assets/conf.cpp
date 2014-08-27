@@ -22,7 +22,7 @@
 #include "conf.hpp"
 
 #include "text_file.hpp"
-#include "../shared/log.hpp"
+#include "shared/log.hpp"
 
 #include <string.h>
 #include <stdlib.h>

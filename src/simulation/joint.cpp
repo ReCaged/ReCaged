@@ -19,8 +19,8 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/joint.hpp"
-#include "../shared/internal.hpp"
+#include "shared/joint.hpp"
+#include "shared/internal.hpp"
 #include "event_buffers.hpp"
 
 //set event

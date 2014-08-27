@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -52,6 +52,9 @@ class Joint: public Component
 		static Joint *head;
 		Joint *prev, *next;
 
+		//if car wheel attached
+		bool *carwheel;
+
 		//events
 		bool buffer_event;
 		//for buffer event processing
@@ -59,6 +62,10 @@ class Joint: public Component
 		dReal threshold; //if force on body exceeds threshold, eat buffer
 		dReal buffer; //if buffer reaches zero, trigger event
 		Script *buffer_script; //the script to run
+
+		friend class Car_Module;
+		friend class Car;
+		friend void Event_Buffers_Process(dReal); //to allow looping
 };
 
 #endif

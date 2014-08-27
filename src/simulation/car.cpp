@@ -19,19 +19,17 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/car.hpp"
-#include "../shared/track.hpp"
-#include "../shared/internal.hpp"
+#include "shared/car.hpp"
+#include "shared/track.hpp"
+#include "shared/internal.hpp"
 
 void Car::Physics_Step(dReal step)
 {
 	int i;
-	Car *carp = head;
+	Car *carp;
 	bool ground; //on ground (not in air)
-	while (carp != NULL)
+	for (carp=head; carp; carp=carp->next)
 	{
-		//first flipover detection (+ antigrav forces)
-
 		//both sensors are triggered, not flipping, only downforce
 		if (carp->sensor1->colliding && carp->sensor2->colliding)
 			ground = true;
@@ -52,9 +50,10 @@ void Car::Physics_Step(dReal step)
 			ground = false;
 
 		//rotation speed of wheels
-		dReal rotv[4];
+		dReal rotv[4] = {0.0, 0.0, 0.0, 0.0};
 		for (i=0; i<4; ++i)
-			rotv[i] = dJointGetHinge2Angle2Rate (carp->joint[i]);
+			if (carp->gotwheel[i])
+				rotv[i] = dJointGetHinge2Angle2Rate (carp->joint[i]);
 
 		//get car velocity:
 		//TODO/IMPORTANT: need to find a reliable solution to this...
@@ -73,14 +72,17 @@ void Car::Physics_Step(dReal step)
 		//(not implemented yet. will need bitfield to mask away non-ground gepms)
 		//
 
-		//downforce
-		if (carp->down_max > 0)
+		//on ground
+		if (ground)
 		{
-			if (ground)
+			dReal force=0.0; //applied downforce
+			dVector3 relgrav;
+			dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
+			dReal grav=-relgrav[2]*carp->dir; //amount of gravity along down direction
+
+			//downforce
+			if (carp->down_max > 0)
 			{
-				dReal relgrav[3];
-				dBodyVectorFromWorld(carp->bodyid, track.gravity[0], track.gravity[1], track.gravity[2], relgrav);
-				dReal grav=-relgrav[2]*carp->dir;
 				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
 
 				dReal missing = carp->down_max - gravforce;
@@ -94,7 +96,7 @@ void Car::Physics_Step(dReal step)
 
 					if (carp->down_aero > 0)
 					{
-						dReal relvel[3];
+						dVector3 relvel;
 
 						dBodyVectorFromWorld(carp->bodyid,
 								vel[0]-track.wind[0], vel[1]-track.wind[1], vel[2]-track.wind[2],
@@ -104,58 +106,67 @@ void Car::Physics_Step(dReal step)
 						available += (relvel[0]*relvel[0]+relvel[1]*relvel[1]) * track.density*carp->down_aero;
 					}
 
-					dReal force; //applied downforce
 					if (missing < available)
 						force=missing;
 					else
 						force=available;
 
-					//apply force to wheels ("elevate suspension")
-					//TODO: could add maximum ammount of force
-					//(prevent too weird elevations)
-					if (carp->elevation)
-					{
-						//compensate total force on body (not wheels) by gravity+downforce
-						dReal elevate=force+grav*carp->body_mass;
-						//remove this force from downforce
-						force-=elevate;
-
-						//apply 1/4 of this force to each wheel
-						dReal wheelforce[3];
-						dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
-						for (i=0; i<4; ++i)
-							dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
-					}
 
 					dBodyAddRelForce (carp->bodyid,0,0, -carp->dir*force);
 				}
 			}
-			else if (carp->down_air > 0 && carp->down_mass)
+
+			//apply force to wheels/body ("elevate suspension")
+			//TODO: could add maximum ammount of force
+			//(prevent too weird elevations)
+			if (carp->elevation)
 			{
-				dReal grav= sqrt(	track.gravity[0]*track.gravity[0]+
-							track.gravity[1]*track.gravity[1]+
-							track.gravity[2]*track.gravity[2]);
-				dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
-				dReal missing = carp->down_max - gravforce;
+				//compensate total force on body (not wheels) by gravity+downforce
+				dReal elevate=force+grav*carp->body_mass;
 
-				if (missing > 0)
+				//apply 1/4 of this force to each wheel
+				dVector3 wheelforce;
+				const dReal *wheelpos;
+				dBodyVectorToWorld(carp->bodyid, 0,0, -carp->dir*elevate/4.0, wheelforce);
+				for (i=0; i<4; ++i)
+					if (carp->gotwheel[i])
+					{
+						//force on wheel
+						dBodyAddForce(carp->wheel_body[i], wheelforce[0], wheelforce[1],  wheelforce[2]);
+						//resulting force back on body
+						wheelpos = dBodyGetPosition(carp->wheel_body[i]);
+						dBodyAddForceAtPos (carp->bodyid,
+								-wheelforce[0], -wheelforce[1], -wheelforce[2],
+								wheelpos[0], wheelpos[1], wheelpos[2]);
+					}
+			}
+		}
+		//in air, but still want downforce?
+		else if (carp->down_air > 0 && carp->down_mass)
+		{
+			dReal grav= sqrt(	track.gravity[0]*track.gravity[0]+
+						track.gravity[1]*track.gravity[1]+
+						track.gravity[2]*track.gravity[2]);
+			dReal gravforce=grav*(carp->body_mass+4*carp->wheel_mass);
+			dReal missing = carp->down_max - gravforce;
+
+			if (missing > 0)
+			{
+				dReal available = grav*carp->down_mass;
+
+				if (missing < available)
 				{
-					dReal available = grav*carp->down_mass;
-
-					if (missing < available)
-					{
-						dBodyAddForce(	carp->bodyid,
-								missing/grav*track.gravity[0],
-								missing/grav*track.gravity[1],
-								missing/grav*track.gravity[2]);
-					}
-					else
-					{
-						dBodyAddForce(	carp->bodyid,
-								carp->down_mass*track.gravity[0],
-								carp->down_mass*track.gravity[1],
-								carp->down_mass*track.gravity[2]);
-					}
+					dBodyAddForce(	carp->bodyid,
+							missing/grav*track.gravity[0],
+							missing/grav*track.gravity[1],
+							missing/grav*track.gravity[2]);
+				}
+				else
+				{
+					dBodyAddForce(	carp->bodyid,
+							carp->down_mass*track.gravity[0],
+							carp->down_mass*track.gravity[1],
+							carp->down_mass*track.gravity[2]);
 				}
 			}
 		}
@@ -223,18 +234,11 @@ void Car::Physics_Step(dReal step)
 			A[3] = front;
 		}
 
-		//apply steering
-		if (carp->turn)
-		{
-			dJointSetHinge2Param (carp->joint[0],dParamLoStop,A[0]-carp->fwtoe);
-			dJointSetHinge2Param (carp->joint[0],dParamHiStop,A[0]-carp->fwtoe);
-			dJointSetHinge2Param (carp->joint[1],dParamLoStop,A[1]-carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[1],dParamHiStop,A[1]-carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[2],dParamLoStop,A[2]+carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[2],dParamHiStop,A[2]+carp->rwtoe);
-			dJointSetHinge2Param (carp->joint[3],dParamLoStop,A[3]+carp->fwtoe);
-			dJointSetHinge2Param (carp->joint[3],dParamHiStop,A[3]+carp->fwtoe);
-		}
+		dReal steer[4] = {
+			A[0]-carp->fwtoe,
+			A[1]-carp->rwtoe,
+			A[2]+carp->rwtoe,
+			A[3]+carp->fwtoe};
 		//
 
 		//braking/accelerating:
@@ -244,36 +248,20 @@ void Car::Physics_Step(dReal step)
 
 
 		//useful values:
-		dReal kinertiatensor = carp->wheel->inertia; //moment of inertia tensor for wheel rotation
 		dReal kpower = carp->power*carp->throttle; //motor power
 		dReal krbrake = (1.0-carp->dbrake)*carp->max_brake*carp->throttle/2.0; //braking power for rear wheels
 		dReal kfbrake = carp->dbrake*carp->max_brake*carp->throttle/2.0; //braking power for front wheels
 		dReal kbrake[4] = {kfbrake, krbrake, krbrake, kfbrake}; //brake power for each wheel (to make things easier)
 
-		//check if using the built-in hinge2 motor for handbraking, and release it
-		if (carp->hinge2_dbrakes)
-		{
-			dJointSetHinge2Param (carp->joint[1],dParamFMax2, 0.0);
-			dJointSetHinge2Param (carp->joint[2],dParamFMax2, 0.0);
-		}
+		//max brake torque to be applied
+		dReal brake[4]={0,0,0,0};
 
 		//no fancy motor/brake solution, lock rear wheels to handbrake turn (oversteer)
 		if (carp->drift_brakes)
 		{
-			if (carp->hinge2_dbrakes) //use super-brake
-			{
-				//request ode to apply as much force as needed to completely lock wheels
-				dJointSetHinge2Param (carp->joint[1],dParamFMax2, dInfinity);
-				dJointSetHinge2Param (carp->joint[2],dParamFMax2, dInfinity);
-			}
-			else
-			{
-				//apply enough on rear wheels to theoretically "lock" them
-				//note: based on moment of inertia by rotation relative to car body...
-				//not the most reliable solution but should suffice
-				torque[1] = -rotv[1]*kinertiatensor/step;
-				torque[2] = -rotv[2]*kinertiatensor/step;
-			}
+			//request ode to apply as much force as needed to completely lock wheels
+			brake[1]=dInfinity;
+			brake[2]=dInfinity;
 		}
 		else
 		{
@@ -331,31 +319,19 @@ void Car::Physics_Step(dReal step)
 				}
 
 				//check if wanting to brake
-				dReal needed;
+				//dReal needed;
 				for (i=0; i<4; ++i)
 				{
 					//if rotating in the oposite way of wanted, use brakes
-					if (rotv[i]*kpower < 0.0) //(different signs makes negative)
-					{
-						//this much torque (in this direction) is needed to brake wheel
-						//not too reliable, since ignores the mass of the car body, and the fact
-						//that the brakeing will have to slow down the car movement too...
-						needed = -rotv[i]*kinertiatensor/step;
-
-						//to make transition between brakeing and acceleration smooth
-						//use different ways of calculate braking torque:
-						if ( needed/kbrake[i] < 1.0) //more braking than needed
-							torque[i] += needed; //brake as needed + keep possible motor
-						else //not enough brake to stop... full brake
-							torque[i] += kbrake[i]; //full brake + possible motor
-					}
+					if (rotv[i]*carp->throttle < 0.0) //(different signs makes negative)
+						brake[i]=kbrake[i];
 				}
 			}
 
 			//redistribute torque if enabled (nonzero force + enabled somewhere)
 			if (carp->redist_force && (carp->fwredist || carp->rwredist) )
 			{
-				dReal radius[4] = {1,1,1,1}; //default, sane, turning radius for all wheels
+				dReal radius[4] = {1.0,1.0,1.0,1.0}; //default, sane, turning radius for all wheels
 
 				//adaptive redistribution and steering:
 				//the wheels are wanted to rotate differently when turning.
@@ -426,30 +402,37 @@ void Car::Physics_Step(dReal step)
 			}
 		}
 	
-		//if a wheel is in air, lets limit the torques
-		dReal airtorque = carp->airtorque;
+		//apply forces/settings
+		dVector3 axle;
 		for (i=0; i<4; ++i)
 		{
-			//is in air
-			if (!carp->wheel_geom_data[i]->colliding)
+			if (carp->gotwheel[i])
 			{
-				//above limit...
-				if (torque[i] > airtorque)
-					torque[i] = airtorque;
-				else if (torque[i] < -airtorque)
-					torque[i] = -airtorque;
+				//finite rotation
+				if (carp->finiterot)
+				{
+					dBodyVectorToWorld(carp->bodyid, cos(steer[i]), -sin(steer[i]), 0.0, axle);
+					dBodySetFiniteRotationAxis(carp->wheel_body[i], axle[0], axle[1], axle[2]);
+				}
+				//steering
+				dJointSetHinge2Param (carp->joint[i],dParamLoStop,steer[i]);
+				dJointSetHinge2Param (carp->joint[i],dParamHiStop,steer[i]);
+
+				//brakes
+				dJointSetHinge2Param (carp->joint[i],dParamFMax2, brake[i]);
+
+				//motor torque
+				//if a wheel is in air, lets limit the torques
+				if (!carp->wheel_geom_data[i]->colliding)
+				{
+					//above limit...
+					if (torque[i] > carp->airtorque)
+						torque[i] = carp->airtorque;
+					else if (torque[i] < -carp->airtorque)
+						torque[i] = -carp->airtorque;
+				}
+				dJointAddHinge2Torques (carp->joint[i],0, torque[i]);
 			}
 		}
-
-		//apply torques
-		dJointAddHinge2Torques (carp->joint[0],0, torque[0]);
-		dJointAddHinge2Torques (carp->joint[1],0, torque[1]);
-		dJointAddHinge2Torques (carp->joint[2],0, torque[2]);
-		dJointAddHinge2Torques (carp->joint[3],0, torque[3]);
-
-		//
-
-		//done, next car...
-		carp=carp->next;
 	}
 }

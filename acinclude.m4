@@ -212,13 +212,13 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Headers for GLEW appears to be missing, install libglew-dev or similar]) ])
 
 	if test "$ON_W32" = "no"; then
-		AC_CHECK_LIB([GLEW], [glewInit],
+		AC_CHECK_LIB([GLEW], [main],
 			[RC_LIBS="$RC_LIBS -lGLEW"],
-			[AC_MSG_ERROR([SDL library appears to be missing, install libglew or similar])])
+			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
 	else
-		AC_CHECK_LIB([glew32], [glewInit],
+		AC_CHECK_LIB([glew32], [main],
 			[RC_LIBS="$RC_LIBS -lglew32"],
-			[AC_MSG_ERROR([SDL library appears to be missing, install libglew or similar])])
+			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
 	fi
 
 ])

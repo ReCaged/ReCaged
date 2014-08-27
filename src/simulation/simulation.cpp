@@ -23,26 +23,27 @@
 #include <SDL/SDL_mutex.h>
 #include <ode/ode.h>
 
-#include "../shared/threads.hpp"
-#include "../shared/internal.hpp"
-#include "../shared/runlevel.hpp"
-#include "../shared/track.hpp"
-#include "../shared/log.hpp"
-#include "../shared/body.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/camera.hpp"
-#include "../shared/car.hpp"
-#include "../shared/joint.hpp"
+#include "shared/threads.hpp"
+#include "shared/internal.hpp"
+#include "shared/runlevel.hpp"
+#include "shared/track.hpp"
+#include "shared/log.hpp"
+#include "shared/body.hpp"
+#include "shared/geom.hpp"
+#include "shared/camera.hpp"
+#include "shared/car.hpp"
+#include "shared/joint.hpp"
 
 #include "collision_feedback.hpp"
 #include "event_buffers.hpp"
 #include "timers.hpp"
 
-#include "../interface/render_list.hpp"
+#include "interface/render_list.hpp"
 
 
-unsigned int simulation_lag = 0;
 unsigned int simulation_count = 0;
+unsigned int simulation_lag_count = 0;
+Uint32 simulation_lag_time = 0;
 Uint32 simulation_time = 0;
 
 bool Simulation_Init(void)
@@ -93,7 +94,11 @@ int Simulation_Loop (void *d)
 	Log_Add(1, "Starting simulation loop");
 
 	simulation_time = SDL_GetTicks(); //set simulated time to realtime
-	Uint32 realtime; //real time (with possible delay since last update)
+	simulation_count=0;
+	simulation_lag_count=0;
+	simulation_lag_time=0;
+
+	Uint32 time; //real time
 	Uint32 stepsize_ms = (Uint32) (internal.stepsize*1000.0+0.0001);
 	dReal divided_stepsize = internal.stepsize/internal.multiplier;
 
@@ -103,7 +108,7 @@ int Simulation_Loop (void *d)
 		//only if in active mode do we simulate
 		if (runlevel == running)
 		{
-			//technically, collision detection doesn't need this, but this is easier
+			//technically, collision detection doesn't need locking, but this is easier
 			SDL_mutexP(ode_mutex);
 
 			for (int i=0; i<internal.multiplier; ++i)
@@ -113,17 +118,19 @@ int Simulation_Loop (void *d)
 				dSpaceCollide (space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
 
 				//special
-				Geom::Physics_Step(); //sensor/radar handling
-				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
+				Wheel::Physics_Step(); //create contacts and rolling resistance
 				Car::Physics_Step(divided_stepsize); //control, antigrav...
-				camera.Physics_Step(divided_stepsize); //calculate velocity and move
+				Geom::Physics_Step(); //sensor/radar handling
 
 				//simulate
 				dWorldQuickStep (world, divided_stepsize);
-				dJointGroupEmpty (contactgroup); //clean up
+				dJointGroupEmpty (contactgroup); //clean up collision joints
 
-				Joint::Physics_Step(divided_stepsize); //joint forces
+				//more
 				Collision_Feedback::Physics_Step(divided_stepsize); //forces from collisions
+				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
+				Joint::Physics_Step(divided_stepsize); //joint forces
+				camera.Physics_Step(divided_stepsize); //calculate velocity and move
 			}
 
 			//previous simulations might have caused events (to be processed by scripts)...
@@ -154,19 +161,23 @@ int Simulation_Loop (void *d)
 		//sync simulation with realtime
 		if (internal.sync_simulation)
 		{
-			//get some time to while away?
-			realtime = SDL_GetTicks();
-			if (simulation_time > realtime)
+			//got some time to while away?
+			time = SDL_GetTicks();
+			if (simulation_time > time) //ahead of reality, wait
 			{
 				//busy-waiting:
 				if (internal.spinning)
 					while (simulation_time > SDL_GetTicks());
 				//sleep:
 				else
-					SDL_Delay (simulation_time - realtime);
+					SDL_Delay (simulation_time-time);
 			}
-			else
-				++simulation_lag;
+			else //oh no, we're lagging behind!
+			{
+				++simulation_lag_count; //increase lag step counter
+				simulation_lag_time+=time-simulation_time; //add lag time
+				simulation_time=time; //and pretend like nothing just hapened...
+			}
 		}
 
 		//count how many steps

@@ -23,7 +23,7 @@
 #include "object.hpp"
 #include "internal.hpp"
 #include "log.hpp"
-#include "../simulation/event_buffers.hpp"
+#include "simulation/event_buffers.hpp"
 
 Body *Body::head = NULL;
 

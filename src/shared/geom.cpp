@@ -24,8 +24,8 @@
 #include "log.hpp"
 #include "track.hpp"
 #include "internal.hpp"
-#include "../simulation/event_buffers.hpp"
-#include "../loaders/conf.hpp"
+#include "simulation/event_buffers.hpp"
+#include "assets/conf.hpp"
 
 Geom *Geom::head = NULL;
 
@@ -59,7 +59,7 @@ Geom::Geom (dGeomID geom, Object *obj): Component(obj) //pass object argument to
 	model = NULL; //default: don't render
 
 	//special geom indicators
-	wheel = NULL; //not a wheel
+	wheel = NULL; //not a wheel (for now)
 	triangle_count = 0; //no "triangles"
 	material_count = 0; //no "materials"
 	triangle_colliding = NULL;
@@ -90,7 +90,11 @@ Geom::~Geom ()
 	if (next) //not last link in list
 		next->prev = prev;
 
+	//remove actual geom from ode
 	dGeomDestroy(geom_id);
+
+	//if wheel data, remove to
+	delete wheel;
 
 	//decrease activity and check if 0
 	object_parent->Decrease_Activity();

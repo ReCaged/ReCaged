@@ -30,7 +30,7 @@
 #include <ode/ode.h>
 
 #include "racetime_data.hpp"
-#include "loaders/image.hpp"
+#include "assets/image.hpp"
 
 //definitions:
 struct Vector_Float{

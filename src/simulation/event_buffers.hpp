@@ -22,10 +22,10 @@
 #ifndef _RC_EVENT_BUFFERS_H
 #define _RC_EVENT_BUFFERS_H
 
-#include "../shared/component.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/body.hpp"
-#include "../shared/joint.hpp"
+#include "shared/component.hpp"
+#include "shared/geom.hpp"
+#include "shared/body.hpp"
+#include "shared/joint.hpp"
 
 //add event to specific buffer
 void Event_Buffer_Add_Depleted(Geom*);

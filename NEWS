@@ -10,18 +10,55 @@ TODO: more info in header!
 ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
 ----------------------------------------------
  * Move to Autotools (Automake, Autoconf) for building
+
  * Detect if running in "installed" or "portable" mode
- * Logging to file
- * NSIS installer for w32
- * Joystick (gamepad) support
- * More reliable window creation (native BPP, better fullscreen support)
- * Use native screen resolution for fullscreen mode
+   * Uses xdg or platform-specific paths when installed
+
+ * NSIS installer for windows
+
+ * New logging system
+TODO: * Colour indication of importance/verbosity
+   * Realtime log output now also on windows
+   * Writes full log output to file
+   * Errors written to stderr (and displayed in message box on windows)
+
  * Fixed various insufficient memory allocations
- * Anti-Aliasing support (multisample)
- * Increased simulation stability
+
+ * Interface improvements:
+   * Joystick (gamepad) support
+   * More reliable window creation (native BPP, better fullscreen support)
+   * Use native screen resolution for fullscreen mode
+   * Anti-Aliasing support (multisample)
+
+ * Simulation improvements:
+   * Increased simulation stability
+   * Simulation does not speed up to catch up with realtime (after lag) anymore
+   * Non-zero surface layer depth (less jitter/improved collision stability)
+TODO:   * New drag simulation
+
+ * Camera improvements:
+   * More reliable movement (more responsive, bumper camera perfectly still)
+   * New damping/drag simulation
+   * Hopefully all potential NaN position/rotation results can now be avoided
+
  * Car improvements:
+   * New, more powerful, downforce
+   * Major reconfiguration of Venom car
    * New tyre friction simulation model (more stable, easier to configure)
    * New tyre combined slip/grip model
    * New tyre/rim contact point evaluation
-   * New soft-brake/rolling-resistance code (more reliable at low speeds)
+   * New load/normal force calculations for tyre contact points
+   * Each wheel now stores its own set of parameters (independent of car, can
+     support unattached wheels, different front/rear wheel handling and so on)
+   * Wheel axles can now break (more a proof-of-concept than actual gameplay)
+   * New soft brake/brake-throttle transition code (more reliable at low speed)
+   * New rolling resistance code (more reliable at low speed/uneven terrain)
+   * Less bending of wheel axles at high speeds (finite rotation for axles)
    *..... TODO!
+
+ * Code reorganization:
+   * Renamed "loaders" to "assets"
+   * Removed "../" from header inclusions (src is now in the inclusion paths)
+   * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
+
+ * TODO!

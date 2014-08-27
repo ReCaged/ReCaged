@@ -19,11 +19,11 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/geom.hpp"
+#include "shared/geom.hpp"
 
-#include "../shared/internal.hpp"
-#include "../shared/track.hpp"
-#include "../shared/log.hpp"
+#include "shared/internal.hpp"
+#include "shared/track.hpp"
+#include "shared/log.hpp"
 
 #include "collision_feedback.hpp"
 #include "event_buffers.hpp"
@@ -96,6 +96,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 	else if (geom2->wheel && b2)
 		wheel2=true;
 
+	//store wheel axle direction right once (instead of querying again)
 	dReal wheelaxle[3];
 	if (wheel1)
 	{
@@ -103,7 +104,6 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		wheelaxle[0] = rot[2];
 		wheelaxle[1] = rot[6];
 		wheelaxle[2] = rot[10];
-		count=geom1->wheel->Merge_Doubles(contact, wheelaxle, count);
 	}
 	else if (wheel2)
 	{
@@ -111,7 +111,6 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		wheelaxle[0] = rot[2];
 		wheelaxle[1] = rot[6];
 		wheelaxle[2] = rot[10];
-		count=geom2->wheel->Merge_Doubles(contact, wheelaxle, count);
 	}
 
 	//loop through all collision points and configure surface settings for each
@@ -195,19 +194,6 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		contact[i].surface.slip2 = 0.0; //not used
 
 		//
-		//simulation of wheel or normal geom?
-		//modify contacts according to slip and similar
-		//
-		//determine if _one_ of the geoms is a wheel
-		if (wheel1)
-			geom1->wheel->Configure_Contacts(b1, b2, geom1, geom2, wheelaxle, surf2, &contact[i], stepsize);
-		else if (wheel2)
-			geom2->wheel->Configure_Contacts(b2, b1, geom2, geom1, wheelaxle, surf1, &contact[i], stepsize);
-		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
-		//if (geom1->wheel&&geom2->wheel)
-		//	?...
-
-		//
 		//optional features:
 		//
 		//optional bouncyness (good for wheels?)
@@ -236,13 +222,28 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		}
 		//end of optional features
 
-		//now we create the contactjoints
-		dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
-		dJointAttach (c,b1,b2);
+		//
+		//simulation of wheel or normal geom?
+		//modify contacts according to slip and similar
+		//
+		//determine if _one_ of the geoms is a wheel
+		if (wheel1)
+			geom1->wheel->Add_Contact(b1, b2, geom1, geom2, true, wheelaxle, surf2, &contact[i], stepsize); //configures friction values based on slip and similar
+		else if (wheel2)
+			geom2->wheel->Add_Contact(b1, b2, geom1, geom2, false, wheelaxle, surf1, &contact[i], stepsize);
+		//TODO: haven't looked at wheel*wheel collision simulation! (will be rim_mu*rim_mu for tyre right now)
+		//if (geom1->wheel&&geom2->wheel)
+		//	?...
+		else
+		{
+			//create the contactjoints for normal collisions (not wheels)
+			dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+			dJointAttach (c,b1,b2);
 
-		//if any of the geoms responds to forces or got a body that responds to force, enable force feedback
-		if (geom1->buffer_event || geom2->buffer_event || geom1->force_to_body || geom2->force_to_body)
-			new Collision_Feedback(c, geom1, geom2);
+			//if any of the geoms responds to forces or got a body that responds to force, enable force feedback
+			if (geom1->buffer_event || geom2->buffer_event || geom1->force_to_body || geom2->force_to_body)
+				new Collision_Feedback(c, geom1, geom2);
+		}
 	}
 }
 

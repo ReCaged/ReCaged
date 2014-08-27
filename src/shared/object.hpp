@@ -30,20 +30,19 @@
 #include "space.hpp"
 
 //object: one "thing" on the track, from a complex building to a tree, spawning
-//will be controlled by a custom scripting langue in future versions, the most
-//important role of "object" is to store the ode space for the spawned object
-//(keeps track of the geoms in ode that describes the components) and joint
-//group (for cleaning up object)
+//from "modules" using lua (in future versions). the most important role of
+//"object" is to store the components, ode space and joint group for the
+//spawned object
 
 //template for spawning
-class Object_Template:public Racetime_Data
+class Module:public Racetime_Data
 {
 	public:
-		static Object_Template *Load(const char *path);
+		static Module *Load(const char *path);
 		void Spawn(dReal x, dReal y, dReal z);
 
 	private:
-		Object_Template(const char*); //just set some default values
+		Module(const char*); //just set some default values
 		//placeholder for script data, now just variables
 
 		//script to be run when spawning object
@@ -78,7 +77,7 @@ class Object
 	private:
 		Object();
 		//the following are either using or inherited from this class
-		friend class Object_Template; //needs access to constructor
+		friend class Module; //needs access to constructor
 		friend bool load_track (const char *);
 		friend class Car;
 

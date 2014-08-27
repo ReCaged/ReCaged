@@ -19,15 +19,14 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-//#include "../shared/shared.hpp"
-#include "../shared/track.hpp"
+#include "shared/track.hpp"
 
-#include "../shared/internal.hpp"
-#include "../shared/camera.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/log.hpp"
-#include "../shared/object.hpp"
-#include "../shared/directories.hpp"
+#include "shared/internal.hpp"
+#include "shared/camera.hpp"
+#include "shared/geom.hpp"
+#include "shared/log.hpp"
+#include "shared/object.hpp"
+#include "shared/directories.hpp"
 
 #include "text_file.hpp"
 
@@ -331,7 +330,7 @@ bool load_track (const char *path)
 	Log_Add(2, "Loading track object list: %s", olist);
 
 	//each object is loaded/selected at a time (NULL if none loaded so far)
-	Object_Template *obj = NULL;
+	Module *obj = NULL;
 
 	//don't fail if can't find file, maybe there is no need for it anyway
 	if (dirs.Find(olist, DATA, READ) && file.Open(dirs.Path()))
@@ -346,7 +345,7 @@ bool load_track (const char *path)
 				strcpy (obj_name, "objects/");
 				strcat (obj_name, file.words[1]);
 
-				if (!(obj = Object_Template::Load(obj_name))) //NULL if failure
+				if (!(obj = Module::Load(obj_name))) //NULL if failure
 				{
 					Log_Add(-1, "Could not load object \"%s\" (requested by track)", obj_name);
 					delete track.object;

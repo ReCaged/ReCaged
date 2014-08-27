@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -28,7 +28,7 @@
 #include "object.hpp"
 #include "trimesh.hpp"
 #include "script.hpp"
-#include "../simulation/wheel.hpp"
+#include "simulation/wheel.hpp"
 #include <SDL/SDL_stdinc.h> //definition for Uint32
 
 //Geom: (meta)data for geometrical shape (for collision detection), for: 
@@ -128,6 +128,7 @@ class Geom: public Component
 		friend void Event_Buffers_Process(dReal); //to allow looping
 		friend void Body::Physics_Step (dReal step); //dito
 		friend void Geom_Render(); //same as above, for debug collision render
+		friend class Wheel; //to set collision feedbacks
 };
 
 #endif

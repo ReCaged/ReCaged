@@ -23,22 +23,22 @@
 #define _RC_WHEEL_H
 
 #include <ode/ode.h>
-#include "../shared/surface.hpp"
-#include "../shared/geom.hpp"
+#include "shared/surface.hpp"
+#include "shared/geom.hpp"
 
-//wheel friction simulation class (created by Car_Template, used by Physics/Geom.cpp)
+//wheel friction simulation class (created by Car_Module, used by Physics/Geom.cpp)
 class Wheel
 {
 	public:
-		int Merge_Doubles(dContact *contact, dReal wheelaxle[], int oldcount);
+		void Add_Contact(dBodyID b1, dBodyID b2, Geom *g1, Geom *g2,
+				bool wheelis1, dReal wheelaxle[], Surface *surface,
+				dContact *contact, dReal stepsize);
 
-		void Configure_Contacts(dBodyID wbody, dBodyID obody, Geom *g1, Geom *g2,
-					dReal wheelaxle[], Surface *surface, dContact *contact,
-					dReal stepsize);
+		static void Physics_Step();
 
-	private:
-		//not allowing creation and modifying of class unless by friend
+		//used primarily by car, but can be used independently
 		Wheel();
+		~Wheel();
 
 		//friction data:
 		dReal x_static_mu;
@@ -53,18 +53,35 @@ class Wheel
 		dReal x_min_denom, y_min_denom;
 
 		dReal x_min_combine, y_min_combine;
+		dReal x_scale_combine, y_scale_combine;
 
 		//extra tyre data:
 		dReal rim_dot;
 		dReal rollres;
-		dReal merge_dot;
+		dReal mix_dot;
+		bool alt_load, alt_load_damp;
 
-		//tmp:
-		dReal inertia;
+	private:
+		//keep track of wheels (double link)
+		static Wheel *head;
+		Wheel *prev;
+		Wheel *next;
 
-		//only car and car template (wheen loading) is allowed
-		friend class Car;
-		friend class Car_Template;
+		//values created by simulation
+		struct pointstore {
+			dContact contact;
+			dBodyID b1, b2;
+			Geom *g1, *g2;
+		};
+
+		std::vector<pointstore> points;
+
+		//rolling resistance
+		dJointID rollresjoint;
+		dReal rollresaxis[3];
+		dReal rollrestorque;
+		dBodyID rollreswbody;
+		dBodyID rollresobody;
 };
 
 #endif

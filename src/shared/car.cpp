@@ -21,7 +21,7 @@
 
 #include "car.hpp"
 #include "log.hpp"
-Car_Template::Car_Template(const char *name) :Racetime_Data(name)
+Car_Module::Car_Module(const char *name) :Racetime_Data(name)
 {
 	conf = car_conf_defaults; //set conf values to default
 }

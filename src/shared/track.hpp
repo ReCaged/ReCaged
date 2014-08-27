@@ -21,7 +21,7 @@
 
 #ifndef _RC_TRACK_H
 #define _RC_TRACK_H
-#include "../loaders/conf.hpp"
+#include "assets/conf.hpp"
 #include "object.hpp"
 #include <GL/glew.h>
 #include <ode/ode.h>
@@ -68,7 +68,7 @@ const struct Track_Struct track_defaults = {
 	{1.0,1.0,1.0 ,1.0},
 	{0, 0, -9.82},
 	1.29,
-	{0.5,1.0,0.0},
+	{0.0,0.0,0.0},
 	{0,-50,1.5},
 	{50,-100,5},
 	{0,0,0},

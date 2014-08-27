@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -19,7 +19,7 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/track.hpp"
+#include "shared/track.hpp"
 #include "event_buffers.hpp"
 #include "timers.hpp"
 
@@ -283,7 +283,13 @@ void Event_Buffers_Process(dReal step)
 
 	//joints buffer:
 	while ((joint = (Joint*)Pop(&joint_depleted)))
+	{
+		//if this was a wheel suspension, notify car that the wheel is gone! 
+		if (joint->carwheel)
+			(*joint->carwheel) = false;
+
 		delete joint;
+	}
 
 	//objects buffer:
 	while ((object = (Object*)Pop(&object_inactive)))

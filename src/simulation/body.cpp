@@ -19,11 +19,11 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/body.hpp"
-#include "../shared/car.hpp"
-#include "../shared/log.hpp"
-#include "../shared/track.hpp"
-#include "../shared/internal.hpp"
+#include "shared/body.hpp"
+#include "shared/car.hpp"
+#include "shared/log.hpp"
+#include "shared/track.hpp"
+#include "shared/internal.hpp"
 #include "event_buffers.hpp"
 
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))

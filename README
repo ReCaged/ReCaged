@@ -215,19 +215,20 @@ compilers and standard libraries for compilation). The latest version can be
 downloaded here:
 http://sourceforge.net/projects/mingw/files/latest/download?source=files
 
-The only installation option really recommended to choose here is the "MSYS
-Basic System", which provides a bash shell suitable for working with MinGW. It's
-not necessarily needed but working without it is much harder and you will not be
-able to use the automated script.
+TODO: new mingw installer is different, mention installing msys in the new gui,
+finding the shell...
 
-Now you can run the provided script "make_w32.sh" with the wanted arguments to
-install the necessary libraries and compile (run "make_w32.sh help" for more
-details). Running "./make_w32.sh dependencies" will install the necessary
-libraries and tools for compiling releases. If you want to compile development
-versions run "./make_w32.sh extras" as well (or instead, as it will also pull
-all other dependencies if missing) to get autotools, git and the vim editor.
+The only installation option really recommended to choose
+here is the "MSYS Basic System", which provides a bash shell suitable for
+working with MinGW. It's not necessarily needed but working without it is much
+harder and you will not be able to use the automated script.
 
-Finally: running "./make_w32.sh installer" should configure and build ReCaged
+Now use the msys bash shell to run the provided script "make_w32.sh" with the
+arguments to install the necessary libraries and compile (run "make_w32.sh
+help" for more details). Running "./make_w32.sh dependencies" will install the
+necessary libraries (in you home directory) and tools for compiling releases.
+
+Finally: Running "./make_w32.sh installer" should configure and build ReCaged
 for w32 with the necessary libraries statically linked (and strip out debug
 symbols and 
 

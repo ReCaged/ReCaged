@@ -22,8 +22,8 @@
 #ifndef _RC_TIMERS_H
 #define _RC_TIMERS_H
 
-#include "../shared/object.hpp"
-#include "../shared/script.hpp"
+#include "shared/object.hpp"
+#include "shared/script.hpp"
 
 #include <ode/ode.h>
 #include <SDL/SDL_stdinc.h> //Uint32

@@ -19,31 +19,31 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/object.hpp"
+#include "shared/object.hpp"
 
 #include <ode/ode.h>
 
-#include "../shared/racetime_data.hpp"
-#include "../shared/trimesh.hpp"
-#include "../shared/log.hpp"
-#include "../shared/track.hpp"
-#include "../shared/joint.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/body.hpp"
+#include "shared/racetime_data.hpp"
+#include "shared/trimesh.hpp"
+#include "shared/log.hpp"
+#include "shared/track.hpp"
+#include "shared/joint.hpp"
+#include "shared/geom.hpp"
+#include "shared/body.hpp"
 
 //load data for spawning object (object data), hard-coded debug version
-Object_Template *Object_Template::Load(const char *path)
+Module *Module::Load(const char *path)
 {
-	Log_Add(1, "Loading object: %s", path);
+	Log_Add(1, "Loading module: %s", path);
 
 	//see if already loaded
-	if (Object_Template *tmp=Racetime_Data::Find<Object_Template>(path))
+	if (Module *tmp=Racetime_Data::Find<Module>(path))
 	{
 		return tmp;
 	}
 
 	//tmp pointers
-	Object_Template *obj;
+	Module *obj;
 	
 	//currently no scripting, only hard-coded solutions
 	if (!strcmp(path,"objects/misc/box"))
@@ -51,7 +51,7 @@ Object_Template *Object_Template::Load(const char *path)
 		//"load" 3d box
 		Log_Add(2, "(hard-coded box)");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->box = true;
 
 		//the debug box will only spawn one component - one "3D file"
@@ -64,7 +64,7 @@ Object_Template *Object_Template::Load(const char *path)
 	{
 		Log_Add(2, "(Mac's hard-coded funbox");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->funbox = true; //id
 
 		//graphics
@@ -76,7 +76,7 @@ Object_Template *Object_Template::Load(const char *path)
 	{
 		Log_Add(2, "(hard-coded flipper)");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->flipper = true; //id
 
 		//graphics
@@ -88,7 +88,7 @@ Object_Template *Object_Template::Load(const char *path)
 	{
 		Log_Add(2, "(hard-coded \"molecule\")");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->NH4 = true;
 
 		//graphics
@@ -101,7 +101,7 @@ Object_Template *Object_Template::Load(const char *path)
 	{
 		Log_Add(2, "(hard-coded beachball)");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->sphere = true;
 		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/beachball/sphere.obj")))
 			return NULL;
@@ -110,7 +110,7 @@ Object_Template *Object_Template::Load(const char *path)
 	{
 		Log_Add(2, "(hard-coded building)");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->building = true;
 
 		//graphics
@@ -125,7 +125,7 @@ Object_Template *Object_Template::Load(const char *path)
 		//"load" 3d box
 		Log_Add(2, "(hard-coded pillar)");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->pillar = true;
 
 		//graphics
@@ -139,7 +139,7 @@ Object_Template *Object_Template::Load(const char *path)
 		//"load" 3d box
 		Log_Add(2, "(hard-coded tetrahedron)");
 
-		obj = new Object_Template(path);
+		obj = new Module(path);
 		obj->tetrahedron = true;
 
 		//try to load and generate needed vertices (render+collision)
@@ -175,7 +175,7 @@ void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 
 //spawn a "loaded" (actually hard-coded) object
 //TODO: rotation
-void Object_Template::Spawn (dReal x, dReal y, dReal z)
+void Module::Spawn (dReal x, dReal y, dReal z)
 {
 	Log_Add(1, "Spawning object at: %f %f %f", x,y,z);
 	//pretend to be executing the script... just load debug values

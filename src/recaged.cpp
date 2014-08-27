@@ -37,8 +37,6 @@
 
 Uint32 starttime = 0;
 Uint32 racetime = 0;
-Uint32 simtime = 0; 
-
 Uint32 start_time = 0;
 void Run_Race(void)
 {
@@ -75,13 +73,12 @@ void Run_Race(void)
 	Log_Add(0, "Race Done!");
 
 	racetime = SDL_GetTicks() - starttime;
-	simtime = simulation_time - starttime;
 }
 
 //
 //tmp:
 //
-#include "loaders/text_file.hpp"
+#include "assets/text_file.hpp"
 
 //instead of menus...
 //try to load "tmp menu selections" for menu simulation
@@ -138,16 +135,16 @@ bool tmp_menus()
 		return false; //GOTO: track selection menu
 
 	//TMP: load some objects for online spawning
-	if (	!(box = Object_Template::Load("objects/misc/box"))		||
-		!(sphere = Object_Template::Load("objects/misc/beachball"))||
-		!(funbox = Object_Template::Load("objects/misc/funbox"))	||
-		!(molecule = Object_Template::Load("objects/misc/NH4"))	)
+	if (	!(box = Module::Load("objects/misc/box"))		||
+		!(sphere = Module::Load("objects/misc/beachball"))||
+		!(funbox = Module::Load("objects/misc/funbox"))	||
+		!(molecule = Module::Load("objects/misc/NH4"))	)
 		return false;
 	//
 
 	//MENU: players, please select team/car
 
-	Car_Template *car_template = NULL;
+	Car_Module *car_template = NULL;
 	Car *car = NULL;
 	//models for rim and tyre
 	Trimesh_3D *tyre = NULL, *rim = NULL;
@@ -162,7 +159,7 @@ bool tmp_menus()
 			{
 				//no, load some defaults...
 				if (!car_template)
-					car_template = Car_Template::Load("teams/Nemesis/cars/Venom");
+					car_template = Car_Module::Load("teams/Nemesis/cars/Venom");
 
 				//if above failed
 				if (!car_template)
@@ -198,7 +195,7 @@ bool tmp_menus()
 			scar += "/cars/";
 			scar += file.words[1];
 
-			if (! (car_template = Car_Template::Load(scar.c_str())) )
+			if (! (car_template = Car_Module::Load(scar.c_str())) )
 				return false;
 
 		}
@@ -546,17 +543,17 @@ Log_puts(1, "\
 	Log_Add(1, "Startup time:		%ums", starttime);
 	Log_Add(1, "Race time:			%ums", racetime);
 
-	Log_Add(1, "Simulated time:		%ums (%u%% of real time)",
-						simtime, (100*simtime)/racetime);
+	Log_Add(1, "Average simulations/second:	%u steps/second (%u total steps)",
+						(1000*simulation_count)/racetime,
+						simulation_count);
 
-	Log_Add(1, "Average simulations/second:	%u steps/second (%u in total)",
-						(1000*simulation_count)/racetime, simulation_count);
-
-	Log_Add(1, "Simulation lag:		%u%% of steps (%u in total)",
-						(100*simulation_lag)/simulation_count, simulation_lag);
+	Log_Add(1, "Simulation lag:		%ums, %u steps (%u%% of total steps)",
+						simulation_lag_time, simulation_lag_count,
+						(100*simulation_lag_count)/simulation_count);
 
 	Log_Add(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
-						(1000*interface_count)/racetime, (100*interface_count)/simulation_count);
+						(1000*interface_count)/racetime,
+						(100*interface_count)/simulation_count);
 
 	Log_puts(1, "\n Bye!\n\n");
 

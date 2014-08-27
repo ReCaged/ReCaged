@@ -23,10 +23,10 @@
 #include <math.h>
 #include <GL/glew.h>
 #include "geom_render.hpp"
-#include "../shared/threads.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/racetime_data.hpp"
-#include "../shared/log.hpp"
+#include "shared/threads.hpp"
+#include "shared/geom.hpp"
+#include "shared/racetime_data.hpp"
+#include "shared/log.hpp"
 #include "shared/internal.hpp"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
