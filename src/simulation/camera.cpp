@@ -63,15 +63,11 @@ void Camera::Accelerate(dReal step)
 	else //normal
 		dBodyVectorToWorld(car->bodyid, settings->distance[0]*car->dir, settings->distance[1], settings->distance[2]*car->dir, result);
 
-	float c_pos[3];
-	c_pos[0]=result[0];
-	c_pos[1]=result[1];
-	c_pos[2]=result[2];
-
+	float c_pos[3]={(float)result[0], (float)result[1], (float)result[2]};
 
 	//position and velocity of anchor
 	dVector3 a_pos;
-	dBodyGetRelPointPos (car->bodyid, settings->anchor[0], settings->anchor[1]-car->offset, settings->anchor[2]*car->dir, a_pos);
+	dBodyGetRelPointPos (car->bodyid, settings->anchor[0], settings->anchor[1], settings->anchor[2]*car->dir, a_pos);
 
 	//relative pos and vel of camera (from anchor)
 	float r_pos[3] = {(float)(pos[0]-a_pos[0]), (float)(pos[1]-a_pos[1]), (float)(pos[2]-a_pos[2])};
@@ -85,8 +81,6 @@ void Camera::Accelerate(dReal step)
 	//unit vectors
 	float r_pos_u[3] = {r_pos[0]/r_pos_l, r_pos[1]/r_pos_l, r_pos[2]/r_pos_l};
 	float c_pos_u[3] = {c_pos[0]/c_pos_l, c_pos[1]/c_pos_l, c_pos[2]/c_pos_l};
-
-
 
 	//"linear spring" between anchor and camera (based on distance)
 	float dist = r_pos_l-c_pos_l;
@@ -214,29 +208,35 @@ void Camera::Damp(dReal step)
 	//damping of current velocity
 	//
 
+	float damping = 1-(step*settings->damping);
+
+	if (damping < 0)
+		damping=0;
+
 	if (settings->relative_damping)
 	{
 		//damping (of relative movement)
 		dVector3 a_vel; //anchor velocity
-		dBodyGetRelPointVel (car->bodyid, settings->anchor[0], settings->anchor[1]-car->offset, settings->anchor[2]*car->dir, a_vel);
-		float r_vel[3] = {(float)(vel[0]-a_vel[0]), (float)(vel[1]-a_vel[1]), (float)(vel[2]-a_vel[2])}; //velocity relative to anchor
+		dBodyGetRelPointVel (car->bodyid, settings->anchor[0], settings->anchor[1], settings->anchor[2]*car->dir, a_vel);
 
-		float damping = (step*settings->damping);
-		if (damping > 1)
-			damping=1;
+		//make velocity relative car
+		vel[0]-=(float)a_vel[0];
+		vel[1]-=(float)a_vel[1];
+		vel[2]-=(float)a_vel[2];
 
-		vel[0]-=damping*r_vel[0];
-		vel[1]-=damping*r_vel[1];
-		vel[2]-=damping*r_vel[2];
+		//apply
+		vel[0]*=damping;
+		vel[1]*=damping;
+		vel[2]*=damping;
+
+		//back to world velocity
+		vel[0]+=(float)a_vel[0];
+		vel[1]+=(float)a_vel[1];
+		vel[2]+=(float)a_vel[2];
 	}
 	else
 	{
-		//absolute damping
-		float damping = 1-(step*settings->damping);
-
-		if (damping < 0)
-			damping=0;
-
+		//apply to world velocity
 		vel[0]*=damping;
 		vel[1]*=damping;
 		vel[2]*=damping;
@@ -325,11 +325,13 @@ void Camera::Rotate(dReal step)
 
 	dVector3 result;
 	if (reverse && !in_air) //move target and position to opposite side (if not just spinning in air)
-		dBodyGetRelPointPos (car->bodyid, settings->target[0]*car->dir, -settings->target[1]-car->offset, settings->target[2]*car->dir, result);
+		dBodyGetRelPointPos (car->bodyid, settings->target[0]*car->dir, -settings->target[1], settings->target[2]*car->dir, result);
 	else //normal
 	{
-		dBodyGetRelPointPos (car->bodyid, settings->target[0]*offset_scale*car->dir,
-				settings->target[1]*offset_scale-car->offset, settings->target[2]*car->dir*offset_scale, result);
+		dBodyGetRelPointPos (car->bodyid,
+				settings->target[0]*offset_scale*car->dir,
+				settings->target[1]*offset_scale,
+				settings->target[2]*car->dir*offset_scale, result);
 	}
 
 	t_dir[0]=result[0]-pos[0];
@@ -509,12 +511,18 @@ void Camera::Physics_Step(dReal step)
 {
 	if (car && settings)
 	{
+		//
+		//perform movement based on last velocity
+		//
+		pos[0]+=vel[0]*step;
+		pos[1]+=vel[1]*step;
+		pos[2]+=vel[2]*step;
 
 		//
-		//if camera got a targeted car and proper settings, simulate movment
+		//if camera got a targeted car and proper settings, simulate movment:
 		//
 
-		//check for some exceptions
+		//check if reverse
 		if (settings->reverse) //enabled
 		{
 			if (car->dir*car->throttle > 0.0 && car->velocity > 0.0) //wanting and going forward
@@ -523,6 +531,7 @@ void Camera::Physics_Step(dReal step)
 				reverse = true;
 		}
 
+		//and if in air
 		if (settings->in_air) //in air enabled
 		{
 			if (!(car->sensor1->colliding) && !(car->sensor2->colliding)) //in air
@@ -569,20 +578,15 @@ void Camera::Physics_Step(dReal step)
 			}
 		}
 
-		//store old velocity
-		dReal old_vel[3] = {vel[0], vel[1], vel[2]};
-
-		//perform movement
+		//
+		//perform calculation of next step velocity
+		//
 		Accelerate(step);
-		Collide(step);
 		Damp(step);
-
-		//during the step, camera will have linear acceleration from old velocity to new
-		pos[0]+=((vel[0]+old_vel[0])/2)*step;
-		pos[1]+=((vel[1]+old_vel[1])/2)*step;
-		pos[2]+=((vel[2]+old_vel[2])/2)*step;
+		Collide(step);
 
 		//rotate camera (focus and rotation)
+		//Accelerate might change pos, so this is done after it
 		Rotate(step);
 	}
 }

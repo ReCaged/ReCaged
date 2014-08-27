@@ -36,6 +36,9 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
 
  * Simulation does not speed up to catch up with realtime (after lag) any more
 
+ * Camera improvements:
+   * More reliable movement (more responsive, bumper camera perfectly still)
+
  * Car improvements:
    * New, more powerful, downforce
    * Major reconfiguration of Venom car

@@ -287,8 +287,6 @@ class Car:public Object
 		dReal fwtoe, rwtoe;
 		bool finiterot;
 
-		dReal offset;
-
 		//just for keeping track
 		dBodyID bodyid,wheel_body[4];
 		dJointID joint[4];

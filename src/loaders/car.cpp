@@ -301,7 +301,7 @@ Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_
 	bdata->Set_Angular_Drag (conf.body_angular_drag);
 
 
-	dBodySetPosition (car->bodyid, x, y+car->offset, z);
+	dBodySetPosition (car->bodyid, x, y, z);
 
 
 	//ok, set rendering model:
@@ -557,7 +557,7 @@ void Car::Respawn (dReal x, dReal y, dReal z)
 
 	//body:
 	dRSetIdentity(r); //no rotation
-	dBodySetPosition(bodyid, x, y+offset, z);
+	dBodySetPosition(bodyid, x, y, z);
 	dBodySetRotation(bodyid, r);
 
 	//wheels:

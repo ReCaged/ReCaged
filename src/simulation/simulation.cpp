@@ -121,15 +121,16 @@ int Simulation_Loop (void *d)
 				Wheel::Physics_Step(); //create contacts and rolling resistance
 				Car::Physics_Step(divided_stepsize); //control, antigrav...
 				Geom::Physics_Step(); //sensor/radar handling
-				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
-				camera.Physics_Step(divided_stepsize); //calculate velocity and move
 
 				//simulate
 				dWorldQuickStep (world, divided_stepsize);
 				dJointGroupEmpty (contactgroup); //clean up collision joints
 
-				Joint::Physics_Step(divided_stepsize); //joint forces
+				//more
 				Collision_Feedback::Physics_Step(divided_stepsize); //forces from collisions
+				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
+				Joint::Physics_Step(divided_stepsize); //joint forces
+				camera.Physics_Step(divided_stepsize); //calculate velocity and move
 			}
 
 			//previous simulations might have caused events (to be processed by scripts)...
