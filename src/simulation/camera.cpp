@@ -78,6 +78,16 @@ void Camera::Accelerate(dReal step)
 	//(TODO: could be computed just once - only when changing camera)
 	float c_pos_l = VLength(c_pos);
 
+	//to prevent unstable division by too small numbers...
+	if (r_pos_l < 0.000001)
+		r_pos_l = 0.000001;
+
+	//and (somewhat ironically) to make sure this becomes exactly 0...
+	//contrary to r_pos above there are fail-safes for low c_pos, so this
+	//just makes sure no weird stuff like sqrt(0²+0²+0²)>0
+	if (c_pos_l < 0.000001)
+		c_pos_l = 0.0;
+
 	//unit vectors
 	float r_pos_u[3] = {r_pos[0]/r_pos_l, r_pos[1]/r_pos_l, r_pos[2]/r_pos_l};
 	float c_pos_u[3] = {c_pos[0]/c_pos_l, c_pos[1]/c_pos_l, c_pos[2]/c_pos_l};
@@ -301,6 +311,16 @@ void Camera::Rotate(dReal step)
 	//the matrix is rotated. the rotation is performed around one single axis
 	//which will have to be computed...
 	//
+	//The simplest way of expressing this is as Mold*x = Mold*x, where Mold
+	//and Mnew are the matrices and x is the vector of rotation. Of course
+	//x is an eigenvector (with eigenvalue=1), but a simpler way of
+	//deriving it is to use a geometric perspective: each column in the
+	//matrices are vectors for their coordinate systems, and the difference
+	//between the new and old vector must be a vector perpendicular to the
+	//axis of rotation. Thus one can simply use the cross product from two
+	//of these vectors! Since we got 3 vectors (and only need 2) just pick
+	//the two best (giving highest calculation precision).
+	//
 
 	//---
 	//first: needed values
@@ -432,7 +452,7 @@ void Camera::Rotate(dReal step)
 
 	//make sure not too small
 	//(since too equal current and wanted rotation, or possibly some computation error?)
-	if (L < 0.000001) //TODO: good?
+	if (L < 0.000001) //TODO: good fail-safe?
 	{
 		rotation[0]=t_right[0]; rotation[1]=t_dir[0]; rotation[2]=t_up[0];
 		rotation[3]=t_right[1]; rotation[4]=t_dir[1]; rotation[5]=t_up[1];

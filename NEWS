@@ -39,6 +39,7 @@ TODO:   * New drag simulation
  * Camera improvements:
    * More reliable movement (more responsive, bumper camera perfectly still)
    * New damping/drag simulation
+   * Hopefully all potential NaN position/rotation results can now be avoided
 
  * Car improvements:
    * New, more powerful, downforce
