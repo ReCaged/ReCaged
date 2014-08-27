@@ -26,7 +26,7 @@
 #include "shared/surface.hpp"
 #include "shared/geom.hpp"
 
-//wheel friction simulation class (created by Car_Template, used by Physics/Geom.cpp)
+//wheel friction simulation class (created by Car_Module, used by Physics/Geom.cpp)
 class Wheel
 {
 	public:

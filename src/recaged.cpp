@@ -135,16 +135,16 @@ bool tmp_menus()
 		return false; //GOTO: track selection menu
 
 	//TMP: load some objects for online spawning
-	if (	!(box = Object_Template::Load("objects/misc/box"))		||
-		!(sphere = Object_Template::Load("objects/misc/beachball"))||
-		!(funbox = Object_Template::Load("objects/misc/funbox"))	||
-		!(molecule = Object_Template::Load("objects/misc/NH4"))	)
+	if (	!(box = Module::Load("objects/misc/box"))		||
+		!(sphere = Module::Load("objects/misc/beachball"))||
+		!(funbox = Module::Load("objects/misc/funbox"))	||
+		!(molecule = Module::Load("objects/misc/NH4"))	)
 		return false;
 	//
 
 	//MENU: players, please select team/car
 
-	Car_Template *car_template = NULL;
+	Car_Module *car_template = NULL;
 	Car *car = NULL;
 	//models for rim and tyre
 	Trimesh_3D *tyre = NULL, *rim = NULL;
@@ -159,7 +159,7 @@ bool tmp_menus()
 			{
 				//no, load some defaults...
 				if (!car_template)
-					car_template = Car_Template::Load("teams/Nemesis/cars/Venom");
+					car_template = Car_Module::Load("teams/Nemesis/cars/Venom");
 
 				//if above failed
 				if (!car_template)
@@ -195,7 +195,7 @@ bool tmp_menus()
 			scar += "/cars/";
 			scar += file.words[1];
 
-			if (! (car_template = Car_Template::Load(scar.c_str())) )
+			if (! (car_template = Car_Module::Load(scar.c_str())) )
 				return false;
 
 		}

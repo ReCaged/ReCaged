@@ -223,14 +223,14 @@ const struct Conf_Index car_conf_index[] = {
 	{"",0,0}};//end
 
 
-class Car_Template:public Racetime_Data
+class Car_Module:public Racetime_Data
 {
 	public:
-		static Car_Template *Load(const char *path);
+		static Car_Module *Load(const char *path);
 		class Car *Spawn(dReal x, dReal y, dReal z, Trimesh_3D *tyre, Trimesh_3D *rim);
 
 	private:
-		Car_Template(const char *name); //only allocate through spawn function
+		Car_Module(const char *name); //only allocate through spawn function
 
 		//conf:
 		struct Car_Conf conf; //loads from conf
@@ -265,10 +265,10 @@ class Car:public Object
 
 	private:
 		Car(); //not allowed to be allocated freely
-		friend class Car_Template; //only one allowed to create Car objects
+		friend class Car_Module; //only one allowed to create Car objects
 		friend class Camera; //needs access to car info
 
-		//configuration data (copied from Car_Template)
+		//configuration data (copied from Car_Module)
 		dReal power, gear_limit;
 		dReal airtorque;
 		dReal body_mass, wheel_mass;

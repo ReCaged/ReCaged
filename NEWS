@@ -32,8 +32,8 @@ TODO: * Colour indication of importance/verbosity
 
  * Simulation improvements:
    * Increased simulation stability
-   * Simulation does not speed up to catch up with realtime (after lag) any more
-   * Non-zero surface layer depth (less jitter/improved stability at collisions)
+   * Simulation does not speed up to catch up with realtime (after lag) anymore
+   * Non-zero surface layer depth (less jitter/improved collision stability)
 TODO:   * New drag simulation
 
  * Camera improvements:
@@ -57,6 +57,7 @@ TODO:   * New drag simulation
 
  * Code reorganization:
    * Renamed "loaders" to "assets"
-   * Removed "../" from header inclusions (src directory added to inclusion paths)
+   * Removed "../" from header inclusions (src is now in the inclusion paths)
+   * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
 
  * TODO!

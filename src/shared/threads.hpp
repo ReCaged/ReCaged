@@ -57,9 +57,9 @@ int Simulation_Loop (void *d);
 
 //TMP: used for keeping track for objects spawning
 #include "object.hpp"
-extern Object_Template *box;
-extern Object_Template *sphere;
-extern Object_Template *funbox;
-extern Object_Template *molecule;
+extern Module *box;
+extern Module *sphere;
+extern Module *funbox;
+extern Module *molecule;
 
 #endif

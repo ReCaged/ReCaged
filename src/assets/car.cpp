@@ -32,16 +32,16 @@
 #include "shared/directories.hpp"
 
 
-Car_Template *Car_Template::Load (const char *path)
+Car_Module *Car_Module::Load (const char *path)
 {
 	Log_Add(1, "Loading car: %s", path);
 
 	//see if already loaded
-	if (Car_Template *tmp=Racetime_Data::Find<Car_Template>(path))
+	if (Car_Module *tmp=Racetime_Data::Find<Car_Module>(path))
 		return tmp;
 
 	//apparently not
-	Car_Template *target = new Car_Template(path);
+	Car_Module *target = new Car_Module(path);
 
 	//car.conf
 	char conf[strlen(path)+9+1];//+1 for \0
@@ -233,7 +233,7 @@ Car_Template *Car_Template::Load (const char *path)
 }
 
 
-Car *Car_Template::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D *rim)
+Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D *rim)
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 

@@ -29,7 +29,7 @@
 
 //allocate new script storage, and add it to list
 //(not used yet, only for storing 3d list pointers...)
-Object_Template::Object_Template(const char *name): Racetime_Data(name)
+Module::Module(const char *name): Racetime_Data(name)
 {
 	//debug identification bools set to false
 	box = false;

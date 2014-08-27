@@ -40,10 +40,10 @@ int joysticks=0;
 SDL_Joystick **joystick;
 
 //TMP: keep track of demo spawn stuff
-Object_Template *box = NULL;
-Object_Template *sphere = NULL;
-Object_Template *funbox = NULL;
-Object_Template *molecule = NULL;
+Module *box = NULL;
+Module *sphere = NULL;
+Module *funbox = NULL;
+Module *molecule = NULL;
 
 //count frames
 unsigned int interface_count = 0;

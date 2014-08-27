@@ -63,7 +63,7 @@ class Joint: public Component
 		dReal buffer; //if buffer reaches zero, trigger event
 		Script *buffer_script; //the script to run
 
-		friend class Car_Template;
+		friend class Car_Module;
 		friend class Car;
 		friend void Event_Buffers_Process(dReal); //to allow looping
 };
