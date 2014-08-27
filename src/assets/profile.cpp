@@ -19,12 +19,10 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-//#include "../shared/shared.hpp"
-#include "../shared/profile.hpp"
-#include "../shared/log.hpp"
-#include "../shared/directories.hpp"
+#include "shared/profile.hpp"
+#include "shared/log.hpp"
+#include "shared/directories.hpp"
 #include "text_file.hpp"
-//#include "loaders.hpp"
 
 
 //inputs (loaded from keys.lst)

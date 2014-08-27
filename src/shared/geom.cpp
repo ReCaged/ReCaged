@@ -24,8 +24,8 @@
 #include "log.hpp"
 #include "track.hpp"
 #include "internal.hpp"
-#include "../simulation/event_buffers.hpp"
-#include "../loaders/conf.hpp"
+#include "simulation/event_buffers.hpp"
+#include "assets/conf.hpp"
 
 Geom *Geom::head = NULL;
 

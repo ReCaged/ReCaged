@@ -25,7 +25,7 @@
 #include <GL/glew.h>
 #include "internal.hpp"
 #include "trimesh.hpp"
-#include "../loaders/conf.hpp"
+#include "assets/conf.hpp"
 #include "log.hpp"
 #include "directories.hpp"
 

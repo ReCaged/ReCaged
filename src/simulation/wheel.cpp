@@ -21,10 +21,10 @@
 
 
 #include "wheel.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/internal.hpp" 
-#include "../shared/track.hpp"
-#include "../simulation/collision_feedback.hpp"
+#include "shared/geom.hpp"
+#include "shared/internal.hpp" 
+#include "shared/track.hpp"
+#include "simulation/collision_feedback.hpp"
 
 //This code tries to implement a reasonably simple and realistic tyre friction model.
 //(it's mostly inspired by different equations based on Pacejka's "magic formula")

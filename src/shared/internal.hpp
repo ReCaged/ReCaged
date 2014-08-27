@@ -21,7 +21,7 @@
 
 #ifndef _RC_INTERNAL_H
 #define _RC_INTERNAL_H
-#include "../loaders/conf.hpp"
+#include "assets/conf.hpp"
 #include <stddef.h>
 #include <ode/ode.h>
 

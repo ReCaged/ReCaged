@@ -19,8 +19,8 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/trimesh.hpp"
-#include "../shared/log.hpp"
+#include "shared/trimesh.hpp"
+#include "shared/log.hpp"
 #include "text_file.hpp"
 #include <string.h>
 

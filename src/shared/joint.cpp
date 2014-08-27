@@ -21,7 +21,7 @@
 
 #include "joint.hpp"
 #include "component.hpp"
-#include "../simulation/event_buffers.hpp"
+#include "simulation/event_buffers.hpp"
 
 Joint *Joint::head = NULL;
 

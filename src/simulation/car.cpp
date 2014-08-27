@@ -19,9 +19,9 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/car.hpp"
-#include "../shared/track.hpp"
-#include "../shared/internal.hpp"
+#include "shared/car.hpp"
+#include "shared/track.hpp"
+#include "shared/internal.hpp"
 
 void Car::Physics_Step(dReal step)
 {

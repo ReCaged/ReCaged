@@ -14,30 +14,31 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
  * Detect if running in "installed" or "portable" mode
    * Uses xdg or platform-specific paths when installed
 
+ * NSIS installer for windows
+
  * New logging system
-   * Colour indication of importance/verbosity
+TODO: * Colour indication of importance/verbosity
    * Realtime log output now also on windows
    * Writes full log output to file
    * Errors written to stderr (and displayed in message box on windows)
 
- * NSIS installer for windows
-
- * Joystick (gamepad) support
-
- * More reliable window creation (native BPP, better fullscreen support)
-
- * Use native screen resolution for fullscreen mode
-
  * Fixed various insufficient memory allocations
 
- * Anti-Aliasing support (multisample)
+ * Interface improvements:
+   * Joystick (gamepad) support
+   * More reliable window creation (native BPP, better fullscreen support)
+   * Use native screen resolution for fullscreen mode
+   * Anti-Aliasing support (multisample)
 
- * Increased simulation stability
-
- * Simulation does not speed up to catch up with realtime (after lag) any more
+ * Simulation improvements:
+   * Increased simulation stability
+   * Simulation does not speed up to catch up with realtime (after lag) any more
+   * Non-zero surface layer depth (less jitter/improved stability at collisions)
+TODO:   * New drag simulation
 
  * Camera improvements:
    * More reliable movement (more responsive, bumper camera perfectly still)
+TODO:   * New drag simulation
 
  * Car improvements:
    * New, more powerful, downforce
@@ -51,7 +52,11 @@ ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
    * Wheel axles can now break (more a proof-of-concept than actual gameplay)
    * New soft brake/brake-throttle transition code (more reliable at low speed)
    * New rolling resistance code (more reliable at low speed/uneven terrain)
-   * Less bending of wheel axles at high speeds
+   * Less bending of wheel axles at high speeds (finite rotation for axles)
    *..... TODO!
+
+ * Code reorganization:
+   * Renamed "loaders" to "assets"
+   * Removed "../" from header inclusions (src directory added to inclusion paths)
 
  * TODO!

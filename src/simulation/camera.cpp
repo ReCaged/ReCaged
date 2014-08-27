@@ -19,9 +19,9 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/camera.hpp"
-#include "../shared/internal.hpp"
-#include "../shared/track.hpp"
+#include "shared/camera.hpp"
+#include "shared/internal.hpp"
+#include "shared/track.hpp"
 
 #include <math.h>
 

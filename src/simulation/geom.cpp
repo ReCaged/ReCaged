@@ -19,11 +19,11 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/geom.hpp"
+#include "shared/geom.hpp"
 
-#include "../shared/internal.hpp"
-#include "../shared/track.hpp"
-#include "../shared/log.hpp"
+#include "shared/internal.hpp"
+#include "shared/track.hpp"
+#include "shared/log.hpp"
 
 #include "collision_feedback.hpp"
 #include "event_buffers.hpp"

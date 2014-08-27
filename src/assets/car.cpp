@@ -19,17 +19,17 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/internal.hpp"
-#include "../shared/racetime_data.hpp"
-#include "../shared/car.hpp"
-#include "../shared/camera.hpp"
-#include "../shared/log.hpp"
-#include "../shared/track.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/body.hpp"
-#include "../shared/joint.hpp"
+#include "shared/internal.hpp"
+#include "shared/racetime_data.hpp"
+#include "shared/car.hpp"
+#include "shared/camera.hpp"
+#include "shared/log.hpp"
+#include "shared/track.hpp"
+#include "shared/geom.hpp"
+#include "shared/body.hpp"
+#include "shared/joint.hpp"
 #include "text_file.hpp"
-#include "../shared/directories.hpp"
+#include "shared/directories.hpp"
 
 
 Car_Template *Car_Template::Load (const char *path)

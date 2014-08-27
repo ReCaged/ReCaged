@@ -19,7 +19,7 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/profile.hpp"
+#include "shared/profile.hpp"
 
 //extract state change for used inputs
 //LUA note: will be performed by rc.lua

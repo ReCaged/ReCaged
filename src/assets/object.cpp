@@ -19,17 +19,17 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/object.hpp"
+#include "shared/object.hpp"
 
 #include <ode/ode.h>
 
-#include "../shared/racetime_data.hpp"
-#include "../shared/trimesh.hpp"
-#include "../shared/log.hpp"
-#include "../shared/track.hpp"
-#include "../shared/joint.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/body.hpp"
+#include "shared/racetime_data.hpp"
+#include "shared/trimesh.hpp"
+#include "shared/log.hpp"
+#include "shared/track.hpp"
+#include "shared/joint.hpp"
+#include "shared/geom.hpp"
+#include "shared/body.hpp"
 
 //load data for spawning object (object data), hard-coded debug version
 Object_Template *Object_Template::Load(const char *path)

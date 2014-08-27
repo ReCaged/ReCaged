@@ -31,7 +31,7 @@
 #include "geom.hpp"
 #include "trimesh.hpp"
 #include "surface.hpp"
-#include "../loaders/conf.hpp"
+#include "assets/conf.hpp"
 
 #include <vector>
 #include <string>

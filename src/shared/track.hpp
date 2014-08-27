@@ -21,7 +21,7 @@
 
 #ifndef _RC_TRACK_H
 #define _RC_TRACK_H
-#include "../loaders/conf.hpp"
+#include "assets/conf.hpp"
 #include "object.hpp"
 #include <GL/glew.h>
 #include <ode/ode.h>

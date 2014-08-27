@@ -19,15 +19,14 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-//#include "../shared/shared.hpp"
-#include "../shared/track.hpp"
+#include "shared/track.hpp"
 
-#include "../shared/internal.hpp"
-#include "../shared/camera.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/log.hpp"
-#include "../shared/object.hpp"
-#include "../shared/directories.hpp"
+#include "shared/internal.hpp"
+#include "shared/camera.hpp"
+#include "shared/geom.hpp"
+#include "shared/log.hpp"
+#include "shared/object.hpp"
+#include "shared/directories.hpp"
 
 #include "text_file.hpp"
 

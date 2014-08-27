@@ -23,22 +23,22 @@
 #include <SDL/SDL_mutex.h>
 #include <ode/ode.h>
 
-#include "../shared/threads.hpp"
-#include "../shared/internal.hpp"
-#include "../shared/runlevel.hpp"
-#include "../shared/track.hpp"
-#include "../shared/log.hpp"
-#include "../shared/body.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/camera.hpp"
-#include "../shared/car.hpp"
-#include "../shared/joint.hpp"
+#include "shared/threads.hpp"
+#include "shared/internal.hpp"
+#include "shared/runlevel.hpp"
+#include "shared/track.hpp"
+#include "shared/log.hpp"
+#include "shared/body.hpp"
+#include "shared/geom.hpp"
+#include "shared/camera.hpp"
+#include "shared/car.hpp"
+#include "shared/joint.hpp"
 
 #include "collision_feedback.hpp"
 #include "event_buffers.hpp"
 #include "timers.hpp"
 
-#include "../interface/render_list.hpp"
+#include "interface/render_list.hpp"
 
 
 unsigned int simulation_count = 0;

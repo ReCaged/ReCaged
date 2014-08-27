@@ -19,7 +19,7 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/track.hpp"
+#include "shared/track.hpp"
 #include "event_buffers.hpp"
 #include "timers.hpp"
 

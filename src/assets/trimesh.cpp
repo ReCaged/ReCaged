@@ -19,9 +19,9 @@
  * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "../shared/trimesh.hpp"
-#include "../shared/log.hpp"
-#include "../shared/directories.hpp"
+#include "shared/trimesh.hpp"
+#include "shared/log.hpp"
+#include "shared/directories.hpp"
 
 //
 //for trimesh file loading

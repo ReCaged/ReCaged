@@ -22,13 +22,13 @@
 #include <GL/glew.h>
 #include "render_list.hpp"
 
-#include "../shared/threads.hpp"
-#include "../shared/internal.hpp"
-#include "../shared/log.hpp"
-#include "../shared/trimesh.hpp"
-#include "../shared/geom.hpp"
-#include "../shared/body.hpp"
-#include "../shared/camera.hpp"
+#include "shared/threads.hpp"
+#include "shared/internal.hpp"
+#include "shared/log.hpp"
+#include "shared/trimesh.hpp"
+#include "shared/geom.hpp"
+#include "shared/body.hpp"
+#include "shared/camera.hpp"
 
 #include <stdlib.h>
 #include <ode/ode.h>
