@@ -157,8 +157,6 @@ void Body::Axis_Angular_Drag (dReal step)
 		rot[1]*vel[0]+rot[5]*vel[1]+rot[9]*vel[2],
 		rot[2]*vel[0]+rot[6]*vel[1]+rot[10]*vel[2] };
 
-	printf("%f %f %f\n", rel[0], rel[1], rel[2]);
-
 	dReal total_vel = v_length(rel[0], rel[1], rel[2]);
 
 	//how much of original velocity is left after braking by air/liquid drag
