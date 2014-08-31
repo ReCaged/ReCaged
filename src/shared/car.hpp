@@ -70,7 +70,7 @@ struct Car_Conf
 	dReal wheel[2], wheel_mass, wheel_pos[2];
 	bool wsphere, wcapsule;
 
-	dReal body_linear_drag[3], body_angular_drag, wheel_linear_drag, wheel_angular_drag;
+	dReal body_linear_drag[3], body_angular_drag[3], wheel_linear_drag, wheel_angular_drag;
 	dReal sensor[4];
 
 	dReal suspension_pos;
@@ -119,7 +119,7 @@ const struct Car_Conf car_conf_defaults = {
 	{1.25, 1.4}, 60.0, {2.4, 1.8},
 	false, false,
 
-	{3.0,1.0,5.0}, 10.0, 0.0, 0.5,
+	{3.0,1.0,5.0}, {20.0, 10.0, 5.0}, 0.0, 0.5,
 	{4.8, 3.6, 1.6, 1.25},
 
 	2.05,
@@ -176,7 +176,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"wheel:capsule",	'b',1, offsetof(struct Car_Conf, wcapsule)},
 
 	{"body:linear_drag",	'R',3, offsetof(struct Car_Conf, body_linear_drag)},
-	{"body:angular_drag",	'R',1, offsetof(struct Car_Conf, body_angular_drag)},
+	{"body:angular_drag",	'R',3, offsetof(struct Car_Conf, body_angular_drag)},
 	{"wheel:linear_drag",	'R',1, offsetof(struct Car_Conf, wheel_linear_drag)},
 	{"wheel:angular_drag",	'R',1, offsetof(struct Car_Conf, wheel_angular_drag)},
 	{"sensor",		'R',4, offsetof(struct Car_Conf, sensor)},
