@@ -79,13 +79,13 @@ const struct internal_struct internal_defaults = {
 	{-1,4},
 	true,
 	//graphics
-	{1200,800},
+	{1280,720},
 	true,
 	false,
 	4,
 	{1.0, 1500.0},
 	500.0,
-	2800.0,
+	2000.0,
 	0};
 
 const struct Conf_Index internal_index[] = {
