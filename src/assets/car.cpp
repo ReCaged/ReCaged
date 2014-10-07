@@ -296,9 +296,9 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D
 
 	//set up air (and liquid) drag for body
 	Body *bdata = new Body (car->bodyid, car);
-	bdata->Set_Advanced_Linear_Drag (conf.body_linear_drag[0], conf.body_linear_drag[1], conf.body_linear_drag[2]);
+	bdata->Set_Axis_Linear_Drag (conf.body_linear_drag[0], conf.body_linear_drag[1], conf.body_linear_drag[2]);
 	//rotational drag
-	bdata->Set_Angular_Drag (conf.body_angular_drag);
+	bdata->Set_Axis_Angular_Drag (conf.body_angular_drag[0], conf.body_angular_drag[1], conf.body_angular_drag[2]);
 
 
 	dBodySetPosition (car->bodyid, x, y, z);

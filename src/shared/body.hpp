@@ -42,9 +42,14 @@ class Body: public Component
 
 		void Set_Event(dReal thresh, dReal buff, Script *scr);
 		void Update_Mass(); //must be called if change of mass
+
+		//set linear/angular air/liquid drag coefficients
 		void Set_Linear_Drag(dReal drag);
 		void Set_Angular_Drag(dReal drag);
-		void Set_Advanced_Linear_Drag(dReal x, dReal y, dReal z);
+
+		//like above, but different coefficients for each (local) axis
+		void Set_Axis_Linear_Drag(dReal x, dReal y, dReal z);
+		void Set_Axis_Angular_Drag(dReal x, dReal y, dReal z); //TODO: perhaps change to matrix (like inertia tensor)?
 
 		static void Physics_Step(dReal step);
 
@@ -70,11 +75,13 @@ class Body: public Component
 		//data for drag (air+water friction)
 		//instead of the simple spherical drag model, use a
 		//"squeezed/stretched" sphere?
-		bool use_advanced_linear_drag;
+		bool use_axis_linear_drag;
+		bool use_axis_angular_drag;
+
 		//drag values (must be adjusted to the body mass)
 		dReal mass; //used for drag
-		dReal linear_drag, advanced_linear_drag[3];
-		dReal angular_drag;
+		dReal linear_drag[3];
+		dReal angular_drag[3];
 
 		//event processing
 		bool buffer_event; //buffer has just been depleted
@@ -85,7 +92,8 @@ class Body: public Component
 		//private methods for drag
 		void Linear_Drag(dReal step);
 		void Angular_Drag(dReal step);
-		void Advanced_Linear_Drag(dReal step);
+		void Axis_Linear_Drag(dReal step);
+		void Axis_Angular_Drag(dReal step);
 };
 
 #endif

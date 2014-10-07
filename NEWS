@@ -34,7 +34,8 @@ TODO: * Colour indication of importance/verbosity
    * Increased simulation stability
    * Simulation does not speed up to catch up with realtime (after lag) anymore
    * Non-zero surface layer depth (less jitter/improved collision stability)
-TODO:   * New drag simulation
+   * New air/liquid drag simulation calculation (both linear and rotational)
+   * Added per-axis rotational drag coefficients (used by cars, like linear)
 
  * Camera improvements:
    * More reliable movement (more responsive, bumper camera perfectly still)

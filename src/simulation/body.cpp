@@ -1,7 +1,7 @@
 /*
  * ReCaged - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
  * This file is part of ReCaged.
  *
@@ -43,22 +43,32 @@ void Body::Update_Mass()
 //(this way the body mass doesn't need to be requested and used in every calculation)
 void Body::Set_Linear_Drag (dReal drag)
 {
-	linear_drag = drag;
-	use_advanced_linear_drag = false;
+	linear_drag[0] = drag;
+	use_axis_linear_drag = false;
 }
 
-void Body::Set_Advanced_Linear_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
+void Body::Set_Axis_Linear_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
 {
-	advanced_linear_drag[0] = drag_x;
-	advanced_linear_drag[1] = drag_y;
-	advanced_linear_drag[2] = drag_z;
+	linear_drag[0] = drag_x;
+	linear_drag[1] = drag_y;
+	linear_drag[2] = drag_z;
 
-	use_advanced_linear_drag = true;
+	use_axis_linear_drag = true;
 }
 
 void Body::Set_Angular_Drag (dReal drag)
 {
-	angular_drag = drag;
+	angular_drag[0] = drag;
+	use_axis_angular_drag = false;
+}
+
+void Body::Set_Axis_Angular_Drag (dReal drag_x, dReal drag_y, dReal drag_z)
+{
+	angular_drag[0] = drag_x;
+	angular_drag[1] = drag_y;
+	angular_drag[2] = drag_z;
+
+	use_axis_angular_drag = true;
 }
 
 
@@ -73,15 +83,12 @@ void Body::Linear_Drag (dReal step)
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
 	//how much of original velocity is left after braking by air/liquid drag
-	dReal remain = 1-(total_vel*(track.density)*(linear_drag/mass)*(step));
-
-	if (remain < 0) //in case braking is so extreme it will reverse movement, just change velocity to 0
-		remain = 0;
+	dReal scale=1.0/(1.0+total_vel*(track.density)*(linear_drag[0]/mass)*(step));
 
 	//change velocity
-	vel[0]*=remain;
-	vel[1]*=remain;
-	vel[2]*=remain;
+	vel[0]*=scale;
+	vel[1]*=scale;
+	vel[2]*=scale;
 
 	//make absolute
 	vel[0]+=track.wind[0];
@@ -92,8 +99,8 @@ void Body::Linear_Drag (dReal step)
 	dBodySetLinearVel(body_id, vel[0], vel[1], vel[2]);
 }
 
-//similar to linear_drag, but different drag for different directions
-void Body::Advanced_Linear_Drag (dReal step)
+//similar to linear_drag, but different drag for different (local) directions
+void Body::Axis_Linear_Drag (dReal step)
 {
 	//absolute velocity
 	const dReal *abs_vel;
@@ -105,20 +112,9 @@ void Body::Advanced_Linear_Drag (dReal step)
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
 	//how much of original velocities is left after braking by air/liquid drag
-	dReal remain;
-	int i;
-	for (i=0; i<3; ++i)
-	{
-		//how much of original velocity remains after drag?
-		remain = 1-(total_vel*(track.density)*(advanced_linear_drag[i]/mass)*(step));
-
-		//check so not going negative
-		if (remain < 0)
-			remain = 0;
-
-		//change velocity
-		vel[i]*=remain;
-	}
+	vel[0]/=1.0+(total_vel*(track.density)*(linear_drag[0]/mass)*(step));
+	vel[1]/=1.0+(total_vel*(track.density)*(linear_drag[1]/mass)*(step));
+	vel[2]/=1.0+(total_vel*(track.density)*(linear_drag[2]/mass)*(step));
 
 	//make absolute
 	dVector3 vel_result;
@@ -140,15 +136,40 @@ void Body::Angular_Drag (dReal step)
 	dReal total_vel = v_length(vel[0], vel[1], vel[2]);
 
 	//how much of original velocity is left after braking by air/liquid drag
-	dReal remain = 1-(total_vel*(track.density)*(angular_drag/mass)*(step));
-
-	if (remain < 0) //in case braking is so extreme it will reverse movement, just change velocity to 0
-		remain = 0;
+	dReal scale=1.0/(1.0+total_vel*(track.density)*(angular_drag[0]/mass)*(step));
 
 	//set velocity with change
-	dBodySetAngularVel(body_id, vel[0]*remain, vel[1]*remain, vel[2]*remain);
+	dBodySetAngularVel(body_id, vel[0]*scale, vel[1]*scale, vel[2]*scale);
 }
 
+void Body::Axis_Angular_Drag (dReal step)
+{
+	//rotation velocity
+	const dReal *vel = dBodyGetAngularVel (body_id);
+
+	//rotation matrix
+	const dReal *rot=dBodyGetRotation(body_id);
+
+	//transform rotation to relative body
+	//(could use matrix for drag, like inertia tensor)
+	dReal rel[3]={
+		rot[0]*vel[0]+rot[4]*vel[1]+rot[8]*vel[2],
+		rot[1]*vel[0]+rot[5]*vel[1]+rot[9]*vel[2],
+		rot[2]*vel[0]+rot[6]*vel[1]+rot[10]*vel[2] };
+
+	dReal total_vel = v_length(rel[0], rel[1], rel[2]);
+
+	//how much of original velocity is left after braking by air/liquid drag
+	rel[0]/=(1.0+total_vel*(track.density)*(angular_drag[0]/mass)*(step));
+	rel[1]/=(1.0+total_vel*(track.density)*(angular_drag[1]/mass)*(step));
+	rel[2]/=(1.0+total_vel*(track.density)*(angular_drag[2]/mass)*(step));
+
+	//set velocity with change (transformed back to world coordinates)
+	dBodySetAngularVel(body_id,
+		rot[0]*rel[0]+rot[1]*rel[1]+rot[2]*rel[2],
+		rot[4]*rel[0]+rot[5]*rel[1]+rot[6]*rel[2],
+		rot[8]*rel[0]+rot[9]*rel[1]+rot[10]*rel[2] );
+}
 
 void Body::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 {
@@ -199,13 +220,16 @@ void Body::Physics_Step (dReal step)
 	while ((body = bnext))
 	{
 		//drag
-		if (body->use_advanced_linear_drag)
-			body->Advanced_Linear_Drag(step);
+		if (body->use_axis_linear_drag)
+			body->Axis_Linear_Drag(step);
 		else //simple drag instead
 			body->Linear_Drag(step);
 
 		//angular
-		body->Angular_Drag(step);
+		if (body->use_axis_angular_drag)
+			body->Axis_Angular_Drag(step);
+		else
+			body->Angular_Drag(step);
 
 
 		//check if at "respawn depth"
