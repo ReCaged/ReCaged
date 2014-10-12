@@ -172,7 +172,7 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags ode], [$pkg_static --libs ode],
 	AC_PATH_TOOL([ODE_CONFIG], [ode-config])
 	RC_CHECK_PROG([$ODE_CONFIG], [--cflags], [--libs],
 	[
-		AC_MSG_WARN([Attempting to guess files for ODE using ac_check_* macros])
+		AC_MSG_WARN([Attempting to guess configuration for ODE using ac_check_* macros])
 		AC_MSG_WARN([Don't know if using double or single precision!... Assuming double...])
 		CPPFLAGS="$CPPFLAGS -DdDOUBLE" #hack: appends to user/global variable, but should be fine...?
 
@@ -197,7 +197,7 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 
 	RC_CHECK_PROG([$SDL_CONFIG], [--cflags], [$sdl_libs],
 	[
-		AC_MSG_WARN([Attempting to guess files for SDL using ac_check_* macros])
+		AC_MSG_WARN([Attempting to guess configuration for SDL using ac_check_* macros])
 		AC_CHECK_HEADER([SDL/SDL.h],, [ AC_MSG_ERROR([Headers for SDL appears to be missing, install libsdl-dev or similar]) ])
 		AC_CHECK_LIB([SDL], [SDL_Init],
 			[RC_LIBS="$RC_LIBS -lSDL"],
