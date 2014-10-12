@@ -1,7 +1,7 @@
 #
 # ReCaged - a Free Software, Futuristic, Racing Game
 #
-# Copyright (C) 2012 Mats Wahlberg
+# Copyright (C) 2012, 2014 Mats Wahlberg
 #
 # This file is part of ReCaged.
 #
@@ -116,8 +116,12 @@ LDADD += resources.o
 #note: sed usage might be a ugly/unreliable, but only replaces dots anyway
 resources.rc: Makefile
 	( echo "1 VERSIONINFO"; \
-	echo "FILEVERSION $(PACKAGE_VERSION),0" | sed "s/\./,/g"; \
-	echo "PRODUCTVERSION $(PACKAGE_VERSION),0" | sed "s/\./,/g"; \
+	echo -n "FILEVERSION "; \
+	echo -n "$(PACKAGE_VERSION)" | sed 's/\([0-9.]*\).*/\1/; s/\./,/g'; \
+	echo ",0"; \
+	echo -n "PRODUCTVERSION "; \
+	echo -n "$(PACKAGE_VERSION)" | sed 's/\([0-9.]*\).*/\1/; s/\./,/g'; \
+	echo ",0"; \
 	echo "BEGIN"; \
 	echo "BLOCK \"StringFileInfo\""; \
 	echo "BEGIN"; \
