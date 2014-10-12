@@ -85,8 +85,8 @@ bool Trimesh::Load_OBJ(const char *f)
 			vector.z=atof(file.words[3]);
 
 			normals.push_back(vector); //add to list
-		} // "f" index and more than 3 words (needs at least 3 indices)
-		else if (file.words[0][0]=='v' && file.words[0][1]=='t' && file.words[0][2]=='\0' && file.word_count==3)
+		} // "f" uv and at least 3 words (2D coordinates, any more elements ignored)
+		else if (file.words[0][0]=='v' && file.words[0][1]=='t' && file.words[0][2]=='\0' && file.word_count>=3)
 		{
 			vector2.x=atof(file.words[1]);
 			vector2.y=-atof(file.words[2]); //needs to reverse this one (counteract opengl weirdness)
@@ -198,7 +198,7 @@ bool Trimesh::Load_OBJ(const char *f)
 	//safety check if no uv maps at all
 	if (texcoords.empty())
 	{
-		Log_Add(1, "Note: obj does not have UV coordinates!");
+		Log_Add(2, "Note: obj does not have UV coordinates!");
 		vector2.x=0.0;
 		vector2.y=0.0;
 		texcoords.push_back(vector2); //add to list

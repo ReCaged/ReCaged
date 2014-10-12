@@ -67,14 +67,18 @@ class Image
 		//remember name for created data
 		std::string name;
 
+		void Allocate();
+
 		//functions for loading:
 		bool Load_BMP(const char *);
+		bool Load_JPG(const char *);
 		//bool Load_PNG
 
 		//actual data to store:
-		Uint8 *pixels;
+		uint8_t *pixels;
 		enum image_format{RGB, BGR, RGBA, BGRA} format;
-		int width, height;
+		int width, height, components, componentdepth;
+		//(componentdepth is number of bits per component and pixel)
 };
 
 #endif

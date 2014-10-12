@@ -24,6 +24,8 @@
 //
 #include <SDL/SDL.h>
 #include <GL/glew.h>
+#include <jpeglib.h>
+#include <setjmp.h> //for insanity of jpeg/png libraries
 #include "shared/internal.hpp"
 #include "shared/log.hpp"
 #include "image.hpp"
@@ -44,8 +46,7 @@ Image::~Image()
 //may I present the main event:
 bool Image::Load (const char *file)
 {
-	Log_Add(1, "Loading image from file \"%s\"", file);
-	Log_Add(2, "determining file type from suffix");
+	Log_Add(2, "Loading image from file \"%s\" (identifying suffix)", file);
 
 	name = file;
 	delete[] pixels;
@@ -68,13 +69,26 @@ bool Image::Load (const char *file)
 	//see if match:
 	if (!strcasecmp(suffix, ".bmp"))
 		return Load_BMP(file);
+	else if (!strcasecmp(suffix, ".jpg") || !strcasecmp(suffix, ".jpeg"))
+		return Load_JPG(file);
 
 	//else, no match
 	Log_Add(-1, "unknown image file suffix for \"%s\"", file);
 	return false;
 }
 
-//and here's the real work for now:
+//just so not forgetting the message output when allocating
+void Image::Allocate()
+{
+	//Ugly, yes. For now it's assumed that componentdepth is multiple of 8
+	size_t size=(width*height*components*componentdepth)/8;
+
+	Log_Add(2, "Allocating image buffer of %u bytes", size);
+	pixels = new uint8_t[size];
+}
+
+//loaders:
+//BMP:
 bool Image::Load_BMP(const char *file)
 {
 	Log_Add(2, "Loading image from BMP file \"%s\"", file);
@@ -91,8 +105,10 @@ bool Image::Load_BMP(const char *file)
 	height=surface->h;
 	Log_Add(2, "resolution: %ix%i", width, height);
 
+	//TODO: indexed BMPs!
 	if (surface->format->BytesPerPixel == 4) //32b = alpha
 	{
+		components=4;
 		//check order
 		if (surface->format->Rmask == 0x000000ff)
 		{
@@ -107,6 +123,7 @@ bool Image::Load_BMP(const char *file)
 	}
 	else if (surface->format->BytesPerPixel == 3) //24b = no alpha
 	{
+		components=3;
 		if (surface->format->Rmask == 0x000000ff)
 		{
 			Log_Add(2, "format: RGB, 24 bits");
@@ -124,15 +141,115 @@ bool Image::Load_BMP(const char *file)
 		SDL_FreeSurface(surface);
 		return false;
 	}
- 
+
+	//assumes 8 bits per component and pixel (so 24 or 32 bits)
+	componentdepth=8;
+	//TODO: else {surface->pitch when not using whole bytes for pixels...}
+
 	//copy:
-	size_t size=surface->pitch*surface->h;
-	pixels = new Uint8[size];
-	memcpy(pixels, surface->pixels, sizeof(Uint8)*size);
+	Allocate();
+	memcpy(pixels, surface->pixels, sizeof(uint8_t)*height*surface->pitch);
 	SDL_FreeSurface(surface);
 
 	return true;
 }
+
+//JPEG:
+
+//error handling (as in example.c from jpeglib)
+struct my_error_mgr
+{
+	struct jpeg_error_mgr pub;
+	jmp_buf setjmp_buffer;
+};
+
+METHODDEF(void) my_error_exit(j_common_ptr cinfo)
+{
+	struct my_error_mgr *err=(struct my_error_mgr *) cinfo->err;
+	char errormsg[JMSG_LENGTH_MAX];
+	( *(cinfo->err->format_message) ) (cinfo, errormsg);
+	Log_Add(-1, "Error reading JPEG: %s", errormsg);
+	longjmp(err->setjmp_buffer, 1);
+}
+
+bool Image::Load_JPG(const char *file)
+{
+	Log_Add(2, "Loading image from JPEG file \"%s\"", file);
+
+	FILE *fp=fopen(file, "rb");
+
+	if (!fp)
+	{
+		Log_Add(-1, "Unable to open image file \"%s\"", file);
+		return false;
+	}
+
+	struct jpeg_decompress_struct cinfo;
+	struct my_error_mgr jerr;
+
+	//set up the (insane, sigh) error handling used by libjpeg...
+	cinfo.err=jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit=my_error_exit;
+
+	//creepy voodoo stuff...
+	if (setjmp(jerr.setjmp_buffer))
+	{
+		jpeg_destroy_decompress(&cinfo);
+		fclose(fp);
+		return false;
+	}
+
+	//create (destroy in error jmp, or when finished)
+	jpeg_create_decompress(&cinfo);
+
+	//read from fp
+	jpeg_stdio_src(&cinfo, fp);
+	jpeg_read_header(&cinfo, TRUE);
+	jpeg_start_decompress(&cinfo);
+
+	//metadata to store
+	width=cinfo.output_width;
+	height=cinfo.output_height;
+
+	if (cinfo.num_components == 4)
+	{
+		components=4;
+		format=RGBA;
+	}
+	else if (cinfo.num_components == 3)
+	{
+		components=3;
+		format=RGB;
+	}
+	else
+	{
+		//obviously something to support for the future (grayscale!)
+		Log_Add(-1, "Unsupported image number of components (%i) in \"%s\" (not 3 or 4)!", cinfo.num_components, name.c_str());
+		return false;
+	}
+
+	componentdepth=BITS_IN_JSAMPLE; //not 100% sure this is right...
+
+	//try to allocate memory
+	Allocate();
+
+	//read, line by line
+	uint8 *ppointer; //libjpeg wants pointer to pointer...
+	int scanlinebytes=width*components*componentdepth/8; //mmm... should be right?...
+	while (cinfo.output_scanline < cinfo.output_height)
+	{
+		ppointer=pixels +cinfo.output_scanline*scanlinebytes;
+		jpeg_read_scanlines(&cinfo, &ppointer, 1);
+	}
+
+	jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+	fclose(fp);
+
+	return true;
+}
+
+//fabricators:
 Image_Texture *Image::Create_Texture()
 {
 	Log_Add(2, "Creating texture from image");
@@ -151,8 +268,10 @@ Image_Texture *Image::Create_Texture()
 	}
 
 	//what format?
-	GLenum pixel_format, internal_format;
+	GLenum pixel_format, internal_format, pixel_type;
 
+	//note: RGBA8 is suggested by the opengl wiki, might want to look over
+	//this when adding grayscale, floating point and boolean textures...
 	switch (format)
 	{
 		case RGBA:
@@ -165,11 +284,11 @@ Image_Texture *Image::Create_Texture()
 			break;
 		case RGB:
 			pixel_format=GL_RGB;
-			internal_format=GL_RGB8; //or RGBA8?
+			internal_format=GL_RGB8; //or RGBA?
 			break;
 		case BGR:
 			pixel_format=GL_BGR;
-			internal_format=GL_RGB8; //or RGBA8?
+			internal_format=GL_RGB8; //or RGBA?
 			break;
 		default:
 			Log_Add(-1, "Unsupported image format in \"%s\"!", name.c_str());
@@ -177,8 +296,18 @@ Image_Texture *Image::Create_Texture()
 			break;
 	}
 
+	if (componentdepth==8)
+		pixel_type=GL_UNSIGNED_BYTE;
+	/*else if (componentdepth==16)
+		pixel_type=GL_UNSIGNED_SHORT;*/
+	else
+	{
+		Log_Add(-1, "Unsupported image component depth (%i) in \"%s\" (not 8 bits)!", componentdepth, name.c_str());
+		return NULL;
+	}
+
 	//create:
-	Log_Add(2, "Generating gpu texture");
+	Log_Add(2, "Generating gpu texture (might use about %i bytes of video ram)", width*height*4); //most cards internally converts everything to RGBA8
 	GLuint id;
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
@@ -199,7 +328,7 @@ Image_Texture *Image::Create_Texture()
 
 	//upload:
 	Log_Add(2, "Uploading texture to gpu");
-	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, pixel_format, GL_UNSIGNED_BYTE, pixels);
+	glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, pixel_format, pixel_type, pixels);
 
 	return new Image_Texture(name.c_str(), id);
 }

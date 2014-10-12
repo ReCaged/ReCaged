@@ -205,10 +205,22 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 	])
 ])
 
+#LIBJPEG:
+#note: Have never seen a libjpeg.pc in the wild, but this can't harm... Right?
+RC_CHECK_PROG([$PKG_CONFIG], [--cflags libjpeg], [$pkg_static --libs libjpeg],
+[
+	#okay, most likely outcome: check for existence directly
+	AC_MSG_WARN([Attempting to guess configuration for LIBJPEG using ac_check_* macros])
+	AC_CHECK_HEADER([jpeglib.h],, [ AC_MSG_ERROR([Headers for LIBJPEG appears to be missing, install libjpeg-dev or similar]) ])
+	AC_CHECK_LIB([jpeg], [jpeg_destroy_decompress],
+		[RC_LIBS="$RC_LIBS -ljpeg"],
+		[AC_MSG_ERROR([LIBJPEG library appears to be missing, install libjpeg or similar])])
+])
+
 #GLEW:
 RC_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 [
-	AC_MSG_WARN([Attempting to guess configuraton for GLEW using ac_check_* macros])
+	AC_MSG_WARN([Attempting to guess configuration for GLEW using ac_check_* macros])
 	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Headers for GLEW appears to be missing, install libglew-dev or similar]) ])
 
 	if test "$ON_W32" = "no"; then
@@ -231,7 +243,7 @@ fi
 #GL (never static):
 RC_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 [
-	AC_MSG_WARN([Attempting to guess configuraton for GL using ac_check_* macros])
+	AC_MSG_WARN([Attempting to guess configuration for GL using ac_check_* macros])
 	AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
 
 	#note: w32 likes to brake naming conventions (opengl32).

@@ -161,7 +161,7 @@ then
 		echo "Getting SDL..."
 		echo ""
 		echo "Figuring out latest version (of 1.2)..."
-		SDLV=$(wget 'http://libsdl.org/download-1.2.php' -O - 2>/dev/null|grep "release/SDL-1\.2.*tar.gz\""|cut -d'"' -f 2)
+		SDLV=$(wget 'http://libsdl.org/download-1.2.php' -O - 2>/dev/null|grep "release/SDL-1\.2.*tar.gz\""|cut -d'"' -f2)
 		echo "Latest version might be: "$SDLV" - trying..."
 
 		cd "$BUILDDIR"
@@ -192,6 +192,32 @@ then
 
 		if ! (cd ode-*&& \
 			./configure --enable-libccd --prefix="$LIBDIR"&& \
+			make install)
+		then
+			echo ""
+			echo "ERROR!"
+			echo ""
+			exit 1
+		fi
+	fi
+
+	#jpeg
+	if [ ! -e "$LIBDIR/include/jpeglib.h" ]
+	then
+		echo ""
+		echo "Getting LIBJPEG..."
+		echo ""
+
+		echo "Figuring out latest version..."
+		JPEGV=$(wget 'http://www.ijg.org/' -O - 2>/dev/null|grep "files/jpegsrc.*tar.gz\""|cut -d'"' -f2)
+		echo "Latest version might be: "$JPEGV" - trying..."
+
+		cd "$BUILDDIR"
+		wget "http://www.ijg.org/$JPEGV"
+		tar xf jpegsrc* &>/dev/null #ignore gid_t warning
+
+		if ! (cd jpeg-*&& \
+			./configure --prefix="$LIBDIR"&& \
 			make install)
 		then
 			echo ""
