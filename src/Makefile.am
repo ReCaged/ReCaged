@@ -141,7 +141,7 @@ resources.rc: Makefile
 	echo "BEGIN"; \
 	echo "VALUE \"Translation\", 0x0000, 0x0000"; \
 	echo "END";\
-	echo "END" ) > resources.rc
+	echo "END" ) > $@
 
 
 #windres creates resource obj from rc

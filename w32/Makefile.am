@@ -30,7 +30,10 @@ all-local: version.nsh
 
 #only updates on changes to w32/Makefile (like version change)
 version.nsh: Makefile
-	echo "!define VERSION \"${PACKAGE_VERSION}\"" > $@
+	( echo "!define VERSION \"${PACKAGE_VERSION}\""; \
+	echo -n "!define W32VERSION "; \
+	echo -n "$(PACKAGE_VERSION)" | sed 's/\([0-9.]*\).*/\1/'; \
+	echo ".0"; ) > $@
 
 endif
 
