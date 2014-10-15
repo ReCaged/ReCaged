@@ -55,7 +55,7 @@ then
 
 	#try building
 	echo "Running configure and make"
-	if ! ( ./configure --enable-w32static --enable-w32console --prefix="$BUILDDIR"  && make install)
+	if ! ( ./configure --enable-w32static --enable-w32console --prefix="$BUILDDIR"  && make clean && make && make install)
 	then
 		echo ""
 		echo "ERROR!"
@@ -260,7 +260,7 @@ then
 elif [ "$1" = "devconfig" ]
 then
 	echo ""
-	echo "Configuring for quick and dynamic compilation"
+	echo "Configuring for simple, repeated builds"
 	echo ""
 
 	echo "Preparing compilation..."
@@ -271,8 +271,8 @@ then
 	autoreconf -fi || exit 1
 
 	#try building
-	echo "Configuring (not enabling static or preparing for installer)"
-	if ! ( ./configure --enable-w32console )
+	echo "Configuring (not building or preparing for installer)"
+	if ! ( ./configure --enable-w32static --enable-w32console)
 	then
 		echo ""
 		echo "ERROR!"
@@ -281,8 +281,9 @@ then
 	fi
 
 	echo "Okay, now you can compile by typing \"make\""
-	echo "Note: the exe can only run inside mingw/msys, not windows!"
-	echo "(type \"src/recaged\" or \"./recaged\" to run it)"
+	echo "(type \"src/recaged\" or \"./recaged\" afterwards to run it)"
+	echo ""
+	echo "Note: If you wanted to create an installer, run \"$0 installer\" instead!"
 
 
 
@@ -300,7 +301,7 @@ else
 	echo "	installer	- compile and create w32 installer"
 	echo "	dependencies	- install everything needed for compiling+packing (+vim)"
 	echo "	update		- update everything (will delete \"$LIBDIR\")"
-	echo "	devconfig	- configure compilation and running from mingw/msys only, no static or installer"
+	echo "	devconfig	- only configure (for development/repeated compilations)"
 	#echo "	crossinstaller	- cross-compile w32 installer"
 	#echo "	crossdependencies	- cross-compile libraries for w32"
 	echo "(see README for more details)"

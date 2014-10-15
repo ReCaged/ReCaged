@@ -102,8 +102,7 @@ InstallButtonText $DIR_BUTTON_TEXT
 ;
 !insertmacro MUI_LANGUAGE "English"
 
-#note: extra ".0" because of windows limitation
-VIProductVersion "${VERSION}.0"
+VIProductVersion "${W32VERSION}"
 VIAddVersionKey "ProductName" "ReCaged"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "ProductVersion" "${VERSION}"
