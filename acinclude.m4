@@ -205,8 +205,31 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 	])
 ])
 
+#LIBPNG:
+RC_CHECK_PROG([$PKG_CONFIG], [--cflags libpng], [$pkg_static --libs libpng],
+[
+	AC_PATH_TOOL([PNG_CONFIG], [libpng-config])
+
+	#add pkg_static for the potential "--static" flag
+	RC_CHECK_PROG([$PNG_CONFIG], [--cflags], [$pkg_static --ldflags],
+	[
+		AC_MSG_WARN([Attempting to guess configuration for LIBPNG using ac_check_* macros])
+		AC_CHECK_HEADER([png.h],, [ AC_MSG_ERROR([Headers for LIBPNG appears to be missing, install libpng-dev or similar]) ])
+		AC_CHECK_LIB([png], [png_destroy_write_struct],
+			[RC_LIBS="$RC_LIBS -lpng"],
+			[AC_MSG_ERROR([LIBPNG library appears to be missing, install libpng or similar])])
+
+		#static linking on windows requires zlib
+		if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
+			AC_CHECK_LIB([z], [gzread],
+				[RC_LIBS="$RC_LIBS -lz"],
+				[AC_MSG_ERROR([ZLIB library appears to be missing, install zlib or similar])])
+		fi
+	])
+])
+
 #LIBJPEG:
-#note: Have never seen a libjpeg.pc in the wild, but this can't harm... Right?
+#note: Have never seen a libjpeg.pc in the wild, but this can't harm... right?
 RC_CHECK_PROG([$PKG_CONFIG], [--cflags libjpeg], [$pkg_static --libs libjpeg],
 [
 	#okay, most likely outcome: check for existence directly

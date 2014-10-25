@@ -67,17 +67,20 @@ class Image
 		//remember name for created data
 		std::string name;
 
+		//TODO: remove this? And don't assume nice bit depths! Each ROW
+		//should be (stored) byte-aligned, but the actual pixels can be
+		//much different (eg 1b)... read based on "rowbytes" instead!
 		void Allocate();
 
 		//functions for loading:
 		bool Load_BMP(const char *);
+		bool Load_PNG(const char *);
 		bool Load_JPG(const char *);
-		//bool Load_PNG
 
 		//actual data to store:
 		uint8_t *pixels;
 		enum image_format{RGB, BGR, RGBA, BGRA} format;
-		int width, height, components, componentdepth;
+		int width, height, components, bitdepth;
 		//(componentdepth is number of bits per component and pixel)
 };
 

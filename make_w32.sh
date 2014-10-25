@@ -139,7 +139,7 @@ then
 		echo "$HOMEDRIVE/mingw /mingw" > /etc/fstab
 	fi
 
-	echo "Installing packages using msys-get..."
+	echo "Installing packages using mingw-get..."
 
 	#using mingw pre-built packages:
 	mingw-get install msys-wget mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-bzip2 mingw32-libz mingw32-autoconf mingw32-automake msys-vim
@@ -192,6 +192,31 @@ then
 
 		if ! (cd ode-*&& \
 			./configure --enable-libccd --prefix="$LIBDIR"&& \
+			make install)
+		then
+			echo ""
+			echo "ERROR!"
+			echo ""
+			exit 1
+		fi
+	fi
+
+	#png
+	if [ ! -e "$LIBDIR/include/png.h" ]
+	then
+		echo "Getting LIBPNG..."
+		echo ""
+
+		echo "Figuring out latest version..."
+		PNGV=$(wget 'http://www.libpng.org/pub/png/libpng.html' -O - 2>/dev/null|grep -m 1 "http://prdownloads.*libpng-.*.tar.xz"|cut -d'"' -f2)
+		echo "Latest version might be: "$PNGV" - trying..."
+
+		cd "$BUILDDIR"
+		wget "$PNGV"
+		tar xf libpng* &>/dev/null #ignore gid_t warning
+
+		if ! (cd libpng-*&& \
+			./configure --prefix="$LIBDIR"&& \
 			make install)
 		then
 			echo ""

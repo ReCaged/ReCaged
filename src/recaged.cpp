@@ -515,6 +515,7 @@ Log_puts(1, "\
   * \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
   * \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
   * \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\
+  * \"The PNG reference library\"		-	PNG file support\n\
   * \"The IJG JPEG library\"		-	JPEG file support\n\n\n\
  Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
  More keys exists for debug/testing/demo, see README if you are interested.\n\n\

@@ -24,6 +24,7 @@
 //
 #include <SDL/SDL.h>
 #include <GL/glew.h>
+#include <png.h>
 #include <jpeglib.h>
 #include <setjmp.h> //for insanity of jpeg/png libraries
 #include "shared/internal.hpp"
@@ -69,6 +70,8 @@ bool Image::Load (const char *file)
 	//see if match:
 	if (!strcasecmp(suffix, ".bmp"))
 		return Load_BMP(file);
+	else if (!strcasecmp(suffix, ".png"))
+		return Load_PNG(file);
 	else if (!strcasecmp(suffix, ".jpg") || !strcasecmp(suffix, ".jpeg"))
 		return Load_JPG(file);
 
@@ -80,8 +83,8 @@ bool Image::Load (const char *file)
 //just so not forgetting the message output when allocating
 void Image::Allocate()
 {
-	//Ugly, yes. For now it's assumed that componentdepth is multiple of 8
-	size_t size=(width*height*components*componentdepth)/8;
+	//Ugly, yes. For now it's assumed that bitdepth is multiple of 8
+	size_t size=(width*height*components*bitdepth)/8;
 
 	Log_Add(2, "Allocating image buffer of %u bytes", size);
 	pixels = new uint8_t[size];
@@ -143,7 +146,7 @@ bool Image::Load_BMP(const char *file)
 	}
 
 	//assumes 8 bits per component and pixel (so 24 or 32 bits)
-	componentdepth=8;
+	bitdepth=8;
 	//TODO: else {surface->pitch when not using whole bytes for pixels...}
 
 	//copy:
@@ -154,7 +157,154 @@ bool Image::Load_BMP(const char *file)
 	return true;
 }
 
+
+//
+//PNG:
+//
+
+//error handling...
+void user_error_fn(png_structp png_ptr, png_const_charp error_msg)
+{
+	Log_Add(-1, "Error loading PNG: \"%s\"", error_msg);
+	longjmp(png_jmpbuf(png_ptr), 1);
+}
+
+void user_warning_fn(png_structp png_ptr, png_const_charp warning_msg)
+{
+	Log_Add(-1, "Warning when loading PNG: \"%s\"", warning_msg);
+}
+
+bool Image::Load_PNG(const char *file)
+{
+	Log_Add(2, "Loading image from PNG file \"%s\"", file);
+
+	FILE *fp=fopen(file, "rb");
+
+	if (!fp)
+	{
+		Log_Add(-1, "Unable to open image file \"%s\"", file);
+		return false;
+	}
+
+	uint8_t header[8];
+	size_t headerbytes=fread(header, 1, 8, fp);
+	if ( (headerbytes==0) || png_sig_cmp(header, 0, headerbytes))
+	{
+		Log_Add(-1, "File type of \"%s\" is not PNG", file);
+		fclose (fp);
+		return false;
+	}
+
+	//start the fun stuff
+	
+	//initialization:
+	png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+			NULL, user_error_fn, user_warning_fn);
+	if (!png_ptr)
+	{
+		Log_Add(-1, "Unable to create PNG read structure");
+		fclose (fp);
+		return false;
+	}
+
+	png_infop info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr)
+	{
+		Log_Add(-1, "Unable to create PNG info structure");
+		png_destroy_read_struct(&png_ptr, NULL, NULL);
+		fclose (fp);
+		return false;
+	}
+
+	//error jump...
+	if (setjmp(png_jmpbuf(png_ptr)))
+	{
+		Log_Add(-1, "Error loading PNG");
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		return false;
+	}
+
+	//set io method
+	png_init_io(png_ptr, fp);
+
+	//compensate for the already read bytes (earlier signature check)
+	png_set_sig_bytes(png_ptr, headerbytes);
+
+	//time to read... using the low-level functions...
+	png_read_info(png_ptr, info_ptr);
+
+	//image properties
+	png_uint_32 pngwidth, pngheight;
+	int pngdepth, pngtype;
+	png_get_IHDR(png_ptr, info_ptr, &pngwidth, &pngheight,
+			&pngdepth, &pngtype, NULL, NULL, NULL);
+
+	//temporary safetycheck...
+	if (pngwidth==0 || pngheight==0 || (pngdepth!=8 && pngdepth!=16) )
+	{
+		Log_Add(-1, "Unsupported format in \"%s\"!", name.c_str());
+		png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		fclose(fp);
+		return false;
+	}
+
+	//convert to our simple formats:
+	width=pngwidth;
+	height=pngheight;
+	bitdepth=pngdepth;
+	switch (pngtype)
+	{
+		case PNG_COLOR_TYPE_RGB_ALPHA:
+			components=4;
+			format=RGBA;
+			break;
+
+		case PNG_COLOR_TYPE_RGB:
+			components=3;
+			format=RGB;
+			break;
+
+		//TODO! Much more to try here, grayscale, bitfield, perhaps
+		//indixed pngs needs special handling too? Some other day...
+		default:
+			Log_Add(-1, "Unsupported image colour type (%i) in \"%s\" (not RGB or RGBA)!", pngtype, name.c_str());
+			png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+			fclose(fp);
+			return false;
+			break;
+	}
+
+	//load
+	Allocate();
+
+	//png_read_update_info(png_ptr, info_ptr); not needed?
+	//libpng expects an array of pointers to rows (like libjpeg, but this
+	//is more important: necessary in case the png is interlaced)
+	png_bytep *row_pointers = new png_bytep[height];
+
+	//not sure this is the best solution...
+	int rowbytes=width*components*bitdepth/8;
+
+	//point to pixel data storage
+	for (int i=0; i<height; ++i)
+		row_pointers[i]=pixels+rowbytes*i;
+
+	png_read_image(png_ptr, row_pointers); //and just like that...
+
+	delete[] row_pointers;
+
+	//ah, now just clean up
+	png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+	fclose(fp);
+
+	return true;
+}
+
+
+//
 //JPEG:
+//
 
 //error handling (as in example.c from jpeglib)
 struct my_error_mgr
@@ -168,7 +318,7 @@ METHODDEF(void) my_error_exit(j_common_ptr cinfo)
 	struct my_error_mgr *err=(struct my_error_mgr *) cinfo->err;
 	char errormsg[JMSG_LENGTH_MAX];
 	( *(cinfo->err->format_message) ) (cinfo, errormsg);
-	Log_Add(-1, "Error reading JPEG: %s", errormsg);
+	Log_Add(-1, "Error loading JPEG: %s", errormsg);
 	longjmp(err->setjmp_buffer, 1);
 }
 
@@ -211,34 +361,39 @@ bool Image::Load_JPG(const char *file)
 	width=cinfo.output_width;
 	height=cinfo.output_height;
 
-	if (cinfo.num_components == 4)
+	switch (cinfo.num_components)
 	{
-		components=4;
-		format=RGBA;
-	}
-	else if (cinfo.num_components == 3)
-	{
-		components=3;
-		format=RGB;
-	}
-	else
-	{
-		//obviously something to support for the future (grayscale!)
-		Log_Add(-1, "Unsupported image number of components (%i) in \"%s\" (not 3 or 4)!", cinfo.num_components, name.c_str());
-		return false;
+		case 4:
+			components=4;
+			format=RGBA;
+			break;
+
+		case 3:
+			components=3;
+			format=RGB;
+			break;
+
+		//obviously something to support for the future (grayscale!
+		//possibly other formats, maybe indexed are different?)
+		default:
+			Log_Add(-1, "Unsupported image number of components (%i) in \"%s\" (not 3 or 4)!", cinfo.num_components, name.c_str());
+			jpeg_destroy_decompress(&cinfo);
+			fclose(fp);
+			return false;
+			break;
 	}
 
-	componentdepth=BITS_IN_JSAMPLE; //not 100% sure this is right...
+	bitdepth=BITS_IN_JSAMPLE; //not 100% sure this is right...
 
 	//try to allocate memory
 	Allocate();
 
 	//read, line by line
 	uint8_t *ppointer; //libjpeg wants pointer to pointer...
-	int scanlinebytes=width*components*componentdepth/8; //mmm... should be right?...
+	int rowbytes=width*components*bitdepth/8; //mmm... should be right?...
 	while (cinfo.output_scanline < cinfo.output_height)
 	{
-		ppointer=pixels +cinfo.output_scanline*scanlinebytes;
+		ppointer=pixels +cinfo.output_scanline*rowbytes;
 		jpeg_read_scanlines(&cinfo, &ppointer, 1);
 	}
 
@@ -296,13 +451,13 @@ Image_Texture *Image::Create_Texture()
 			break;
 	}
 
-	if (componentdepth==8)
+	if (bitdepth==8)
 		pixel_type=GL_UNSIGNED_BYTE;
-	/*else if (componentdepth==16)
-		pixel_type=GL_UNSIGNED_SHORT;*/
+	else if (bitdepth==16)
+		pixel_type=GL_UNSIGNED_SHORT;
 	else
 	{
-		Log_Add(-1, "Unsupported image component depth (%i) in \"%s\" (not 8 bits)!", componentdepth, name.c_str());
+		Log_Add(-1, "Unsupported image component bit depth (%i) in \"%s\" (not 8 or 16 bits)!", bitdepth, name.c_str());
 		return NULL;
 	}
 
