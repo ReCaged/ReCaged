@@ -79,7 +79,7 @@ class Image
 
 		//actual data to store:
 		uint8_t *pixels;
-		enum image_format{RGB, BGR, RGBA, BGRA} format;
+		enum image_format{RGB, BGR, RGBA, BGRA, GRAY} format;
 		int width, height, components, bitdepth;
 		//(componentdepth is number of bits per component and pixel)
 };

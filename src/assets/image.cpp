@@ -265,8 +265,13 @@ bool Image::Load_PNG(const char *file)
 			format=RGB;
 			break;
 
-		//TODO! Much more to try here, grayscale, bitfield, perhaps
-		//indixed pngs needs special handling too? Some other day...
+		case PNG_COLOR_TYPE_GRAY:
+			components=1;
+			format=GRAY;
+			break;
+
+		//TODO! Much more to try here, bitfield, perhaps indixed pngs
+		//needs special handling too? Some other day...
 		default:
 			Log_Add(-1, "Unsupported image colour type (%i) in \"%s\" (not RGB or RGBA)!", pngtype, name.c_str());
 			png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
@@ -373,8 +378,13 @@ bool Image::Load_JPG(const char *file)
 			format=RGB;
 			break;
 
-		//obviously something to support for the future (grayscale!
-		//possibly other formats, maybe indexed are different?)
+		case 1:
+			components=1;
+			format=GRAY;
+			break;
+
+		//obviously more to support in the future! Possibly other
+		//formats, maybe indexed are different?)
 		default:
 			Log_Add(-1, "Unsupported image number of components (%i) in \"%s\" (not 3 or 4)!", cinfo.num_components, name.c_str());
 			jpeg_destroy_decompress(&cinfo);
@@ -439,11 +449,15 @@ Image_Texture *Image::Create_Texture()
 			break;
 		case RGB:
 			pixel_format=GL_RGB;
-			internal_format=GL_RGB8; //or RGBA?
+			internal_format=GL_RGB8; //or RGBA8? Driver may promote to RGBA8 internally anyway...
 			break;
 		case BGR:
 			pixel_format=GL_BGR;
-			internal_format=GL_RGB8; //or RGBA?
+			internal_format=GL_RGB8; //or RGBA8? -''-
+			break;
+		case GRAY:
+			pixel_format=GL_LUMINANCE;
+			internal_format=GL_RGB8; //or RGBA8? -''-
 			break;
 		default:
 			Log_Add(-1, "Unsupported image format in \"%s\"!", name.c_str());
@@ -462,7 +476,10 @@ Image_Texture *Image::Create_Texture()
 	}
 
 	//create:
-	Log_Add(2, "Generating gpu texture (might use about %i bytes of video ram)", width*height*4); //most cards internally converts everything to RGBA8
+
+	//(most cards internally converts everything to RGBA8)
+	Log_Add(2, "Generating gpu texture (might use about %i bytes of video ram)", width*height*4);
+
 	GLuint id;
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
