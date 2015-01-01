@@ -1,35 +1,35 @@
 # Process this file with autoconf to produce a configure script.
 
 #
-# ReCaged - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Simulator
 #
 # Copyright (C) 2012, 2013, 2014 Mats Wahlberg
 #
-# This file is part of ReCaged.
+# This file is part of RCX.
 #
-# ReCaged is free software: you can redistribute it and/or modify
+# RCX is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ReCaged is distributed in the hope that it will be useful,
+# RCX is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+# along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 AC_PREREQ([2.60]) #should work (and be old enough)
-AC_INIT([ReCaged], [0.7.1rc0], [rcxslinger@gmail.com], [recaged], [http://recaged.net])
+AC_INIT([RCX], [0.8.0wip], [rcxslinger@gmail.com], [rcx], [http://recaged.net])
 
 # Define codename and year (for title and version printout)
-AC_DEFINE([PACKAGE_CODENAME], ["The Sky's the Limit"])
-AC_DEFINE([PACKAGE_YEAR], ["2014"])
+AC_DEFINE([PACKAGE_CODENAME], ["The Devil's Mind is an Idle Workshop"])
+AC_DEFINE([PACKAGE_YEAR], ["2015"])
 
 # Only a safety check
-AC_CONFIG_SRCDIR([src/recaged.cpp])
+AC_CONFIG_SRCDIR([src/rcx.cpp])
 
 # No need for "AC_CONFIG_HEADERS" right now?
 
@@ -55,7 +55,7 @@ AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor memset pow sqrt strcasecmp strrchr strtol])
 
 # Check for additional libraries (in acinclude.m4)
-RC_LIBS_CONFIG
+RCX_LIBS_CONFIG
 
 # Finally: what to generate
 AC_CONFIG_FILES([Makefile config/Makefile data/Makefile icons/Makefile man/Makefile src/Makefile w32/Makefile])

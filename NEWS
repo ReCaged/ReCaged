@@ -1,4 +1,4 @@
- Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
 
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
@@ -7,8 +7,8 @@
 
 TODO: more info in header!
 
-ReCaged 0.7.1 "The Sky's the Limit" (?/?/2014)
-----------------------------------------------
+RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
+---------------------------------------------------------------
  * Move to Autotools (Automake, Autoconf) for building
 
  * Detect if running in "installed" or "portable" mode

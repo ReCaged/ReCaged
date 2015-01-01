@@ -1,6 +1,6 @@
-recaged
-recaged-*.tar.gz
-recaged-*.tar.gz.sig
+rcx
+rcx-*.tar.gz
+rcx-*.tar.gz.sig
 
 *.Po
 *.o

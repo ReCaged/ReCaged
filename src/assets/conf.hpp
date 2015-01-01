@@ -1,26 +1,26 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Game
+ * RCX - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
- * This file is part of ReCaged.
+ * This file is part of RCX.
  *
- * ReCaged is free software: you can redistribute it and/or modify
+ * RCX is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ReCaged is distributed in the hope that it will be useful,
+ * RCX is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+ * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#ifndef _RC_CONF_H
-#define _RC_CONF_H
+#ifndef _RCX_CONF_H
+#define _RCX_CONF_H
 #include "unistd.h"
 #include "stddef.h"
 
@@ -29,7 +29,7 @@
 //f - floating point
 //d - double floating point
 //b - boolean
-//R - dReal (float or double depending on ode configureaiton)
+//R - dReal (float or double depending on ode configuration)
 //s - string (fixed-size c array, defined as Conf_String below)
 
 #define Conf_String_Size 100 //99 chars (plus \0)

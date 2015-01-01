@@ -1,22 +1,22 @@
 #
-# ReCaged - a Free Software, Futuristic, Racing Game
+# RCX - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2014 Mats Wahlberg
 #
-# This file is part of ReCaged.
+# This file is part of RCX.
 #
-# ReCaged is free software: you can redistribute it and/or modify
+# RCX is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ReCaged is distributed in the hope that it will be useful,
+# RCX is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+# along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 
@@ -24,15 +24,15 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
 #compiler flags
-AM_CPPFLAGS =	$(RC_FLAGS) -Wall \
-		-DDATADIR='"$(datadir)/recaged/"' \
-		-DCONFDIR='"$(sysconfdir)/xdg/recaged/"'
+AM_CPPFLAGS =	$(RCX_FLAGS) -Wall \
+		-DDATADIR='"$(datadir)/rcx/"' \
+		-DCONFDIR='"$(sysconfdir)/xdg/rcx/"'
 #AM_LDFLAGS not used right now
-LDADD = $(RC_LIBS)
+LDADD = $(RCX_LIBS)
 
-bin_PROGRAMS = recaged
+bin_PROGRAMS = rcx
 
-recaged_SOURCES =	./recaged.cpp \
+rcx_SOURCES =		./rcx.cpp \
 			assets/car.cpp \
 			assets/conf.cpp \
 			assets/conf.hpp \
@@ -129,7 +129,7 @@ resources.rc: Makefile
 	echo "BEGIN"; \
 	echo "BLOCK \"00000000\""; \
 	echo "BEGIN"; \
-	echo "VALUE \"ProductName\", \"ReCaged\""; \
+	echo "VALUE \"ProductName\", \"RCX\""; \
 	echo "VALUE \"FileVersion\", \"$(PACKAGE_VERSION)\""; \
 	echo "VALUE \"ProductVersion\", \"$(PACKAGE_VERSION)\""; \
 	echo "VALUE \"Comments\", \"A Free Software, Futuristic, Racing Game\""; \

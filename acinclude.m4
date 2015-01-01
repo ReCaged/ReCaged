@@ -1,22 +1,22 @@
 #
-# ReCaged - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Simulator
 #
 # Copyright (C) 2012, 2014 Mats Wahlberg
 #
-# This file is part of ReCaged.
+# This file is part of RCX.
 #
-# ReCaged is free software: you can redistribute it and/or modify
+# RCX is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ReCaged is distributed in the hope that it will be useful,
+# RCX is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+# along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 
@@ -27,12 +27,12 @@
 
 
 #
-# RC_LIBS_INIT()
+# RCX_LIBS_INIT()
 #
 # Basic tests before starting
 #
 
-AC_DEFUN([RC_LIBS_INIT],
+AC_DEFUN([RCX_LIBS_INIT],
 [
 
 #using... "w32"?
@@ -76,13 +76,13 @@ fi
 
 
 #
-# RC_CHECK_PROG(PROGRAM, FLAG_ARGS, LIB_ARGS, [ACTION-ON-FAILURE]
+# RCX_CHECK_PROG(PROGRAM, FLAG_ARGS, LIB_ARGS, [ACTION-ON-FAILURE]
 #
 # Find and configure library by running PROGRAM with arguments FLAG_ARGS and
 # LIB_ARGS, perform other action on failuer.
 #
 
-AC_DEFUN([RC_CHECK_PROG],
+AC_DEFUN([RCX_CHECK_PROG],
 [
 
 FAILED="yes"
@@ -111,8 +111,8 @@ if test "$1"; then
 fi
 
 if test "$FAILED" = "no"; then
-	RC_FLAGS="$RC_FLAGS $tmp_flags"
-	RC_LIBS="$RC_LIBS $tmp_libs"
+	RCX_FLAGS="$RCX_FLAGS $tmp_flags"
+	RCX_LIBS="$RCX_LIBS $tmp_libs"
 else
 	$4
 fi
@@ -122,15 +122,15 @@ fi
 
 
 #
-# RC_LIBS_CONFIG()
+# RCX_LIBS_CONFIG()
 #
 # Check and configure needed libraries
 #
 
-AC_DEFUN([RC_LIBS_CONFIG],
+AC_DEFUN([RCX_LIBS_CONFIG],
 [
 
-AC_REQUIRE([RC_LIBS_INIT])
+AC_REQUIRE([RCX_LIBS_INIT])
 
 #make sure only enabling w32 options on w32
 if test "$ON_W32" != "no"; then
@@ -140,7 +140,7 @@ if test "$ON_W32" != "no"; then
 	if test "$CONSOLE" != "no"; then
 		AC_MSG_RESULT([yes])
 
-		RC_LIBS="$RC_LIBS -mconsole"
+		RCX_LIBS="$RCX_LIBS -mconsole"
 	else
 		AC_MSG_RESULT([no])
 	fi
@@ -150,9 +150,9 @@ if test "$ON_W32" != "no"; then
 	if test "$STATIC" != "no"; then
 		AC_MSG_RESULT([yes])
 
-		RC_FLAGS="$RC_FLAGS -DGLEW_STATIC"
+		RCX_FLAGS="$RCX_FLAGS -DGLEW_STATIC"
 		#TODO: move static-lib* to LDFLAGS?
-		RC_LIBS="$RC_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
+		RCX_LIBS="$RCX_LIBS -Wl,-Bstatic -static-libgcc -static-libstdc++"
 		pkg_static="--static"
 	else
 		AC_MSG_RESULT([no])
@@ -167,10 +167,10 @@ fi
 AC_PATH_TOOL([PKG_CONFIG], [pkg-config])
 
 #ODE:
-RC_CHECK_PROG([$PKG_CONFIG], [--cflags ode], [$pkg_static --libs ode],
+RCX_CHECK_PROG([$PKG_CONFIG], [--cflags ode], [$pkg_static --libs ode],
 [
 	AC_PATH_TOOL([ODE_CONFIG], [ode-config])
-	RC_CHECK_PROG([$ODE_CONFIG], [--cflags], [--libs],
+	RCX_CHECK_PROG([$ODE_CONFIG], [--cflags], [--libs],
 	[
 		AC_MSG_WARN([Attempting to guess configuration for ODE using ac_check_* macros])
 		AC_MSG_WARN([Don't know if using double or single precision!... Assuming double...])
@@ -178,13 +178,13 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags ode], [$pkg_static --libs ode],
 
 		AC_CHECK_HEADER([ode/ode.h],, [ AC_MSG_ERROR([Headers for ODE appears to be missing, install libode-dev or similar]) ])
 		AC_CHECK_LIB([ode], [dInitODE2],
-			[RC_LIBS="$RC_LIBS -lode"],
+			[RCX_LIBS="$RCX_LIBS -lode"],
 			[AC_MSG_ERROR([ODE library appears to be missing, install libode1 or similar])])
 	])
 ])
 
 #SDL:
-RC_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
+RCX_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 [
 	AC_PATH_TOOL([SDL_CONFIG], [sdl-config])
 
@@ -195,12 +195,12 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 		sdl_libs="--libs"
 	fi
 
-	RC_CHECK_PROG([$SDL_CONFIG], [--cflags], [$sdl_libs],
+	RCX_CHECK_PROG([$SDL_CONFIG], [--cflags], [$sdl_libs],
 	[
 		AC_MSG_WARN([Attempting to guess configuration for SDL using ac_check_* macros])
 		AC_CHECK_HEADER([SDL/SDL.h],, [ AC_MSG_ERROR([Headers for SDL appears to be missing, install libsdl-dev or similar]) ])
 		AC_CHECK_LIB([SDL], [SDL_Init],
-			[RC_LIBS="$RC_LIBS -lSDL"],
+			[RCX_LIBS="$RCX_LIBS -lSDL"],
 			[AC_MSG_ERROR([SDL library appears to be missing, install libsdl-1.2 or similar])])
 	])
 ])
@@ -241,18 +241,18 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags libjpeg], [$pkg_static --libs libjpeg],
 ])
 
 #GLEW:
-RC_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
+RCX_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 [
 	AC_MSG_WARN([Attempting to guess configuration for GLEW using ac_check_* macros])
 	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Headers for GLEW appears to be missing, install libglew-dev or similar]) ])
 
 	if test "$ON_W32" = "no"; then
 		AC_CHECK_LIB([GLEW], [main],
-			[RC_LIBS="$RC_LIBS -lGLEW"],
+			[RCX_LIBS="$RCX_LIBS -lGLEW"],
 			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
 	else
 		AC_CHECK_LIB([glew32], [main],
-			[RC_LIBS="$RC_LIBS -lglew32"],
+			[RCX_LIBS="$RCX_LIBS -lglew32"],
 			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
 	fi
 
@@ -260,11 +260,11 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 
 #static stop (if enabled and on w32)
 if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
-	RC_LIBS="$RC_LIBS -Wl,-Bdynamic"
+	RCX_LIBS="$RCX_LIBS -Wl,-Bdynamic"
 fi
 
 #GL (never static):
-RC_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
+RCX_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 [
 	AC_MSG_WARN([Attempting to guess configuration for GL using ac_check_* macros])
 	AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
@@ -273,18 +273,18 @@ RC_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 	#also GL libraries got unreliable symbols (so just check for dummy main)
 	if test "$ON_W32" = "no"; then
 		AC_CHECK_LIB([GL], [main],
-			[RC_LIBS="$RC_LIBS -lGL"],
+			[RCX_LIBS="$RCX_LIBS -lGL"],
 			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
 	else
 		AC_CHECK_LIB([opengl32], [main],
-			[RC_LIBS="$RC_LIBS -lopengl32"],
+			[RCX_LIBS="$RCX_LIBS -lopengl32"],
 			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
 	fi
 
 ])
 
 #make available
-AC_SUBST(RC_FLAGS)
-AC_SUBST(RC_LIBS)
+AC_SUBST(RCX_FLAGS)
+AC_SUBST(RCX_LIBS)
 
 ])

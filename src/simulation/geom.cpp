@@ -1,22 +1,22 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Game
+ * RCX - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
  *
- * This file is part of ReCaged.
+ * This file is part of RCX.
  *
- * ReCaged is free software: you can redistribute it and/or modify
+ * RCX is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ReCaged is distributed in the hope that it will be useful,
+ * RCX is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+ * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
 #include "shared/geom.hpp"
@@ -183,7 +183,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 
 		contact[i].surface.mu = (surf1->mu)*(surf2->mu); //friction
 
-		//optional or not even/rarely used by rc, set to 0 to prevent compiler warnings:
+		//optional or not even/rarely used by rcx, set to 0 to prevent compiler warnings:
 		contact[i].surface.mu2 = 0.0; //only for tyre
 		contact[i].surface.bounce = 0.0;
 		contact[i].surface.bounce_vel = 0.0;
@@ -204,7 +204,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 
 			//use sum
 			contact[i].surface.bounce = (surf1->bounce)+(surf2->bounce);
-			contact[i].surface.bounce_vel = 0.0; //not used by rc right now, perhaps for future tweaking?
+			contact[i].surface.bounce_vel = 0.0; //not used by rcx right now, perhaps for future tweaking?
 		}
 
 		//optional spring+damping erp+cfm override
