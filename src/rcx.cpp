@@ -1,22 +1,22 @@
 /*
- * ReCaged - a Free Software, Futuristic, Racing Game
+ * RCX - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
  *
- * This file is part of ReCaged.
+ * This file is part of RCX.
  *
- * ReCaged is free software: you can redistribute it and/or modify
+ * RCX is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * ReCaged is distributed in the hope that it will be useful,
+ * RCX is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+ * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
 //Required stuff:
@@ -92,7 +92,7 @@ bool tmp_menus()
 	dirs.Find("tmp_menu_selections", CONFIG, READ);
 	file.Open(dirs.Path()); //just assume it opens (no harm if not)...
 
-	//MENU: welcome to rc, please select profile or create a new profile
+	//MENU: welcome to rcx, please select profile or create a new profile
 	sprofile = "profiles/";
 	if (file.Read_Line() && file.word_count == 2 && !strcmp(file.words[0], "profile"))
 		sprofile += file.words[1];
@@ -346,7 +346,7 @@ int main (int argc, char *argv[])
 		switch(c)
 		{
 			case 'V': //data directory
-				Log_puts(1, "ReCaged " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\")\nCopyright (C) " PACKAGE_YEAR " Mats Wahlberg\n");
+				Log_puts(1, "RCX " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\")\nCopyright (C) " PACKAGE_YEAR " Mats Wahlberg\n");
 				exit(0); //stop execution
 				break;
 
@@ -417,7 +417,7 @@ int main (int argc, char *argv[])
 			default: //print help output
 				//TODO: "Usage: %s [OPTION]... -- [LUA OPTIONS]\n"
 				Log_puts(0, "\
-Usage: recaged [OPTION]...\n\
+Usage: rcx [OPTION]...\n\
   -h, --help		display help and exit\n\
   -V, --version		display version and exit\n\
   -c, --config FILE	load settings from FILE\n\
@@ -447,7 +447,7 @@ Options for overriding normal (automatic) directory detection:\n\
 	}
 
 	//welcome message
-	Log_printf(0, "\n\t-=[ Welcome to ReCaged version %s (\"%s\") ]=-\n\n", PACKAGE_VERSION, PACKAGE_CODENAME);
+	Log_puts(0, "\n  -=[ Welcome to RCX version " PACKAGE_VERSION " (\"" PACKAGE_CODENAME "\") ]=-\n\n");
 
 	//start SDL (also init timers when at it)
 	if (SDL_Init(SDL_INIT_TIMER))
@@ -488,28 +488,28 @@ Options for overriding normal (automatic) directory detection:\n\
 	Log_Change_Verbosity((internal.verbosity-1));
 
 	//TODO: rotate credits/libraries order/descriptions
-	Log_puts(0, " ReCaged is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n");
+	Log_puts(0, " RCX is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n");
 
 Log_puts(1, "\
 \n\
- ReCaged is free software: you can redistribute it and/or modify\n\
+ RCX is free software: you can redistribute it and/or modify\n\
  it under the terms of the GNU General Public License as published by\n\
  the Free Software Foundation, either version 3 of the License, or\n\
  (at your option) any later version.\n\
 \n\
- ReCaged is distributed in the hope that it will be useful,\n\
+ RCX is distributed in the hope that it will be useful,\n\
  but WITHOUT ANY WARRANTY; without even the implied warranty of\n\
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n\
  GNU General Public License for more details.\n\
 \n\
  You should have received a copy of the GNU General Public License\n\
- along with this program.  If not, see <http://www.gnu.org/licenses/>.\n\
+ along with RCX.  If not, see <http://www.gnu.org/licenses/>.\n\
 \n\n\
 				-=[ Credits ]=-\n\n\
   * Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
   * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
   * \"Spontificus\"			-	Testing, hacks and various fixes\n\n\
-\n		-=[ Other Projects that made RC possible ]=-\n\n\
+\n		-=[ Other Projects that made RCX possible ]=-\n\n\
   * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
   * \"The GNU Project\"			-	For Developing a Free OS\n\
   * \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
@@ -530,7 +530,7 @@ Log_puts(1, "\
 
 	//
 	//TODO: there should be menus here, but menu/osd system is not implemented yet... also:
-	//on failure, rc should not just terminate but instead abort the race and warn the user
+	//on failure, rcx should not just terminate but instead abort the race and warn the user
 	if (!tmp_menus())
 	{
 		Log_Add(-1, "One or more errors, can not start!");

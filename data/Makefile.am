@@ -1,27 +1,27 @@
 #
-# ReCaged - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Simulator
 #
 # Copyright (C) 2012 Mats Wahlberg
 #
-# This file is part of ReCaged.
+# This file is part of RCX.
 #
-# ReCaged is free software: you can redistribute it and/or modify
+# RCX is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ReCaged is distributed in the hope that it will be useful,
+# RCX is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+# along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 #TODO: in future "teams" and "worlds" will be part of "objects" and a new dir
 #"shared" will be added. Then: one Makefile.am for each dir.
-objectsdir = $(datadir)/recaged
+objectsdir = $(datadir)/rcx
 nobase_dist_objects_DATA = \
 	objects/misc/beachball/README \
 	objects/misc/beachball/sphere.mtl \
@@ -58,7 +58,7 @@ nobase_dist_objects_DATA = \
 	objects/misc/tetrahedron/README
 
 #TODO: remove in future (everything will be objects)
-teamsdir = $(datadir)/recaged/
+teamsdir = $(datadir)/rcx/
 nobase_dist_teams_DATA = \
 	teams/Nemesis/cars/Venom/car.conf \
 	teams/Nemesis/cars/Venom/geoms.lst \
@@ -70,7 +70,7 @@ nobase_dist_teams_DATA = \
 	teams/Nemesis/rims/diameter/2/Split/Split.mtl \
 	teams/Nemesis/rims/diameter/2/Split/Split.obj
 
-worldsdir = $(datadir)/recaged/
+worldsdir = $(datadir)/rcx/
 nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
@@ -91,6 +91,6 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tyres/diameter/2/Slick/tyre.conf
 
 #TODO: add in future (shared media)
-#objectsdir = $(datadir)/recaged/data
+#objectsdir = $(datadir)/rcx/data
 #nobase_dist_objects_DATA = 
 

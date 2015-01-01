@@ -1,23 +1,23 @@
 #!/bin/sh
 #
-# ReCaged - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Simulator
 #
 # Copyright (C) 2012, 2014 Mats Wahlberg
 #
-# This file is part of ReCaged.
+# This file is part of RCX
 #
-# ReCaged is free software: you can redistribute it and/or modify
+# RCX is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# ReCaged is distributed in the hope that it will be useful,
+# RCX is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
+# along with RCX  If not, see <http://www.gnu.org/licenses/>.
 #
 
 #
@@ -93,9 +93,9 @@ then
 	cp w32/version.nsh "$BUILDDIR"
 
 	#move to place
-	mv "$BUILDDIR"/bin/recaged.exe "$BUILDDIR"/ReCaged.exe
-	mv "$BUILDDIR"/etc/xdg/recaged "$BUILDDIR"/config
-	mv "$BUILDDIR"/share/recaged "$BUILDDIR"/data
+	mv "$BUILDDIR"/bin/rcx "$BUILDDIR"/RCX.exe
+	mv "$BUILDDIR"/etc/xdg/rcx "$BUILDDIR"/config
+	mv "$BUILDDIR"/share/rcx "$BUILDDIR"/data
 
 	#find nsis the stupid way
 	MAKENSIS="$PROGRAMFILES/NSIS/makensis"
@@ -103,9 +103,9 @@ then
 	then
 		"$MAKENSIS" "$BUILDDIR"/installer.nsi
 
-		if [ -e "$BUILDDIR"/ReCaged*Setup.exe ]
+		if [ -e "$BUILDDIR"/RCX*Setup.exe ]
 		then
-			mv "$BUILDDIR"/ReCaged*Setup.exe .
+			mv "$BUILDDIR"/RCX*Setup.exe .
 			rm -rf "$BUILDDIR"
 
 			echo ""
@@ -281,7 +281,7 @@ then
 	fi
 
 	echo "Okay, now you can compile by typing \"make\""
-	echo "(type \"src/recaged\" or \"./recaged\" afterwards to run it)"
+	echo "(type \"src/rcx\" or \"./rcx\" afterwards to run it)"
 	echo ""
 	echo "Note: If you wanted to create an installer, run \"$0 installer\" instead!"
 
