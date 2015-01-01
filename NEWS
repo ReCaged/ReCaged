@@ -9,6 +9,8 @@ TODO: more info in header!
 
 RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
 ---------------------------------------------------------------
+ * Change of name: "ReCaged" is now "RCX"
+
  * Move to Autotools (Automake, Autoconf) for building
 
  * Detect if running in "installed" or "portable" mode
