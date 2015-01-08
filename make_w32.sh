@@ -26,8 +26,8 @@
 #
 
 #paths:
-BUILDDIR="$HOME/RC/BUILD"
-LIBDIR="$HOME/RC/LIBS"
+BUILDDIR="$HOME/RCX/BUILD"
+LIBDIR="$HOME/RCX/LIBS"
 
 #create directories, make sure build is empty
 rm -rf "$BUILDDIR"
