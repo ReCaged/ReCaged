@@ -33,8 +33,10 @@ LIBDIR="$HOME/RCX/LIBS"
 rm -rf "$BUILDDIR"
 mkdir -p "$LIBDIR" "$BUILDDIR" || exit 1
 
-#and extend execution path (for *-configs)
+#and extend custom execution paths
 export PATH="$PATH:$LIBDIR/bin"
+export CPPFLAGS="-I$LIBDIR/include"
+export LDFLAGS="-L$LIBDIR/lib"
 
 
 #check for what to do
@@ -43,11 +45,6 @@ then
 	echo ""
 	echo "Creating w32 installer..."
 	echo ""
-
-	#set up custom paths for configuration
-	echo "Preparing compilation..."
-	export CPPFLAGS="-I$LIBDIR/include"
-	export LDFLAGS="-L$LIBDIR/lib"
 
 	#force create autoconf script/files
 	echo "Creating autoconf script"
@@ -262,10 +259,6 @@ then
 	echo ""
 	echo "Configuring for simple, repeated builds"
 	echo ""
-
-	echo "Preparing compilation..."
-	export CPPFLAGS="-I$LIBDIR/include"
-	export LDFLAGS="-L$LIBDIR/lib"
 
 	echo "Creating autoconf script"
 	autoreconf -fi || exit 1
