@@ -35,9 +35,6 @@
 AC_DEFUN([RCX_LIBS_INIT],
 [
 
-#using...
-AC_CANONICAL_HOST
-
 AC_MSG_CHECKING(if building for a terrible OS)
 case "$target_os" in
 
