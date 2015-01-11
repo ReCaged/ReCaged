@@ -39,12 +39,12 @@ AC_MSG_CHECKING(if building for a terrible OS)
 case "$target_os" in
 
 mingw*|cygwin*)
-	AC_MSG_RESULT(yes, windows)
+	AC_MSG_RESULT(yes)
 	RCX_TARGET="w32"
 	;;
 
 *apple*|*darwin*)
-	AC_MSG_RESULT(yes, macintosh)
+	AC_MSG_RESULT(yes)
 	RCX_TARGET="mac"
 	;;
 

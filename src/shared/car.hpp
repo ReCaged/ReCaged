@@ -245,7 +245,7 @@ class Car_Module:public Racetime_Data
 			Surface surf;
 		};
 
-		std::vector<class geom_properties> geoms;
+		std::vector<geom_properties> geoms;
 
 		//3D rendering model
 		Trimesh_3D *model;
