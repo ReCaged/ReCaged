@@ -18,6 +18,8 @@ RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
 
  * NSIS installer for windows
 
+ * Support for macintosh
+
  * New logging system
 TODO: * Colour indication of importance/verbosity
    * Realtime log output now also on windows

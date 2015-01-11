@@ -31,6 +31,9 @@ AC_DEFINE([PACKAGE_YEAR], ["2015"])
 # Only a safety check
 AC_CONFIG_SRCDIR([src/rcx.cpp])
 
+# For checking os/target
+AC_CANONICAL_TARGET
+
 # No need for "AC_CONFIG_HEADERS" right now?
 
 # Arguments for automake

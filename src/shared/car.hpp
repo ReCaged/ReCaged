@@ -236,7 +236,7 @@ class Car_Module:public Racetime_Data
 		struct Car_Conf conf; //loads from conf
 
 		//geoms
-		struct geom { //can describe any supported geom
+		struct geom_properties { //can describe any supported geom
 			int type;
 			dReal size[3];
 			Trimesh_Geom *mesh;
@@ -245,7 +245,7 @@ class Car_Module:public Racetime_Data
 			Surface surf;
 		};
 
-		std::vector<class geom> geoms;
+		std::vector<geom_properties> geoms;
 
 		//3D rendering model
 		Trimesh_3D *model;
