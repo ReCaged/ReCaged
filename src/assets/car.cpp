@@ -62,7 +62,7 @@ Car_Module *Car_Module::Load (const char *path)
 	{
 		//default surface parameters
 		Surface surface;
-		struct geom tmp_geom;
+		struct geom_properties tmp_geom;
 		int pos;
 
 		while (file.Read_Line())
@@ -311,7 +311,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D
 	//done, add collision geoms:
 	dGeomID geom;
 	Geom *gdata;
-	struct geom tmp_geom;
+	struct geom_properties tmp_geom;
 	dMatrix3 rot;
 	for (size_t i=0; i<geoms.size(); ++i)
 	{
