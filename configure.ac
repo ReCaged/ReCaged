@@ -39,6 +39,9 @@ AC_CANONICAL_TARGET
 # Arguments for automake
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
+# Silent rules by default (easier to spot errors)
+AM_SILENT_RULES([yes])
+
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
