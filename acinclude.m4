@@ -35,19 +35,33 @@
 AC_DEFUN([RCX_LIBS_INIT],
 [
 
-#using... "w32"?
-AC_MSG_CHECKING(if using that crappy OS)
-AC_COMPILE_IFELSE( [AC_LANG_SOURCE([
-	#ifdef _WIN32
-		you fail
-	#endif
-	])], [ ON_W32=no ], [ ON_W32=yes ] )
-AC_MSG_RESULT($ON_W32)
+#using...
+AC_CANONICAL_HOST
 
-#make this result available for automake
-AM_CONDITIONAL([ON_W32], [test "$ON_W32" != "no"])
+AC_MSG_CHECKING(if building for a terrible OS)
+case "$target_os" in
 
-#if so, probably wanting static linking?
+mingw*|cygwin*)
+	AC_MSG_RESULT(yes, windows)
+	RCX_TARGET="w32"
+	;;
+
+*apple*|*darwin*)
+	AC_MSG_RESULT(yes, macintosh)
+	RCX_TARGET="mac"
+	;;
+
+*)
+	AC_MSG_RESULT(probably not)
+	RCX_TARGET="good"
+	;;
+
+esac
+
+#make this result available for automake (certain code alterations)
+AM_CONDITIONAL([ON_W32], [test "$RCX_TARGET" = "w32"])
+
+#if w32, probably wanting static linking?
 AC_ARG_ENABLE(
 	[w32static],
 	[AS_HELP_STRING([--enable-w32static],
@@ -64,7 +78,7 @@ AC_ARG_ENABLE(
 	[CONSOLE="no"] )
 
 #need windres if on w32
-if test "$ON_W32" != "no"; then
+if test "$RCX_TARGET" = "w32"; then
 	AC_PATH_TOOL([WINDRES], [windres])
 	if test -z "$WINDRES"; then
 		AC_MSG_ERROR([Program windres appears to be missing])
@@ -133,7 +147,7 @@ AC_DEFUN([RCX_LIBS_CONFIG],
 AC_REQUIRE([RCX_LIBS_INIT])
 
 #make sure only enabling w32 options on w32
-if test "$ON_W32" != "no"; then
+if test "$RCX_TARGET" = "w32"; then
 
 	#console flag
 	AC_MSG_CHECKING([if building with w32 console enabled])
@@ -189,7 +203,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 	AC_PATH_TOOL([SDL_CONFIG], [sdl-config])
 
 	#normally "--libs", but might change in certain situation (w32+static)
-	if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
+	if test "$RCX_TARGET" = "w32" && test "$STATIC" != "no"; then
 		sdl_libs="--static-libs"
 	else
 		sdl_libs="--libs"
@@ -211,20 +225,21 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 	AC_MSG_WARN([Attempting to guess configuration for GLEW using ac_check_* macros])
 	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Headers for GLEW appears to be missing, install libglew-dev or similar]) ])
 
-	if test "$ON_W32" = "no"; then
-		AC_CHECK_LIB([GLEW], [main],
-			[RCX_LIBS="$RCX_LIBS -lGLEW"],
-			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
-	else
+	#w32 uses (of course...) a different name
+	if test "$RCX_TARGET" = "w32"; then
 		AC_CHECK_LIB([glew32], [main],
 			[RCX_LIBS="$RCX_LIBS -lglew32"],
+			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
+	else
+		AC_CHECK_LIB([GLEW], [main],
+			[RCX_LIBS="$RCX_LIBS -lGLEW"],
 			[AC_MSG_ERROR([GLEW library appears to be missing, install libglew or similar])])
 	fi
 
 ])
 
 #static stop (if enabled and on w32)
-if test "$ON_W32" != "no" && test "$STATIC" != "no"; then
+if test "$RCX_TARGET" = "w32" && test "$STATIC" != "no"; then
 	RCX_LIBS="$RCX_LIBS -Wl,-Bdynamic"
 fi
 
@@ -232,19 +247,34 @@ fi
 RCX_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 [
 	AC_MSG_WARN([Attempting to guess configuration for GL using ac_check_* macros])
-	AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
 
-	#note: w32 likes to brake naming conventions (opengl32).
-	#also GL libraries got unreliable symbols (so just check for dummy main)
-	if test "$ON_W32" = "no"; then
-		AC_CHECK_LIB([GL], [main],
-			[RCX_LIBS="$RCX_LIBS -lGL"],
-			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
+	#here's a fun part: both w32 and mac likes to brake naming conventions for opengl...
+	if test "$RCX_TARGET" = "mac"; then
+		AC_CHECK_HEADER([OpenGL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, you go and figure this one out]) ])
 	else
+		AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
+	fi
+
+	#also GL libraries got unreliable symbols (so just check for dummy main)
+	case "$RCX_TARGET" in
+
+	w32)
 		AC_CHECK_LIB([opengl32], [main],
 			[RCX_LIBS="$RCX_LIBS -lopengl32"],
 			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
-	fi
+		;;
+
+	mac)
+		AC_MSG_WARN([Just guessing "-framework OpenGL" can be used for linking gl library, no guarantees!])
+		RCX_LIBS="$RCX_LIBS -framework OpenGL"
+		;;
+	
+	*)
+		AC_CHECK_LIB([GL], [main],
+			[RCX_LIBS="$RCX_LIBS -lGL"],
+			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
+		;;
+	esac
 
 ])
 

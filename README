@@ -16,6 +16,8 @@
 
 1) [TABLE OF CONTENTS]
 
+TODO: move Compilation to beginning, Running?
+
 1) Table of Contents
 2) Licensing
 3) Running
@@ -59,6 +61,8 @@ the file or in an accompanying README file.
 
 
 3) [RUNNING]
+
+TODO: all of this should be rewritten! And see COMPILATION, MORE/MOVE HERE?
 
 The current version of RCX does not require installation in order to run.
 Instead, just place rcx (on windows: rcx.exe) in any directory.
@@ -201,14 +205,21 @@ packages and if so, install them too (look for packages named like
 lib<name>-dev). Also make sure you got the usual development tools (Make, C++
 compiler, Autotools, libraries etc).
 
-The build process is the standard autoconf routine: run "./configure" and
-"make". "make install" will install (but it's not needed to run, you could just
-start "rcx" from the src directory). If you're building a development (git)
+The build process is the standard autoconf routine: run "./configure" followed
+by "make". "make install" will install (but that is not needed to run, you
+could just start "rcx" from the src directory). If you're building from the
+git repository (development), first run "autoreconf -fi" to generate the
+configure script and other required files. Remember to set "CPPFLAGS" and
+"LDFLAGS" if necessary.
+
+If you are building on macintosh (you crazy person!), you can use MacPorts to
+get all necessary dependencies (libsdl, ode, glew, autoconf, automake, etc).
+The rest or the building process is just like above. Remember that macports
+use a nonstandard path (/opt/local), so you will need to run configure like:
+
+./configure CPPFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib
 
 TODO: installer for windows, more OSes!
-version first run "autoreconf -fi" to generate the configure script and other
-required files. Remember to set "CPPFLAGS" and "LDFLAGS" if necessary.
-
 
 On windows things will be more difficult: since there is no package manager,
 you would have to install all requirements manually. There is however a script
