@@ -10,7 +10,6 @@
  are permitted in any medium without royalty provided the copyright
  notice and this notice are preserved. This file is offered as-is,
  without any warranty.
----
 
 
 
@@ -19,23 +18,33 @@
 TODO: move Compilation to beginning, Running?
 
 1) Table of Contents
-2) Licensing
-3) Running
-4) Default Controls
-5) Configuration
-6) Hardware Requirements
-7) Software Requirements
-   7.1) OpenGL
-   7.2) GLEW
-   7.3) SDL
-   7.4) ODE
-8) Compilation
+2) Introduction
+3) Licensing
+4) Requirements
+5) Compiling
+6) Running
+7) Default Controls
+8) Configuration
 9) Credits
 10) Links
 
 
 
-2) [LICENSING]
+2) [INTRODUCTION]
+TODO... Futuristic, Vehicular combat, inspiration...
+
+Supports OSes...
+TODO: installer for windows, more OSes!
+
+Also, a POSIX compliant OS should be used (such as GNU or BSD). A GNU variant
+is recommended (such as GNU/kfreebsd or GNU/linux). Note that Windows is not a
+targeted OS, because it's not POSIX compliant and generally difficult to
+use/develop on. It has however been successfully tested on many operative
+systems and there is a windows installer.
+
+
+
+3) [LICENSING]
 
 RCX  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Mats Wahlberg
 
@@ -60,97 +69,9 @@ the file or in an accompanying README file.
 
 
 
-3) [RUNNING]
+4) [REQUIREMENTS]
 
-TODO: all of this should be rewritten! And see COMPILATION, MORE/MOVE HERE?
-
-The current version of RCX does not require installation in order to run.
-Instead, just place rcx (on windows: rcx.exe) in any directory.
-In the archive, there are two directories: src and data. While data is needed,
-src is only needed for compilation.
-
-Src is not needed for rcx to run - it contains the sourcecode for compilation
-and modification of rcx. The data directory contains the default configuration
-and all 3D models. Without the 3D files in the data directory, rcx will not
-have anything to render, which is why rcx will refuse to start if these files
-are missing.
-
-A few options are available as arguments:
-Path to data directory ("-d"), default: "data" in the same dir as the binary).
-Path to profile directory ("-p"), default: "profiles" inside the data dir.
-
-Example: use the read only _data_ directory "/opt/rcx/data", and "profile"
-directory the user has read/write access to (in home):
-> rcx -d /opt/rcx/data -p /home/slinger/rcx
-
-
-TODO: running as installed, portable. explanation (longer than --help), examples
-
-
-
-4) [DEFAULT CONTROLS]
-
-While (almost) all input keys can be changed (data/profiles/default/keys.lst),
-the following is the defaults keys for the car:
-
-* Arrow keys for accelerating/reversing/breaking and steering
-* Space for locking/drifting breaks
-* Changing of camera modes using F1-F4
-* For quitting the game, just press Esc.
-
-
-There are also a couple of demo/debug keys (these keys can not be changed):
-
-Camera movement/tweaking:
-* A/D, W/S and Q/E - movement along X, Y and Z axes.
-  Note that these buttons will be used for weapon control in future versions.
-
-Spawning:
-* F5-F8 - spawn some objects:
-  box, beachball, funbox, molecule.
-  Note that this function will also be removed in future versions
-
-Debugging:
-* F9  - switch car (if more than one)
-* F10 - respawn car at track starting point
-* F11 - simulation pause (camera can still be moved)
-* F12 - wireframe geom/collision rendering toggle, the following is provided:
-   + models (normal rendering, only the 3D models)
-   + models and (clearly visible) simple geoms (all geoms but trimeshes)
-   + models and all geoms (includes trimeshes)
-   + all geoms (like above, but without 3D models)
-   + simple geoms (like above but without trimeshes)
-   + collisions (all geoms, black background and colour based on collision)
-
-
-
-5) [Configuration]
-
-RCX can be configured using a couple of plain-text files divided into several
-directories inside the data directory, such as "teams", "worlds" and "profiles"
-
-What you might be most interested in is specified in internal.conf, it
-provides many ways of tweaking the performance, and also is the place where
-you will be able to select resolution, full screen toggling, and eye_distance.
-
-If you are wondering about the last one:
-
-The viewing angle in the game is calculated based on your eye distance from
-the screen, in pixels. This system got the advantage of always providing a
-realistic viewing angle for all resolutions. But if you don't like this, you
-can force a viewing angle in the configuration file (internal.conf).
-
-If you want to tweak this value to your specific workstation, determine how
-many pixels a normal length unit is by dividing your screen height (or width)
-resolution with your physical screen height (or width). You can then multiply
-the resulting value with the distance you have measured between your eyes and
-screen (in reality).
-
-
-
-6) [HARDWARE REQUIREMENTS]
-
-The requirements for running rcx is modest, a recommended minimum would be:
+The hardware requirements are modest, a recommended minimum would be:
 
 * Processor:	1.5GHz, 32bit
 * Memory:	32MiB RAM memory free
@@ -160,44 +81,40 @@ Memory and processor requirements also depends on OS and other programs
 running at the same time as rcx. If you want to use many high detail models,
 be prepared that the requirements might increase a bit.
 
-Note: hardware opengl acceleration recommended, but of course, software
-rendering is an alternative, assuming you got enough processing power.
+Note: hardware opengl acceleration recommended, but software rendering is a
+viable alternative (assuming you got enough processing power).
 
-Also, a POSIX compliant OS should be used (such as GNU or BSD). A GNU variant
-is recommended (such as GNU/kfreebsd or GNU/linux). Note that Windows is not
-a targeted OS, because it's not POSIX compliant and generally difficult to
-use/develop on. There is however a windows compiled version (rcx.exe)
-which might work.
+Except for the usual requirements RCX needs OpenGL and a few third party
+libraries (the compiled windows binary includes these):
 
-TODO: installer for windows, more OSes!
-
-
-
-7) [SOFTWARE REQUIREMENTS]
-
-RCX needs OpenGL and three libraries (the compiled windows binary includes the
-needed libraries):
-
-   7.1) [OPENGL]
+   4.1) [OPENGL]
    As mentioned above, some kind of OpenGL implementation is needed for
    rendering of 3D graphics. This is OS dependent, but it is quite common
    (either hardware or software). This version requires GL 1.5 or later.
    Note that RCX does not use GLU or GLUT, only GL.
 
-   7.2) [GLEW]
+   4.2) [GLEW]
    RCX uses the library "OpenGL Extension Wrangler Library" for loading and
    checking opengl versions and extensions.
 
-   7.3) [SDL]
+   4.3) [SDL]
    RCX uses the library "Simple DirectMedia Layer" for some OS independent
    functionality.
 
-   7.4) [ODE]
-   RCX uses the library "Open Dynamics Engine" for some physics simulations.
+   4.4) [ODE]
+   RCX uses the library "Open Dynamics Engine" for most physics simulations.
+
+TODO:
+
+Z LIB
+PNG reference library
+IJG JPEG library
 
 
+5) [COMPILING]
 
-8) [COMPILING]
+If you have installed a pre-compiled package or used the windows installer,
+you can skip this section. Otherwise read on...
 
 First of all, you will need the libraries mentioned above (gl, glew, sdl and
 ode). Also check if your distro provides development libraries in separate
@@ -208,22 +125,21 @@ compiler, Autotools, libraries etc).
 The build process is the standard autoconf routine: run "./configure" followed
 by "make". "make install" will install (but that is not needed to run, you
 could just start "rcx" from the src directory). If you're building from the
-git repository (development), first run "autoreconf -fi" to generate the
+git repository (development), first run "autoreconf -vfi" to generate the
 configure script and other required files. Remember to set "CPPFLAGS" and
 "LDFLAGS" if necessary.
 
-If you are building on macintosh (you crazy person!), you can use MacPorts to
-get all necessary dependencies (libsdl, ode, glew, autoconf, automake, etc).
-The rest or the building process is just like above. Remember that macports
-use a nonstandard path (/opt/local), so you will need to run configure like:
+If you are building on OS X (you crazy person!), you can use MacPorts to get
+all necessary dependencies (libsdl, ode, glew, autoconf, automake, etc).  The
+rest or the building process is just like above. Remember that macports use a
+nonstandard path (/opt/local), so you will need to run configure like this:
 
 ./configure CPPFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib
 
-TODO: installer for windows, more OSes!
 
-On windows things will be more difficult: since there is no package manager,
+On Windows things will be more difficult: since there is no package manager,
 you would have to install all requirements manually. There is however a script
-called "make_w32.sh" included to help automate this process.
+called "make_w32.sh" included to help automate the build process.
 
 First of all, install MinGW (a minimal port of GNU for windows - it provides
 compilers and standard libraries for compilation). The latest version can be
@@ -259,26 +175,99 @@ are linked into the exe, and "--enable-w32console" enables console log output
 
 
 
+6) [RUNNING]
+
+TODO: all of this should be rewritten!
+
+note about installed and portable mode, xdg/standard dirs, arguments, etc...
+And see COMPILATION
+
+
+
+7) [DEFAULT CONTROLS]
+
+While (almost) all input keys can be changed (data/profiles/default/keys.lst),
+the following are the default keys for the car:
+
+* Arrow keys for accelerating/reversing/breaking and steering
+* Space for locking/drifting breaks
+* Changing of camera modes using F1-F4
+* For quitting the game, just press Esc.
+
+TODO: gamepad input, defaults...
+
+There are also a couple of demo/debug keys (these keys can not be changed):
+
+Camera movement/tweaking:
+* A/D, W/S and Q/E - movement along X, Y and Z axes.
+  Note that these buttons will be used for weapon control in future versions.
+
+Spawning:
+* F5-F8 - spawn some objects:
+  box, beachball, funbox, molecule.
+  Note that this function will also be removed in future versions
+
+Debugging:
+* F9  - switch car (if more than one)
+* F10 - respawn car at track starting point
+* F11 - simulation pause (camera can still be moved)
+* F12 - wireframe geom/collision rendering toggle, the following is provided:
+   + models (normal rendering, only the 3D models)
+   + models and (clearly visible) simple geoms (all geoms but trimeshes)
+   + models and all geoms (includes trimeshes)
+   + all geoms (like above, but without 3D models)
+   + simple geoms (like above but without trimeshes)
+   + collisions (all geoms, black background and colour based on collision)
+
+
+
+8) [CONFIGURATION]
+
+TODO: note about installed vs portable file layout, xdg, $HOME, etc...
+RCX can be configured using a couple of plain-text files divided into several
+directories inside the data directory, such as "teams", "worlds" and "profiles"
+
+What you might be most interested in is specified in internal.conf, it
+provides many ways of tweaking the performance, and also is the place where
+you will be able to select resolution, full screen toggling, and eye_distance.
+
+TODO: mention tmp_menu_selections!
+
+TODO: change to fixed angle? Keep short note about eye_distance
+
+If you are wondering about the last one:
+
+The viewing angle in the game is calculated based on your eye distance from
+the screen, in pixels. This system got the advantage of always providing a
+realistic viewing angle for all resolutions. But if you don't like this, you
+can force a viewing angle in the configuration file (internal.conf).
+
+If you want to tweak this value to your specific workstation, determine how
+many pixels a normal length unit is by dividing your screen height (or width)
+resolution with your physical screen height (or width). You can then multiply
+the resulting value with the distance you have measured between your eyes and
+screen (in reality).
+
+
+
 9) [CREDITS]
 
-RCX credits (nicknames refers to names on the forum):
+RCX credits (some people referred to by nicknames):
 
-  * Mats Wahlberg ("Slinger")	Creator (coder) + development 3D models
+  * Mats Wahlberg ("Slinger")	Creator/developer + development 3D models
   * "K.Mac"			Extensive testing, hacks and new ideas
-  * "Spontificus"		Testing, hacks and various fixes
+  * "MeAkaJon"			Creating the original project homepage
+  * "Spontificus"		Hacks, fixes, move to C++, git and new website
+  * "MoruganKodi"/"コディ[KODI]"	Many High Detail 3D models for cars and tracks
+  * "orgyia"			Scramble-like test track and test ramps
+  * You (yes, you)		For being interested and trying RCX!
 
 
 Other Projects that made RCX possible:
 
-  * "Free Software Foundation"  "Free Software, Free Society", supporting the
-				free software movement
-
-  * "The GNU Project"           Developing a Free OS. Its work for computer
-				freedom has changed the world
-
-  * "Simple DirectMedia Layer"	OS/hardware abstractions
-  * "Open Dynamics Engine"	Rigid body dynamics and collision detection
-  * "OpenGL Extension Wrangler" OpenGL version/extension loader
+  * "Free Software Foundation"	"Free Software, Free Society"
+  * "The GNU Project"		Developing a Free OS
+  * "TuxFamily"			Amazingly generous hosting for the project!
 
 
 

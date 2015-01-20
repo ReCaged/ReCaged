@@ -18,7 +18,13 @@ RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
 
  * NSIS installer for windows
 
- * Support for macintosh
+ * Support for OS X
+
+ * New test track:
+   * Ramps and stunt object by CodieMorgan/MoruganKodi/コディ[KODI]
+   * Scramble-like test road and ramps by orgyia
+TODO:   * Rework superbowl and vertigo roads
+TODO:   * New tracks and cars by Codie?
 
  * New logging system
 TODO: * Colour indication of importance/verbosity

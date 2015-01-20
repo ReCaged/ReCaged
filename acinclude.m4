@@ -45,7 +45,8 @@ mingw*|cygwin*)
 
 *apple*|*darwin*)
 	AC_MSG_RESULT(yes)
-	RCX_TARGET="mac"
+	RCX_TARGET="osx"
+
 	;;
 
 *)
@@ -280,8 +281,8 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 [
 	AC_MSG_WARN([Attempting to guess configuration for GL using ac_check_* macros])
 
-	#here's a fun part: both w32 and mac likes to brake naming conventions for opengl...
-	if test "$RCX_TARGET" = "mac"; then
+	#here's a fun part: both w32 and osx likes to brake naming conventions for opengl...
+	if test "$RCX_TARGET" = "osx"; then
 		AC_CHECK_HEADER([OpenGL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, you go and figure this one out]) ])
 	else
 		AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
@@ -296,7 +297,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 			[AC_MSG_ERROR([GL library appears to be missing, install libgl1-mesa or similar])])
 		;;
 
-	mac)
+	osx)
 		AC_MSG_WARN([Just guessing "-framework OpenGL" can be used for linking gl library, no guarantees!])
 		RCX_LIBS="$RCX_LIBS -framework OpenGL"
 		;;
