@@ -487,8 +487,7 @@ Options for overriding normal (automatic) directory detection:\n\
 	//update log verbosity according to settings in conf _and_ any arguments)
 	Log_Change_Verbosity((internal.verbosity-1));
 
-	//TODO: rotate credits/libraries order/descriptions
-	Log_puts(0, " RCX is copyright (C) 2009, 2010, 2011, 2012, 2013, 2014 Mats Wahlberg\n");
+	Log_puts(0, " RCX is copyright (C) " PACKAGE_YEAR " Mats Wahlberg\n");
 
 Log_puts(1, "\
 \n\
@@ -506,18 +505,22 @@ Log_puts(1, "\
  along with RCX.  If not, see <http://www.gnu.org/licenses/>.\n\
 \n\n\
 				-=[ Credits ]=-\n\n\
-  * Mats Wahlberg (\"Slinger\")		-	Creator (coder) + development 3D models\n\
+  * Mats Wahlberg (\"Slinger\")		-	Creator/developer + development 3D models\n\
   * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
-  * \"Spontificus\"			-	Testing, hacks and various fixes\n\n\
+  * \"MeAkaJon\"				-	Creating the original project homepage\n\
+  * \"Spontificus\"			-	Hacks, fixes, move to C++, git and new website\n\
+  * \"MoruganKodi\"/\"コディ[KODI]\"	-	Many High Detail 3D models for cars and tracks\n\
+  * \"orgyia\"				-	Scramble-like test track and test ramps\n\
+  * You (yes, you)			-	For being interested and trying RCX!\n\
 \n		-=[ Other Projects that made RCX possible ]=-\n\n\
   * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
-  * \"The GNU Project\"			-	For Developing a Free OS\n\
-  * \"Simple DirectMedia Layer\"		-	OS/hardware abstraction library\n\
-  * \"Open Dynamics Engine\"		-	Rigid body dynamics and collision detection library\n\
-  * \"OpenGL Extension Wrangler\"		-	OpenGL version/extension loader\n\n\n\
+  * \"The GNU Project\"			-	Developing a Free OS\n\
+  * \"TuxFamily\"				-	Amazingly generous hosting for the project!\n\n\n\
+ Default track and cars can be changed in \"config/tmp_menu_selections\"\n\
  Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
  More keys exists for debug/testing/demo, see README if you are interested.\n\n\
  - See README for more info -\n\n");
+
 
 
 	//ok, start loading
