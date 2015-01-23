@@ -125,9 +125,10 @@ configure script and other required files. Remember to set "CPPFLAGS" and
 "LDFLAGS" if necessary.
 
 If you are building on OS X (you crazy person!), you can use MacPorts to get
-all necessary dependencies (libsdl, ode, glew, autoconf, automake, etc).  The
-rest or the building process is just like above. Remember that macports use a
-nonstandard path (/opt/local), so you will need to run configure like this:
+all necessary dependencies (libsdl, ode, glew, etc. you can also get automake,
+autoconf and git for development versions). The rest or the build process is
+just like above. Remember that macports use a nonstandard path (/opt/local),
+so you will need to run configure like this:
 
 ./configure CPPFLAGS=-I/opt/local/include LDFLAGS=-L/opt/local/lib
 
