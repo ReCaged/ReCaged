@@ -23,6 +23,8 @@
 #"shared" will be added. Then: one Makefile.am for each dir.
 objectsdir = $(datadir)/rcx
 nobase_dist_objects_DATA = \
+	README \
+	recaged.png \
 	objects/misc/beachball/README \
 	objects/misc/beachball/sphere.mtl \
 	objects/misc/beachball/sphere.obj \

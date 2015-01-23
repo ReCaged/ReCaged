@@ -48,13 +48,20 @@ class Image_Texture: public Racetime_Data
 
 		//only graphics list rendering can access this stuff
 		friend void Render_List_Render();
+
+		//to allow destruction of temporary splash image texture
+		friend bool Interface_Splash(const char*, int, int);
 };
 
 //used to temporarily store image
 class Image
 {
 	public:
+		//identifies file and runs appropriate loader
 		bool Load(const char*);
+
+		//info
+		int Width(), Height();
 
 		//create "dedicated" (used during race) timeshes from this one:
 		Image_Texture *Create_Texture();
@@ -80,7 +87,7 @@ class Image
 		//actual data to store:
 		uint8_t *pixels;
 		enum image_format{RGB, BGR, RGBA, BGRA, GRAY} format;
-		int width, height, components, bitdepth;
+		unsigned int width, height, components, bitdepth;
 		//(componentdepth is number of bits per component and pixel)
 };
 

@@ -62,6 +62,6 @@ class Racetime_Data
 		char *name; //name of specific data
 
 		static Racetime_Data *head;
-		Racetime_Data *next;
+		Racetime_Data *prev, *next;
 };
 #endif

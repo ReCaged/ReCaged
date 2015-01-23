@@ -211,6 +211,8 @@ SectionIn RO
 	File /r "config"
 	File "README.txt"
 	File "COPYING.txt"
+	File "GPL-3.txt"
+	File "CC-BY-SA-4.0.txt"
 	File "RCX.exe"
 
 	;only if installing
@@ -240,6 +242,8 @@ Section "Start Menu Shortcuts" SecStart
 		CreateShortCut "$SMPROGRAMS\RCX\RCX.lnk" "$INSTDIR\RCX.exe" "" "$INSTDIR\RCX.exe"
 		CreateShortCut "$SMPROGRAMS\RCX\Readme.lnk" "$INSTDIR\README.txt" "" "$INSTDIR\README.txt"
 		CreateShortCut "$SMPROGRAMS\RCX\Copying.lnk" "$INSTDIR\COPYING.txt" "" "$INSTDIR\COPYING.txt"
+		CreateShortCut "$SMPROGRAMS\RCX\GPL-3.lnk" "$INSTDIR\GPL-3.txt" "" "$INSTDIR\GPL-3.txt"
+		CreateShortCut "$SMPROGRAMS\RCX\CC-BY-SA-4.0.lnk" "$INSTDIR\CC-BY-SA-4.0.txt" "" "$INSTDIR\CC-BY-SA-4.0.txt"
 		CreateShortCut "$SMPROGRAMS\RCX\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe"
 	${endif}
 
@@ -287,6 +291,8 @@ Section "Uninstall"
 	RMDir /r "$INSTDIR\config"
 	Delete "$INSTDIR\ReadMe.txt"
 	Delete "$INSTDIR\Copying.txt"
+	Delete "$INSTDIR\GPL-3.txt"
+	Delete "$INSTDIR\CC-BY-SA-4.0.txt"
 	Delete "$INSTDIR\RCX.exe"
 	Delete "$INSTDIR\Uninstall.exe"
 

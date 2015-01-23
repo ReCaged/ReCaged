@@ -31,6 +31,7 @@ Racetime_Data::Racetime_Data(const char *n)
 	name = new char[strlen(n)+1];
 	strcpy (name, n);
 
+	prev = NULL;
 	next = head;
 	head = this;
 }
@@ -38,21 +39,26 @@ Racetime_Data::Racetime_Data(const char *n)
 Racetime_Data::~Racetime_Data()
 {
 	Log_Add(2, "removing racetime data called \"%s\"", name);
+
+	//remove from list
+	if (prev)
+		prev->next=next;
+	else
+		head=next;
+	if (next)
+		next->prev=prev;
+
+	//remove string name
 	delete[] name;
+	//child classes takes care of their own memory business!
 }
 
 void Racetime_Data::Destroy_All()
 {
 	Log_Add(2, "destroying all racetime data");
 
-	Racetime_Data *tmp, *data = head;
-	while (data)
-	{
-		tmp = data;
-		data=data->next;
-
-		delete tmp;
-	}
+	while (head)
+		delete head;
 
 	head = NULL;
 }

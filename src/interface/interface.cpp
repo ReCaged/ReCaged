@@ -28,10 +28,13 @@
 #include "shared/threads.hpp"
 #include "shared/log.hpp"
 #include "shared/profile.hpp"
+#include "shared/directories.hpp"
 
 #include "shared/camera.hpp"
 #include "render_list.hpp"
 #include "geom_render.hpp"
+
+#include "assets/image.hpp"
 
 SDL_Surface *screen;
 Uint32 flags = SDL_OPENGL | SDL_RESIZABLE;
@@ -57,8 +60,12 @@ float view_angle_rate_y=0.0;
 bool background = true;
 //
 
+//for vbo handling (for splash screen)
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 void Resize (int new_w, int new_h)
 {
+	Log_Add(1, "Resizing to: %dx%d in pixels", new_w, new_h);
 	screen = SDL_SetVideoMode (new_w, new_h, bpp, flags);
 
 	if (!screen)
@@ -85,7 +92,7 @@ void Resize (int new_w, int new_h)
 	{
 		//angle between w/2 (distance from center of screen to right edge) and players eye distance
 		angle = atan( (((GLfloat) w)/2.0)/internal.dist );
-		Log_Add(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
+		Log_Add(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels)", angle*180/M_PI, internal.dist);
 	}
 	else //bad...
 	{
@@ -112,6 +119,110 @@ void Resize (int new_w, int new_h)
 	//switch back to usual matrix
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity();
+}
+
+
+//simple rendering of image (splash screen) when loading
+bool Interface_Splash(const char *file, int screenx, int screeny)
+{
+	Log_Add(2, "Using \"%s\" for splash screen", file);
+
+	//load texture from file
+	Image image;
+
+	if (!image.Load(file))
+		return false;
+
+	//create texture and bind it
+	Image_Texture *texture=image.Create_Texture();
+
+	if (!texture)
+		return false;
+
+	glBindTexture(GL_TEXTURE_2D, texture->GetID());
+
+	//create quad for rendering it
+	GLfloat imageratio= (GLfloat)image.Width() / (GLfloat)image.Height();
+	GLfloat screenratio = (GLfloat)screenx / (GLfloat)screeny;
+	GLfloat x,y; //size of quad
+
+	//wider than window, fill width (border above/below)
+	if (imageratio > screenratio)
+	{
+		x=(GLfloat)screenx; //100%
+		y=(x/imageratio); //=x*height/width
+	}
+	//narrower than window (fill height, borders on sides)
+	else
+	{
+		y=(GLfloat)screeny;
+		x=(y*imageratio);
+	}
+
+	//x and y gives us the bottom-right corner of the quad, if also got the
+	//top-left corner. enter x0 and y0!
+	GLfloat x0=((GLfloat)screenx-x)/2.0; //half of unused screen area (if any)
+	GLfloat y0=((GLfloat)screeny-y)/2.0; //-''-
+
+	//x, y, z, u, v components/channels
+	GLfloat quad[]=
+	{
+		x0+x,	y0,	-1.0,	1.0,	0.0,
+		x0,	y0,	-1.0,	0.0,	0.0,
+		x0,	y0+y,	-1.0,	0.0,	1.0,
+		x0+x,	y0+y,	-1.0,	1.0,	1.0,
+	};
+
+	//create vbo and upload above quad to it
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*4*5, quad, GL_STATIC_DRAW);
+	glVertexPointer(3, GL_FLOAT, sizeof(GLfloat)*5, BUFFER_OFFSET(0));
+	glTexCoordPointer(2, GL_FLOAT, sizeof(GLfloat)*5, BUFFER_OFFSET(sizeof(GLfloat)*3));
+
+	//change projection matrix to ortho mode, store old matrix
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+	glOrtho(0, screenx, screeny, 0, 0, 10);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity(); //clear, just in case
+
+	//arbitrary clear colour, but black background works for most people
+	glClearColor (0.0, 0.0, 0.0, 1.0);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//enable lots of stuff:
+	glEnableClientState(GL_VERTEX_ARRAY); //coordinates
+	glEnableClientState(GL_TEXTURE_COORD_ARRAY); //UVs
+
+	glEnable(GL_TEXTURE_2D); //texture
+	glEnable(GL_BLEND); //alpha blending (looks even better without a single background colour...)
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //a common function, looks good
+
+	//
+	//and everything done, just to be able to run the following, once.
+	glDrawArrays(GL_QUADS, 0, 4); //ZOMG!
+	SDL_GL_SwapBuffers(); //and show it to the user! :)
+	//
+
+	//and now start the clean up:
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
+	glDisableClientState(GL_VERTEX_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+	//delete vbo and texture
+	glDeleteBuffers(1, &vbo);
+	delete texture;
+
+	//restore good old perspective matrix
+	glMatrixMode (GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode (GL_MODELVIEW);
+
+	return true;
 }
 
 bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
@@ -233,6 +344,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 				Log_Add(0, "Failed to open joystick %i", i);
 		}
 	}
+
 	//
 	//options
 	//
@@ -258,6 +370,11 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	else
 		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
 
+	//and render splash screen, if found (not fatal if fails)
+	Directories dirs;
+	if (dirs.Find("recaged.png", DATA, READ))
+		Interface_Splash(dirs.Path(), screen->w, screen->h);
+
 	//things possibly used in future:
 	/*
 	glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
@@ -268,8 +385,6 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	//everything ok
 	return true;
 }
-
-
 
 int Interface_Loop ()
 {

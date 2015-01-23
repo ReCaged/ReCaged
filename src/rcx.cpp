@@ -281,7 +281,7 @@ bool tmp_menus()
 
 	//MENU: race done, replay, play again, quit?
 	// - assuming quit -
-	
+
 	//remove loaded data (not all data, only "racetime" - for this race)
 	Racetime_Data::Destroy_All();
 

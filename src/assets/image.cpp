@@ -80,13 +80,25 @@ bool Image::Load (const char *file)
 	return false;
 }
 
+//simple get of infos
+int Image::Width()
+{
+	return width;
+}
+
+int Image::Height()
+{
+	return height;
+}
+
 //just so not forgetting the message output when allocating
 void Image::Allocate()
 {
 	//Ugly, yes. For now it's assumed that bitdepth is multiple of 8
 	size_t size=(width*height*components*bitdepth)/8;
 
-	Log_Add(2, "Allocating image buffer of %u bytes", size);
+	Log_Add(2, "Allocating image buffer of %u bytes (%ux%u resolution, %u components, %u depth)",
+			size, width, height, components, bitdepth);
 	pixels = new uint8_t[size];
 }
 
@@ -292,7 +304,7 @@ bool Image::Load_PNG(const char *file)
 	int rowbytes=width*components*bitdepth/8;
 
 	//point to pixel data storage
-	for (int i=0; i<height; ++i)
+	for (unsigned int i=0; i<height; ++i)
 		row_pointers[i]=pixels+rowbytes*i;
 
 	png_read_image(png_ptr, row_pointers); //and just like that...

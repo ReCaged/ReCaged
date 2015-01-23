@@ -77,8 +77,12 @@ then
 	#these two aren't installed automatically, copy:
 	cp README "$BUILDDIR"/README.txt
 	cp COPYING "$BUILDDIR"/COPYING.txt
-	#add carriage return to gpl text (all readmes handled in next line):
-	unix2dos "$BUILDDIR"/COPYING.txt
+	cp "GPL-3" "$BUILDDIR/GPL-3.txt"
+	cp "CC-BY-SA-4.0" "$BUILDDIR/CC-BY-SA-4.0.txt"
+	#add carriage return to licensing texts (all readmes handled in next line):
+	unix2dos "$BUILDDIR/COPYING.txt"
+	unix2dos "$BUILDDIR/GPL-3.txt"
+	unix2dos "$BUILDDIR/CC-BY-SA-4.0.txt"
 	#convert rest of the copyright info (files moved by install)
 	find "$BUILDDIR" -name "README" -exec mv "{}" "{}".txt \; #add txt suffix
 	find "$BUILDDIR" -name "README.txt" -exec unix2dos "{}" \; #add CRLF
