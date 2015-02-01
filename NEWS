@@ -36,9 +36,10 @@ TODO: * Colour indication of importance/verbosity
 
  * Interface improvements:
    * Joystick (gamepad) support
+   * Anti-Aliasing support (multisample)
    * More reliable window creation (native BPP, better fullscreen support)
    * Use native screen resolution for fullscreen mode
-   * Anti-Aliasing support (multisample)
+   * Better information output regarding window creation/resize
 
  * Simulation improvements:
    * Increased simulation stability

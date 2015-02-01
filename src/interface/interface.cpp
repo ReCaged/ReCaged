@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -73,25 +73,21 @@ void Resize (int new_w, int new_h)
 	glMatrixMode (GL_PROJECTION);
 	glLoadIdentity();
 
-	//lets calculate viewing angle based on the players _real_ viewing angle...
+	//lets calculate FOV based on the player's _real_ perspective...
 	//the player should specify an eye_distance in internal.conf
-	//
-	//(divide your screens resolution height or width with real height or
-	//width, and multiply that with your eyes distance from the screen)
-	//
 	float angle;
 
-	if (!internal.angle) //good
+	if (internal.fov) //fixed
+	{
+		angle = ( (internal.fov/2.0) * M_PI/180);;
+	}
+	else //dynamic
 	{
 		//angle between w/2 (distance from center of screen to right edge) and players eye distance
 		angle = atan( (((GLfloat) w)/2.0)/internal.dist );
-		Log_Add(1, "(perspective: %f degrees, based on (your) eye distance: %f pixels", angle*180/M_PI, internal.dist);
 	}
-	else //bad...
-	{
-		Log_Add(1, "Angle forced to: %f degrees. And you are an evil person...", internal.angle);
-		angle = ( (internal.angle/2.0) * M_PI/180);;
-	}
+
+	Log_Add(1, "Window resize: %dx%d, FOV: %f (%s)", w, h, 2*angle*180/M_PI, internal.fov? "fixed":"dynamic");
 
 	//useful for more things:
 	//x = rate*depth
@@ -162,12 +158,16 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 		//set resolution from screen info
 		x = info->current_w;
 		y = info->current_h;
+
+		Log_Add(1, "Window creation (fullscreen): %dx%d, BPP: %d, MSAA: %d", x, y, bpp, internal.msaa);
 	}
 	else //windowed mode
 	{
 		//set resolution from conf or as forced by args
 		x= (xres > 0)? xres : internal.res[0];
 		y= (yres > 0)? yres : internal.res[1];
+
+		Log_Add(1, "Window creation: %dx%d, BPP: %d, MSAA: %d", x, y, bpp, internal.msaa);
 	}
 
 	//try to set video

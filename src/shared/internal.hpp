@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -58,8 +58,8 @@ extern struct internal_struct {
 	int msaa;
 	float clipping[2];
 	float fog;
+	float fov;
 	float dist;
-	float angle;
 } internal;
 
 const struct internal_struct internal_defaults = {
@@ -84,9 +84,9 @@ const struct internal_struct internal_defaults = {
 	false,
 	4,
 	{1.0, 1500.0},
-	500.0,
-	2000.0,
-	0};
+	1000.0,
+	45.0,
+	2500.0};
 
 const struct Conf_Index internal_index[] = {
 	{"verbosity",		'i',1, offsetof(struct internal_struct, verbosity)},
@@ -120,8 +120,8 @@ const struct Conf_Index internal_index[] = {
 	{"multisample",		'i',1, offsetof(struct internal_struct, msaa)},
 	{"clipping",		'f',2, offsetof(struct internal_struct, clipping)},
 	{"fog",			'f',1, offsetof(struct internal_struct, fog)},
+	{"FOV",			'f',1, offsetof(struct internal_struct, fov)},
 	{"eye_distance",	'f',1, offsetof(struct internal_struct, dist)},
-	{"view_angle",		'f',1, offsetof(struct internal_struct, angle)},
 
 	{"",0,0}};
 

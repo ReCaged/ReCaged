@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -510,7 +510,7 @@ Log_puts(1, "\
   * \"MeAkaJon\"				-	Creating the original project homepage\n\
   * \"Spontificus\"			-	Hacks, fixes, move to C++, git and new website\n\
   * \"MoruganKodi\"/\"コディ[KODI]\"	-	Many High Detail 3D models for cars and tracks\n\
-  * \"orgyia\"				-	Scramble-like test track and test ramps\n\
+  * \"orgyia\"				-	Testing, scramble-like test track and ramps\n\
   * You (yes, you)			-	For being interested and trying RCX!\n\
 \n		-=[ Other Projects that made RCX possible ]=-\n\n\
   * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
