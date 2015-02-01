@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -227,7 +227,7 @@ class Car_Module:public Racetime_Data
 {
 	public:
 		static Car_Module *Load(const char *path);
-		class Car *Spawn(dReal x, dReal y, dReal z, Trimesh_3D *tyre, Trimesh_3D *rim);
+		class Car *Spawn(dReal x, dReal y, dReal z, Trimesh_3D *wheel);
 
 	private:
 		Car_Module(const char *name); //only allocate through spawn function

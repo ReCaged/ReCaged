@@ -1,4 +1,4 @@
-# Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+# Copyright (C) 2009, 2010, 2011, 2012, 2015 Mats Wahlberg
 #
 # Copying and distribution of this file, with or without modification,
 # are permitted in any medium without royalty provided the copyright
@@ -10,35 +10,36 @@
 # one single user (with one profile) controls all cars ("players")
 #
 #the idea here is to mimic menu selections for now:
-#hello, welcome to rc! select a profile (or create a new):
+#hello, welcome to rcx!
+#select a profile (or create a new):
 profile default
 
-#main menu... player selects "race"... and free-roam mode
+#main menu...
+#player selects "race"...
+#and free-roam mode...
 #select world:
 world Sandbox
 #select track:
 track Box
 
 #waiting for players...
-#one player
+#one player joins the cage
 #please select team:
 team Nemesis
 #what car?
 car Venom
-#ok, tyre and rim
-diameter 2 #rim diameter
-tyre Slick #by world or track)
-rim Split #by team or car)
+#ok, wheel?
+wheel Slick #by world OR TRACK (tracks can ship optional track-specific wheels)
+
 #todo: automatic spawning position instead of
 #manual x and y coords relative to track start
-position -8 0
+spawn -8 0
 
 #another player joins the cage
 team Nemesis
 car Venom
 diameter 2
-tyre Slick
-rim Split
-position 8 0
+wheel Slick
+spawn 8 0
 
 #ok, end of file: cage is closed, race will start!
