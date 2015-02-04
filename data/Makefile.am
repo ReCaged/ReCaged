@@ -70,6 +70,8 @@ worldsdir = $(datadir)/rcx/
 nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
+	worlds/Sandbox/tracks/Box/Box3.mtl \
+	worlds/Sandbox/tracks/Box/Box3.obj \
 	worlds/Sandbox/tracks/Box/figure_8.road \
 	worlds/Sandbox/tracks/Box/geoms.lst \
 	worlds/Sandbox/tracks/Box/in_a_spin.road \
