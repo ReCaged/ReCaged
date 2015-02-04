@@ -241,9 +241,8 @@ Section "Start Menu Shortcuts" SecStart
 		CreateDirectory "$SMPROGRAMS\RCX"
 		CreateShortCut "$SMPROGRAMS\RCX\RCX.lnk" "$INSTDIR\RCX.exe" "" "$INSTDIR\RCX.exe"
 		CreateShortCut "$SMPROGRAMS\RCX\Readme.lnk" "$INSTDIR\README.txt" "" "$INSTDIR\README.txt"
+		CreateShortCut "$SMPROGRAMS\RCX\News.lnk" "$INSTDIR\NEWS.txt" "" "$INSTDIR\NEWS.txt"
 		CreateShortCut "$SMPROGRAMS\RCX\Copying.lnk" "$INSTDIR\COPYING.txt" "" "$INSTDIR\COPYING.txt"
-		CreateShortCut "$SMPROGRAMS\RCX\GPL-3.lnk" "$INSTDIR\GPL-3.txt" "" "$INSTDIR\GPL-3.txt"
-		CreateShortCut "$SMPROGRAMS\RCX\CC-BY-SA-4.0.lnk" "$INSTDIR\CC-BY-SA-4.0.txt" "" "$INSTDIR\CC-BY-SA-4.0.txt"
 		CreateShortCut "$SMPROGRAMS\RCX\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe"
 	${endif}
 

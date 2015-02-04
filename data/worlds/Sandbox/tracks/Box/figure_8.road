@@ -3,8 +3,8 @@
 #load materials
 material_file surfaces.mtl
 
-section wide	-11 0 11 0
-section small	-7 0 7 0
+section wide	-12 0 12 0
+section small	-8 0 8 0
 
 
 material concrete
@@ -17,55 +17,55 @@ select small
 resolution 5 10
 stiffness 20 20
 rotation 0 0 -30
-add -10 25 -0.25
+add -20 25 -0.25
 
 #180° turn
 resolution 10 20
 rotation -20 -20 0
-add -40 140 55
+add -40 130 40
 stiffness 80 80
 rotation 15 20 180
-add 40 140 100
+add 40 140 60
 
 #from turn to figure-8
 resolution 5 10
 rotation 15 0 180
 stiffness 10 10
-add 15 15 140
+add 15 15 100
 
 resolution 1 10
 rotation 0 0 180
-add 15 -40 150
+add 15 -40 110
 select wide
-add 0 -90 150
+add 0 -90 110
 
 #figure-8
 stiffness 49.7 49.7
 
 resolution 10 20
 rotation 20 0 90
-add 90 -180 150
+add 90 -180 110
 resolution 1 20
 rotation 0 20 0
-add 180 -90 150
+add 180 -90 110
 resolution 10 20
 
 rotation 0 0 -90
-add 90 0 150
+add 90 0 110
 resolution 1 1
-add -90 0 150
+add -90 0 110
 
 resolution 10 20
 rotation 0 -20 0
-add -180 90 150
+add -180 90 110
 resolution 1 20
 rotation -20 0 90
-add -90 180 150
+add -90 180 110
 resolution 10 20
 
 rotation 0 0 180
-add 0 90 150
+add 0 90 110
 resolution 1 1
-add 0 -90 150
+add 0 -90 110
 
 

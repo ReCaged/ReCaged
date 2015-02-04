@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -60,8 +60,8 @@ extern struct internal_struct {
 	int filter;
 	bool separate_specular;
 	float fog;
+	float fov;
 	float dist;
-	float angle;
 } internal;
 
 const struct internal_struct internal_defaults = {
@@ -88,9 +88,9 @@ const struct internal_struct internal_defaults = {
 	{1.0, 1500.0},
 	1,
 	true,
-	500.0,
-	2000.0,
-	0};
+	1000.0,
+	45.0,
+	2500.0};
 
 const struct Conf_Index internal_index[] = {
 	{"verbosity",		'i',1, offsetof(struct internal_struct, verbosity)},
@@ -126,8 +126,8 @@ const struct Conf_Index internal_index[] = {
 	{"texture:filter",	'i',1, offsetof(struct internal_struct, filter)},
 	{"texture:separate_specular",'b',1, offsetof(struct internal_struct, separate_specular)},
 	{"fog",			'f',1, offsetof(struct internal_struct, fog)},
+	{"FOV",			'f',1, offsetof(struct internal_struct, fov)},
 	{"eye_distance",	'f',1, offsetof(struct internal_struct, dist)},
-	{"view_angle",		'f',1, offsetof(struct internal_struct, angle)},
 
 	{"",0,0}};
 

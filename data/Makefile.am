@@ -1,7 +1,7 @@
 #
 # RCX - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2012, 2014 Mats Wahlberg
+# Copyright (C) 2012, 2014, 2015 Mats Wahlberg
 #
 # This file is part of RCX.
 #
@@ -68,11 +68,7 @@ nobase_dist_teams_DATA = \
 	teams/Nemesis/cars/Venom/geoms.lst \
 	teams/Nemesis/cars/Venom/README \
 	teams/Nemesis/cars/Venom/Venom.mtl \
-	teams/Nemesis/cars/Venom/Venom.obj \
-	teams/Nemesis/rims/diameter/2/Split/README \
-	teams/Nemesis/rims/diameter/2/Split/rim.conf \
-	teams/Nemesis/rims/diameter/2/Split/Split.mtl \
-	teams/Nemesis/rims/diameter/2/Split/Split.obj
+	teams/Nemesis/cars/Venom/Venom.obj
 
 worldsdir = $(datadir)/rcx/
 nobase_dist_worlds_DATA = \
@@ -89,10 +85,16 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/surfaces.mtl \
 	worlds/Sandbox/tracks/Box/track.conf \
 	worlds/Sandbox/tracks/Box/vertigo.road \
-	worlds/Sandbox/tyres/diameter/2/Slick/README \
-	worlds/Sandbox/tyres/diameter/2/Slick/Slick.mtl \
-	worlds/Sandbox/tyres/diameter/2/Slick/Slick.obj \
-	worlds/Sandbox/tyres/diameter/2/Slick/tyre.conf
+	worlds/Sandbox/wheels/Reckon \
+	worlds/Sandbox/wheels/Reckon/wheel.mtl \
+	worlds/Sandbox/wheels/Reckon/wheel.conf \
+	worlds/Sandbox/wheels/Reckon/wheel.obj \
+	worlds/Sandbox/wheels/Reckon/README \
+	worlds/Sandbox/wheels/Slipstream \
+	worlds/Sandbox/wheels/Slipstream/wheel.mtl \
+	worlds/Sandbox/wheels/Slipstream/wheel.conf \
+	worlds/Sandbox/wheels/Slipstream/wheel.obj \
+	worlds/Sandbox/wheels/Slipstream/README
 
 #TODO: add in future (shared media)
 #objectsdir = $(datadir)/rcx/data

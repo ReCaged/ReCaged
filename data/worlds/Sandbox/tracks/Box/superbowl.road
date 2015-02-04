@@ -3,24 +3,43 @@
 #load materials
 material_file surfaces.mtl
 
-#we will only need one C-shape for the whole road:
-section C	15 20	-15 20	-15 -20	15 -20
+#we will only need one half-circle for the whole road:
+section C	30 36	-18 36	-18 -36	30 -36
 
 #...and select this section to be used
 select C
 
 material concrete
-resolution 25 50
 
 depth 0.5
 
 #radius of 160, multiplied by 0.5523... gives good
-#stiffness values for circle approximation
+#stiffness values for quarter-circle approximation
 stiffness 88.37 88.37
 
 nocapping #not needed
 
-#build in 1/4 of circle
-add -160 0 0
+#first 180° turn
+resolution 25 50
+rotation 0 0 -90
+add -140 -160 0
+rotation 0 0 0
+add -300 0 0
 rotation 0 0 90
-add 0 160 0
+add -140 160 0
+
+#straight forward
+resolution 25 1
+add 140 160 0
+
+#turn again
+resolution 25 50
+rotation 0 0 180
+add 300 0 0
+rotation 0 0 270
+add 140 -160 0
+
+#and finish up
+resolution 25 1
+add -140 -160 0
+

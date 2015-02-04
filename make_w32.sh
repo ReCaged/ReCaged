@@ -2,7 +2,7 @@
 #
 # RCX - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2012, 2014 Mats Wahlberg
+# Copyright (C) 2012, 2014, 2015 Mats Wahlberg
 #
 # This file is part of RCX
 #
@@ -48,7 +48,7 @@ then
 
 	#force create autoconf script/files
 	echo "Creating autoconf script"
-	autoreconf -fi || exit 1
+	autoreconf -fvi || exit 1
 
 	#try building
 	echo "Running configure and make"
@@ -74,16 +74,23 @@ then
 
 	#translate (add CRLF)
 	#note: unix2dos got the "-n" option, but most mingw/msys installs got old versions:
-	#these two aren't installed automatically, copy:
-	cp README "$BUILDDIR"/README.txt
-	cp COPYING "$BUILDDIR"/COPYING.txt
-	cp "GPL-3" "$BUILDDIR/GPL-3.txt"
-	cp "CC-BY-SA-4.0" "$BUILDDIR/CC-BY-SA-4.0.txt"
-	#add carriage return to licensing texts (all readmes handled in next line):
-	unix2dos "$BUILDDIR/COPYING.txt"
-	unix2dos "$BUILDDIR/GPL-3.txt"
-	unix2dos "$BUILDDIR/CC-BY-SA-4.0.txt"
+
+	#these aren't installed automatically, copy:
+	for f in AUTHORS README COPYING NEWS ChangeLog; do
+		cp $f "$BUILDDIR"/$f.txt
+		unix2dos "$BUILDDIR"/$f.txt
+	done
+
+	#long license texts (all READMEs handled in next line):
+	#directory with long license texts:
+	cp -r licenses "$BUILDDIR"/licenses
+	for f in "$BUILDDIR"/licenses/*; do
+		mv $f $f.txt
+		unix2dos $f.txt
+	done
+
 	#convert rest of the copyright info (files moved by install)
+	#info together with files:
 	find "$BUILDDIR" -name "README" -exec mv "{}" "{}".txt \; #add txt suffix
 	find "$BUILDDIR" -name "README.txt" -exec unix2dos "{}" \; #add CRLF
 
@@ -107,7 +114,6 @@ then
 		if [ -e "$BUILDDIR"/RCX*Setup.exe ]
 		then
 			mv "$BUILDDIR"/RCX*Setup.exe .
-			rm -rf "$BUILDDIR"
 
 			echo ""
 			echo "Installer should now have been created!"
@@ -309,29 +315,33 @@ then
 
 
 
-elif [ "$1" = "devconfig" ]
+elif [ "$1" = "quick" ]
 then
 	echo ""
-	echo "Configuring for simple, repeated builds"
+	echo "Doing a quick build"
 	echo ""
 
-	echo "Creating autoconf script"
-	autoreconf -fi || exit 1
-
-	#try building
-	echo "Configuring (not building or preparing for installer)"
-	if ! ( ./configure --enable-w32static --enable-w32console)
+	if [ ! -e "configure" ]
 	then
-		echo ""
-		echo "ERROR!"
-		echo ""
-		exit 1
+		echo "autoreconf..."
+		autoreconf -fvi || exit 1
+	else
+		echo "autoreconf not needed"
 	fi
 
-	echo "Okay, now you can compile by typing \"make\""
-	echo "(type \"src/rcx\" or \"./rcx\" afterwards to run it)"
-	echo ""
-	echo "Note: If you wanted to create an installer, run \"$0 installer\" instead!"
+	if [ ! -e "Makefile" ]
+	then
+		echo "./configure..."
+		./configure --enable-w32static --enable-w32console || exit 1
+	else
+		echo "configure not needed"
+	fi
+
+	echo "make..."
+	make || exit 1
+
+	echo "sorting out the \"total mess...\" ;-)"
+	cp "src/rcx.exe" .
 
 
 
@@ -349,7 +359,7 @@ else
 	echo "	installer	- compile and create w32 installer"
 	echo "	dependencies	- install everything needed for compiling+packing (+vim)"
 	echo "	update		- update everything (will delete \"$LIBDIR\")"
-	echo "	devconfig	- only configure (for development/repeated compilations)"
+	echo "	quick		- build and copy exe out of src (for devs, no installer)"
 	#echo "	crossinstaller	- cross-compile w32 installer"
 	#echo "	crossdependencies	- cross-compile libraries for w32"
 	echo "(see README for more details)"

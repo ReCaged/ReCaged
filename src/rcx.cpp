@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -86,7 +86,7 @@ void Run_Race(void)
 //note: if selections are not found, will still fall back on safe defaults
 bool tmp_menus()
 {
-	std::string sprofile, sworld, strack, steam, scar, sdiameter, styre, srim; //easy text manipulation...
+	std::string sprofile, sworld, strack, steam, scar, swheel; //easy text manipulation...
 	Directories dirs; //for finding
 	Text_File file; //for parsing
 	dirs.Find("tmp_menu_selections", CONFIG, READ);
@@ -146,8 +146,7 @@ bool tmp_menus()
 
 	Car_Module *car_template = NULL;
 	Car *car = NULL;
-	//models for rim and tyre
-	Trimesh_3D *tyre = NULL, *rim = NULL;
+	Trimesh_3D *wheel = NULL;
 
 	while (1)
 	{
@@ -166,16 +165,14 @@ bool tmp_menus()
 					return false;
 
 				//try to load tyre and rim (if possible)
-				if (!tyre)
-					tyre = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/tyres/diameter/2/Slick", "tyre.conf");
-				if (!rim)
-					rim = Trimesh_3D::Quick_Load_Conf("teams/Nemesis/rims/diameter/2/Split", "rim.conf");
+				if (!wheel)
+					wheel = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/wheels/Reckon", "wheel.conf");
 				//good, spawn
 				car = car_template->Spawn(
 					track.start[0], //x
 					track.start[1], //y
 					track.start[2], //z
-					tyre, rim);
+					wheel);
 			}
 
 			//then break this loop...
@@ -199,61 +196,27 @@ bool tmp_menus()
 				return false;
 
 		}
-		//tyre diameter selected in menu
-		else if (file.word_count == 2 && !strcmp(file.words[0], "diameter"))
+		//wheel selected in menu
+		else if (file.word_count == 2 && !strcmp(file.words[0], "wheel"))
 		{
-			sdiameter = file.words[1];
-		}
-		//tyre selected in menu
-		else if (file.word_count == 2 && !strcmp(file.words[0], "tyre"))
-		{
-			//try loading from world tyres
-			styre = sworld;
-			styre += "/tyres/diameter/";
-			styre += sdiameter;
-			styre += "/";
-			styre += file.words[1];
+			//try loading from world wheels
+			swheel = sworld;
+			swheel += "/wheels/";
+			swheel += file.words[1];
 
 			//if failure...
-			if (! (tyre = Trimesh_3D::Quick_Load_Conf(styre.c_str(), "tyre.conf")) )
+			if (! (wheel = Trimesh_3D::Quick_Load_Conf(swheel.c_str(), "wheel.conf")) )
 			{
 				//try seing if its track specific tyre
-				styre = strack;
-				styre += "/tyres/diameter/";
-				styre += sdiameter;
-				styre += "/";
-				styre += file.words[1];
+				swheel = strack;
+				swheel += "/wheels/";
+				swheel += file.words[1];
 
-				tyre = Trimesh_3D::Quick_Load_Conf(styre.c_str(), "tyre.conf");
-			}
-		}
-		//rim selected in menu
-		else if (file.word_count == 2 && !strcmp(file.words[0], "rim"))
-		{
-			//try loading from team rims
-			srim = steam;
-			srim += "/rims/diameter/";
-			srim += sdiameter;
-			srim += "/";
-			srim += file.words[1];
-
-			//if failure...
-			if (! (rim = Trimesh_3D::Quick_Load_Conf(srim.c_str(), "rim.conf")) )
-			{
-				//try seing if car specific
-
-				srim = scar;
-				srim += "/rims/diameter/";
-				srim += sdiameter;
-				srim += "/";
-				srim += file.words[1];
-
-				//don't care if fails...
-				rim = Trimesh_3D::Quick_Load_Conf(srim.c_str(), "rim.conf");
+				wheel = Trimesh_3D::Quick_Load_Conf(swheel.c_str(), "wheel.conf");
 			}
 		}
 		//manual position required for spawning
-		else if (file.word_count == 3 && !strcmp(file.words[0], "position"))
+		else if (file.word_count == 3 && !strcmp(file.words[0], "spawn"))
 		{
 			if (!car_template)
 			{
@@ -265,7 +228,7 @@ bool tmp_menus()
 					(track.start[0]+atof(file.words[1])), //x
 					(track.start[1]+atof(file.words[2])), //y
 					(track.start[2]), //z
-					tyre, rim);
+					wheel); //wheel of choice
 		}
 	}
 
@@ -510,7 +473,7 @@ Log_puts(1, "\
   * \"MeAkaJon\"				-	Creating the original project homepage\n\
   * \"Spontificus\"			-	Hacks, fixes, move to C++, git and new website\n\
   * \"MoruganKodi\"/\"コディ[KODI]\"	-	Many High Detail 3D models for cars and tracks\n\
-  * \"orgyia\"				-	Scramble-like test track and test ramps\n\
+  * \"orgyia\"				-	Testing, scramble-like test track\n\
   * You (yes, you)			-	For being interested and trying RCX!\n\
 \n		-=[ Other Projects that made RCX possible ]=-\n\n\
   * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\

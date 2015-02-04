@@ -9,36 +9,41 @@ TODO: more info in header!
 
 RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
 ---------------------------------------------------------------
+TODO: more stuff here!
  * Change of name: "ReCaged" is now "RCX"
 
  * Move to Autotools (Automake, Autoconf) for building
 
  * Detect if running in "installed" or "portable" mode
    * Uses xdg or platform-specific paths when installed
+   * Automatic detection and paths can be overridden by invocation arguments
+
+ * New set of invocation flags and arguments (includes long arguments)
 
  * NSIS installer for windows
 
  * Support for OS X
 
- * New test track:
-   * Ramps and stunt object by CodieMorgan/MoruganKodi/コディ[KODI]
-   * Scramble-like test road and ramps by orgyia
-TODO:   * Rework superbowl and vertigo roads
-TODO:   * New tracks and cars by Codie?
-
- * New logging system
-TODO: * Colour indication of importance/verbosity
-   * Realtime log output now also on windows
-   * Writes full log output to file
-   * Errors written to stderr (and displayed in message box on windows)
-
  * Fixed various insufficient memory allocations
+
+ * Separate tyre and rim models replaced by wheel models (by world/track)
+
+ * New models and tracks:
+   * New wheels, ramps and stunt objects by CodieMorgan/MoruganKodi/コディ[KODI]
+   * Scramble-like test road by orgyia
+   * superbowl and vertigo roads reworked to be much more pleasant
+
+ * New logging system:
+   * Realtime log output now also on windows
+   * Writes complete log output to log file
+   * Errors written to stderr (and displayed in message box on windows)
 
  * Interface improvements:
    * Joystick (gamepad) support
+   * Anti-Aliasing support (multisample)
    * More reliable window creation (native BPP, better fullscreen support)
    * Use native screen resolution for fullscreen mode
-   * Anti-Aliasing support (multisample)
+   * Better information output regarding window creation/resize
 
  * Simulation improvements:
    * Increased simulation stability
@@ -72,4 +77,3 @@ TODO: * Colour indication of importance/verbosity
    * Removed "../" from header inclusions (src is now in the inclusion paths)
    * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
 
- * TODO!

@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -233,7 +233,7 @@ Car_Module *Car_Module::Load (const char *path)
 }
 
 
-Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D *rim)
+Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
@@ -470,8 +470,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *tyre, Trimesh_3D
 		//note: it's now possible to render two models for each wheel:
 		//one for the geom and one for the body
 		//this is great in this case where the wheels got two models (rim+tyre)
-		bdata->model = rim;
-		wheel_data[i]->model = tyre;
+		bdata->model = wheel3D;
 	}
 
 	//place and rotate wheels
