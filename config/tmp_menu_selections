@@ -28,8 +28,8 @@ track Box
 team Nemesis
 #what car?
 car Venom
-#ok, wheel?
-wheel Slick #by world OR TRACK (tracks can ship optional track-specific wheels)
+#ok, wheel? (by world OR TRACK SPECIFIC)
+wheel Slipstream
 
 #todo: automatic spawning position instead of
 #manual x and y coords relative to track start
@@ -39,7 +39,7 @@ spawn -8 0
 team Nemesis
 car Venom
 diameter 2
-wheel Slick
+wheel Reckon
 spawn 8 0
 
 #ok, end of file: cage is closed, race will start!

@@ -36,6 +36,7 @@ TODO... Futuristic, Vehicular combat, inspiration...
 Supports OSes...
 TODO: installer for windows, more OSes!
 
+TODO: update...
 Also, a POSIX compliant OS should be used (such as GNU or BSD). A GNU variant
 is recommended (such as GNU/kfreebsd or GNU/linux). Note that Windows is not a
 targeted OS, because it's not POSIX compliant and generally difficult to
@@ -66,6 +67,8 @@ Licensing information of binary media files is specified in a README file in
 the same directory as the relevant media file. However, all files are released
 under the same terms as above (GPL version 3), unless stated otherwise inside
 the file or in an accompanying README file.
+
+TODO: licensing directory!
 
 
 
@@ -117,12 +120,12 @@ packages and if so, install them too (look for packages named like
 lib<name>-dev). Also make sure you got the usual development tools (Make, C++
 compiler, Autotools, libraries etc).
 
-The build process is the standard autoconf routine: run "./configure" followed
-by "make". "make install" will install (but that is not needed to run, you
-could just start "rcx" from the src directory). If you're building from the
-git repository (development), first run "autoreconf -vfi" to generate the
-configure script and other required files. Remember to set "CPPFLAGS" and
-"LDFLAGS" if necessary.
+The build process is the standard autoconf routine (see the file "INSTALL" for
+more information): run "./configure" followed by "make". "make install" will
+install (but that is not needed to run, you could just start "rcx" from the
+src directory). If you're building from the git repository (development),
+first run "autoreconf -vfi" to generate the configure script and other
+required files. Remember to set "CPPFLAGS" and "LDFLAGS" if necessary.
 
 If you are building on OS X (you crazy person!), you can use MacPorts to get
 all necessary dependencies (libsdl, ode, glew, etc. you can also get automake,
@@ -242,7 +245,7 @@ RCX credits (some people referred to by nicknames):
   * "MeAkaJon"			Creating the original project homepage
   * "Spontificus"		Hacks, fixes, move to C++, git and new website
   * "MoruganKodi"/"コディ[KODI]"	Many High Detail 3D models for cars and tracks
-  * "orgyia"			Testing, scramble-like test track and ramps
+  * "orgyia"			Testing, scramble-like test track
   * You (yes, you)		For being interested and trying RCX!
 
 

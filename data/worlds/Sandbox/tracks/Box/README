@@ -1,5 +1,4 @@
-The files "Box.obj", "Box.mtl", "figure_8.road", "in_a_spin.road",
-"superbowl.road", "surfaces.mtl" and "vertigo.road" are:
+The files "Box.obj", "Box.mtl", "in_a_spin.road", and "surfaces.mtl" are:
 
 Copyright (C) 2010, 2011, 2012 Mats Wahlberg
 
@@ -16,3 +15,19 @@ Copying and distribution of these files, with or without modification,
 are permitted in any medium without royalty provided the copyright
 notice and this notice are preserved. These files are offered as-is,
 without any warranty.
+
+The files "superbowl.obj", "figure_8.road" and "vertigo.mtl" are:
+
+Copyright (C) 2010, 2015 Mats Wahlberg
+
+Copying and distribution of these files, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved. These files are offered as-is,
+without any warranty.
+
+The files "Box3.obj" and "Box3.mtl" are:
+
+Copyright (C) 2015 orgyia
+
+These files are licensed under the Creative Commons CC0 1.0 Universal License
+(CC0). See the included file CC0 for more information.

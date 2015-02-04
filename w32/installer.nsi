@@ -239,6 +239,7 @@ Section "Start Menu Shortcuts" SecStart
 		CreateDirectory "$SMPROGRAMS\RCX"
 		CreateShortCut "$SMPROGRAMS\RCX\RCX.lnk" "$INSTDIR\RCX.exe" "" "$INSTDIR\RCX.exe"
 		CreateShortCut "$SMPROGRAMS\RCX\Readme.lnk" "$INSTDIR\README.txt" "" "$INSTDIR\README.txt"
+		CreateShortCut "$SMPROGRAMS\RCX\News.lnk" "$INSTDIR\NEWS.txt" "" "$INSTDIR\NEWS.txt"
 		CreateShortCut "$SMPROGRAMS\RCX\Copying.lnk" "$INSTDIR\COPYING.txt" "" "$INSTDIR\COPYING.txt"
 		CreateShortCut "$SMPROGRAMS\RCX\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe"
 	${endif}

@@ -74,12 +74,23 @@ then
 
 	#translate (add CRLF)
 	#note: unix2dos got the "-n" option, but most mingw/msys installs got old versions:
-	#these two aren't installed automatically, copy:
-	cp README "$BUILDDIR"/README.txt
-	cp COPYING "$BUILDDIR"/COPYING.txt
-	#add carriage return to gpl text (all readmes handled in next line):
-	unix2dos "$BUILDDIR"/COPYING.txt
+
+	#these aren't installed automatically, copy:
+	for f in AUTHORS README COPYING NEWS ChangeLog; do
+		cp $f "$BUILDDIR"/$f.txt
+		unix2dos "$BUILDDIR"/$f.txt
+	done
+
+	#long license texts (all READMEs handled in next line):
+	#directory with long license texts:
+	cp -r licenses "$BUILDDIR"/licenses
+	for f in "$BUILDDIR"/licenses/*; do
+		mv $f $f.txt
+		unix2dos $f.txt
+	done
+
 	#convert rest of the copyright info (files moved by install)
+	#info together with files:
 	find "$BUILDDIR" -name "README" -exec mv "{}" "{}".txt \; #add txt suffix
 	find "$BUILDDIR" -name "README.txt" -exec unix2dos "{}" \; #add CRLF
 

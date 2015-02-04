@@ -166,7 +166,7 @@ bool tmp_menus()
 
 				//try to load tyre and rim (if possible)
 				if (!wheel)
-					wheel = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/wheels/Slick", "wheel.conf");
+					wheel = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/wheels/Reckon", "wheel.conf");
 				//good, spawn
 				car = car_template->Spawn(
 					track.start[0], //x
@@ -473,7 +473,7 @@ Log_puts(1, "\
   * \"MeAkaJon\"				-	Creating the original project homepage\n\
   * \"Spontificus\"			-	Hacks, fixes, move to C++, git and new website\n\
   * \"MoruganKodi\"/\"コディ[KODI]\"	-	Many High Detail 3D models for cars and tracks\n\
-  * \"orgyia\"				-	Testing, scramble-like test track and ramps\n\
+  * \"orgyia\"				-	Testing, scramble-like test track\n\
   * You (yes, you)			-	For being interested and trying RCX!\n\
 \n		-=[ Other Projects that made RCX possible ]=-\n\n\
   * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\

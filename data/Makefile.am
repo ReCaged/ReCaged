@@ -81,10 +81,16 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/surfaces.mtl \
 	worlds/Sandbox/tracks/Box/track.conf \
 	worlds/Sandbox/tracks/Box/vertigo.road \
-	worlds/Sandbox/wheels/Slick/README \
-	worlds/Sandbox/wheels/Slick/Slick.mtl \
-	worlds/Sandbox/wheels/Slick/Slick.obj \
-	worlds/Sandbox/wheels/Slick/wheel.conf
+	worlds/Sandbox/wheels/Reckon \
+	worlds/Sandbox/wheels/Reckon/wheel.mtl \
+	worlds/Sandbox/wheels/Reckon/wheel.conf \
+	worlds/Sandbox/wheels/Reckon/wheel.obj \
+	worlds/Sandbox/wheels/Reckon/README \
+	worlds/Sandbox/wheels/Slipstream \
+	worlds/Sandbox/wheels/Slipstream/wheel.mtl \
+	worlds/Sandbox/wheels/Slipstream/wheel.conf \
+	worlds/Sandbox/wheels/Slipstream/wheel.obj \
+	worlds/Sandbox/wheels/Slipstream/README
 
 #TODO: add in future (shared media)
 #objectsdir = $(datadir)/rcx/data

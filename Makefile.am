@@ -27,7 +27,11 @@ ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 SUBDIRS                 = config data icons man src w32
 
 #TODO!
-EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog make_w32.sh
+EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog \
+			  make_w32.sh \
+			  licenses/CC0 \
+			  licenses/CC-BY-SA-4.0 \
+			  licenses/GPL-3
 
 #create ChangeLog from git log
 dist-hook:
