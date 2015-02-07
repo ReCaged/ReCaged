@@ -209,8 +209,12 @@ SectionIn RO
 	;should cover all
 	File /r "data"
 	File /r "config"
-	File "README.txt"
-	File "COPYING.txt"
+	File /r "licenses"
+	File "AUTHORS"
+	File "README"
+	File "COPYING"
+	File "NEWS"
+	File "ChangeLog"
 	File "RCX.exe"
 
 	;only if installing

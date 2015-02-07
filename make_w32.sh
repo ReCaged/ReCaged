@@ -85,8 +85,8 @@ then
 	#directory with long license texts:
 	cp -r licenses "$BUILDDIR"/licenses
 	for f in "$BUILDDIR"/licenses/*; do
-		mv $f $f.txt
-		unix2dos $f.txt
+		mv "$f" "$f".txt
+		unix2dos "$f".txt
 	done
 
 	#convert rest of the copyright info (files moved by install)
