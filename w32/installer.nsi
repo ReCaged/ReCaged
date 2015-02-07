@@ -210,11 +210,11 @@ SectionIn RO
 	File /r "data"
 	File /r "config"
 	File /r "licenses"
-	File "AUTHORS"
-	File "README"
-	File "COPYING"
-	File "NEWS"
-	File "ChangeLog"
+	File "AUTHORS.txt"
+	File "README.txt"
+	File "COPYING.txt"
+	File "NEWS.txt"
+	File "ChangeLog.txt"
 	File "RCX.exe"
 
 	;only if installing
