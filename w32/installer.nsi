@@ -290,9 +290,15 @@ Section "Uninstall"
 	;files (plus uninstaller)
 	RMDir /r "$INSTDIR\data"
 	RMDir /r "$INSTDIR\config"
-	Delete "$INSTDIR\ReadMe.txt"
-	Delete "$INSTDIR\Copying.txt"
+	RMDir /r "$INSTDIR\licensing"
+
+	Delete "$INSTDIR\AUTHORS.txt"
+	Delete "$INSTDIR\README.txt"
+	Delete "$INSTDIR\COPYING.txt"
+	Delete "$INSTDIR\NEWS.txt"
+	Delete "$INSTDIR\ChangeLog.txt"
 	Delete "$INSTDIR\RCX.exe"
+
 	Delete "$INSTDIR\Uninstall.exe"
 
 	;and dir itself if possible
