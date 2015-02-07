@@ -303,6 +303,9 @@ void Render_List_Prepare()
 //updated on resizing, needed here:
 extern float view_angle_rate_x, view_angle_rate_y;
 
+//for setting up buffers (attribute pointers)
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+
 void Render_List_Render()
 {
 	//pointers to data
@@ -368,6 +371,7 @@ void Render_List_Render()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 
 	//NOTE: new opengl vbo rendering commands (2.0 I think). For compatibility lets stick to 1.5 instead
 	//glEnableVertexAttribArray(0);
@@ -419,6 +423,11 @@ void Render_List_Render()
 				//bind and configure the new vbo
 				glBindBuffer(GL_ARRAY_BUFFER, model->vbo_id);
 
+				//configure attributes: AFAIK this should be stored in the buffer! Apparently not. Driver bugs?
+				glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
+				glTexCoordPointer(2, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+				glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*5));
+
 				//indicate this is used now
 				bound_vbo = model->vbo_id;
 			}
@@ -463,14 +472,6 @@ void Render_List_Render()
 
 		glPopMatrix();
 	}
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-	glDisableClientState(GL_NORMAL_ARRAY);
-
-	//new/not used (see above)
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
 
 	//mark as old
 	buffer_render->updated=false;

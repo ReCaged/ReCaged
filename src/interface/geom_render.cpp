@@ -569,19 +569,19 @@ void Geom_Render()
 		return;
 	}
 
-	//configure rendering options:
-	glDisable (GL_LIGHTING);
+	//configure rendering properties:
 	glShadeModel (GL_FLAT);
-	glEnable (GL_TEXTURE_2D);
+	glDisable (GL_LIGHTING);
+	glDisable (GL_TEXTURE_2D);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_FOG);
+
 
 	//disable depth testing at level 1, since we need to see everything
 	if (geom_render_level == 1)
 		glDisable (GL_DEPTH_TEST);
 	else
 		glEnable (GL_DEPTH_TEST);
-
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_FOG);
 
 	//disable here, if enabled
 	if (internal.msaa)
@@ -593,11 +593,9 @@ void Geom_Render()
 	//render buffer
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 
+	//and here we go:
 	glDrawElements(GL_LINES, 2*index_usage, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-
-	//done
 }

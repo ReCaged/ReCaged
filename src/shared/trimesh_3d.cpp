@@ -35,7 +35,7 @@
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
 
 //offset for vbo
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
+//#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 //keep track of VBOs (new generated if not enough room in already existing)
 class VBO: public Racetime_Data
@@ -78,12 +78,16 @@ class VBO: public Racetime_Data
 			glBindBuffer(GL_ARRAY_BUFFER, target); //bind
 			glBufferData(GL_ARRAY_BUFFER, size, NULL, GL_STATIC_DRAW); //fill/allocate
 
-			//set up interleaved mode:
-			glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
-			glTexCoordPointer(2, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
-			glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*5));
+			//NOTE: This would be the best place to set up
+			//attribute pointers, but for some reason they are not
+			//reliably stored in the buffer object, So it's
+			//necessary to set them up on every bind!
 
-			//
+			//glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
+			//glTexCoordPointer(2, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+			//glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*5));
+
+			//these calls are repeated on every rendering call instead!
 
 			//check if allocated ok:
 			if (GLenum error = glGetError()) //if got error...
