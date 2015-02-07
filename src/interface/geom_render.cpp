@@ -592,11 +592,7 @@ void Geom_Render()
 	//render buffer
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
+	glDisableClientState(GL_NORMAL_ARRAY);
 
 	glDrawElements(GL_LINES, 2*index_usage, GL_UNSIGNED_INT, BUFFER_OFFSET(0));
-
-	glDisableClientState(GL_VERTEX_ARRAY);
-	glDisableClientState(GL_COLOR_ARRAY);
-
-	//done
 }

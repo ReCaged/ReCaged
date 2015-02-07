@@ -365,6 +365,7 @@ void Render_List_Render()
 	//enable rendering of vertices and normals
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
+	glDisableClientState(GL_COLOR_ARRAY);
 
 	//NOTE: new opengl vbo rendering commands (2.0 I think). For compatibility lets stick to 1.5 instead
 	//glEnableVertexAttribArray(0);
@@ -441,13 +442,6 @@ void Render_List_Render()
 
 		glPopMatrix();
 	}
-
-	glDisableClientState(GL_NORMAL_ARRAY);
-	glDisableClientState(GL_VERTEX_ARRAY);
-
-	//new/not used (see above)
-	//glDisableVertexAttribArray(0);
-	//glDisableVertexAttribArray(1);
 
 	//mark as old
 	buffer_render->updated=false;
