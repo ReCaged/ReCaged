@@ -209,10 +209,12 @@ SectionIn RO
 	;should cover all
 	File /r "data"
 	File /r "config"
+	File /r "licenses"
+	File "AUTHORS.txt"
 	File "README.txt"
 	File "COPYING.txt"
-	File "GPL-3.txt"
-	File "CC-BY-SA-4.0.txt"
+	File "NEWS.txt"
+	File "ChangeLog.txt"
 	File "RCX.exe"
 
 	;only if installing
@@ -288,11 +290,15 @@ Section "Uninstall"
 	;files (plus uninstaller)
 	RMDir /r "$INSTDIR\data"
 	RMDir /r "$INSTDIR\config"
-	Delete "$INSTDIR\ReadMe.txt"
-	Delete "$INSTDIR\Copying.txt"
-	Delete "$INSTDIR\GPL-3.txt"
-	Delete "$INSTDIR\CC-BY-SA-4.0.txt"
+	RMDir /r "$INSTDIR\licensing"
+
+	Delete "$INSTDIR\AUTHORS.txt"
+	Delete "$INSTDIR\README.txt"
+	Delete "$INSTDIR\COPYING.txt"
+	Delete "$INSTDIR\NEWS.txt"
+	Delete "$INSTDIR\ChangeLog.txt"
 	Delete "$INSTDIR\RCX.exe"
+
 	Delete "$INSTDIR\Uninstall.exe"
 
 	;and dir itself if possible

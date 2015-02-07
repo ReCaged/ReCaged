@@ -188,7 +188,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags ode], [$pkg_static --libs ode],
 		AC_MSG_WARN([Don't know if using double or single precision!... Assuming double...])
 		CPPFLAGS="$CPPFLAGS -DdDOUBLE" #hack: appends to user/global variable, but should be fine...?
 
-		AC_CHECK_HEADER([ode/ode.h],, [ AC_MSG_ERROR([Headers for ODE appears to be missing, install libode-dev or similar]) ])
+		AC_CHECK_HEADER([ode/ode.h],, [ AC_MSG_ERROR([Header for ODE appears to be missing, install libode-dev or similar]) ])
 		AC_CHECK_LIB([ode], [dInitODE2],
 			[RCX_LIBS="$RCX_LIBS -lode"],
 			[AC_MSG_ERROR([ODE library appears to be missing, install libode1 or similar])])
@@ -210,7 +210,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 	RCX_CHECK_PROG([$SDL_CONFIG], [--cflags], [$sdl_libs],
 	[
 		AC_MSG_WARN([Attempting to guess configuration for SDL using ac_check_* macros])
-		AC_CHECK_HEADER([SDL/SDL.h],, [ AC_MSG_ERROR([Headers for SDL appears to be missing, install libsdl-dev or similar]) ])
+		AC_CHECK_HEADER([SDL/SDL.h],, [ AC_MSG_ERROR([Header for SDL appears to be missing, install libsdl-dev or similar]) ])
 		AC_CHECK_LIB([SDL], [SDL_Init],
 			[RCX_LIBS="$RCX_LIBS -lSDL"],
 			[AC_MSG_ERROR([SDL library appears to be missing, install libsdl-1.2 or similar])])
@@ -256,7 +256,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags libjpeg], [$pkg_static --libs libjpeg],
 RCX_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 [
 	AC_MSG_WARN([Attempting to guess configuration for GLEW using ac_check_* macros])
-	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Headers for GLEW appears to be missing, install libglew-dev or similar]) ])
+	AC_CHECK_HEADER([GL/glew.h],, [ AC_MSG_ERROR([Header for GLEW appears to be missing, install libglew-dev or similar]) ])
 
 	#w32 uses (of course...) a different name
 	if test "$RCX_TARGET" = "w32"; then
@@ -283,9 +283,9 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags gl], [--libs gl],
 
 	#here's a fun part: both w32 and osx likes to brake naming conventions for opengl...
 	if test "$RCX_TARGET" = "osx"; then
-		AC_CHECK_HEADER([OpenGL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, you go and figure this one out]) ])
+		AC_CHECK_HEADER([OpenGL/gl.h],, [ AC_MSG_ERROR([Header for GL appears to be missing, you go and figure this one out]) ])
 	else
-		AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Headers for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
+		AC_CHECK_HEADER([GL/gl.h],, [ AC_MSG_ERROR([Header for GL appears to be missing, install libgl1-mesa-dev or similar]) ])
 	fi
 
 	#also GL libraries got unreliable symbols (so just check for dummy main)
