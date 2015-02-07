@@ -290,7 +290,7 @@ Section "Uninstall"
 	;files (plus uninstaller)
 	RMDir /r "$INSTDIR\data"
 	RMDir /r "$INSTDIR\config"
-	RMDir /r "$INSTDIR\licensing"
+	RMDir /r "$INSTDIR\licenses"
 
 	Delete "$INSTDIR\AUTHORS.txt"
 	Delete "$INSTDIR\README.txt"
