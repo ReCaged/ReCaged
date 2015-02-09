@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -423,7 +423,7 @@ void Render_List_Render()
 				//bind and configure the new vbo
 				glBindBuffer(GL_ARRAY_BUFFER, model->vbo_id);
 
-				//configure attributes: AFAIK this should be stored in the buffer! Apparently not. Driver bugs?
+				//configure attributes
 				glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
 				glTexCoordPointer(2, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
 				glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*5));
