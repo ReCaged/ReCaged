@@ -26,8 +26,14 @@
 #
 
 #paths:
-BUILDDIR="$HOME/RCX/BUILD"
-LIBDIR="$HOME/RCX/LIBS"
+#this would be ideal:
+#BASEPATH="$HOME/RCX"
+#but msys can create home dirs with spaces (depending on user name), so:
+BASEPATH="/opt/RCX"
+
+#the actual dirs, based on the one above:
+BUILDDIR="$BASEPATH/BUILD"
+LIBDIR="$BASEPATH/LIBS"
 
 #create directories, make sure build is empty
 rm -rf "$BUILDDIR"
