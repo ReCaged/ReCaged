@@ -21,19 +21,32 @@
 #
 
 #
-# This is a hackish script for installing stuff needed/suggested for w32
-# development. It will print a usage summary when run.
+# This is a hackish script for more obscure building processes. Right now it
+# only exists for windows builds, to help installing dependencies and building
+# an installer. It will print a usage summary when run.
+#
+# It will be extended for android builds in future versions
 #
 
 #paths:
 #this would be ideal:
-#BASEPATH="$HOME/RCX"
-#but msys can create home dirs with spaces (depending on user name), so:
-BASEPATH="/opt/RCX"
+#BASEDIR="$HOME/RCX"
+#but msys can create home dirs with spaces (depending on user name)...
+case $HOME in
+	*\ *) #space
+		echo '(detected space in $HOME, using /opt/rcx instead of ~/.rcxdev)'
+		echo ""
+		BASEDIR="/opt/rcxdev"
+		;;
+	*)
+		BASEDIR="$HOME/.rcxdev"
+		;;
+esac
+		
 
 #the actual dirs, based on the one above:
-BUILDDIR="$BASEPATH/BUILD"
-LIBDIR="$BASEPATH/LIBS"
+BUILDDIR="$BASEDIR/BUILD"
+LIBDIR="$BASEDIR/LIBS"
 
 #create directories, make sure build is empty
 rm -rf "$BUILDDIR"
@@ -46,8 +59,9 @@ export LDFLAGS="-L$LIBDIR/lib"
 
 
 #check for what to do
-if [ "$1" = "installer" ]
-then
+case $1 in
+	w32inst)
+
 	echo ""
 	echo "Creating w32 installer..."
 	echo ""
@@ -137,10 +151,11 @@ then
 		exit 1
 	fi
 
+	;;
 
 
-elif [ "$1" = "dependencies" ]
-then
+w32deps)
+
 	echo ""
 	echo "Getting build dependencies..."
 	echo ""
@@ -237,21 +252,20 @@ then
 
 
 	#lua TODO!
-	#test -e
-	#cd /tmp/make_w32_deps#wget
-	#make install
 
 	#nsis (always try this, best way to update I guess)
+	cd "$HOME" #otherwise browser will prevent deletion of BUILDDIR
 	echo ""
 	echo "Almost done! Now just install NSIS..."
 	echo ""
 	echo "NOTE: Keep installation path and options/plug-ins at default!"
 	cmd //c start "" 'http://sourceforge.net/projects/nsis/files/latest/download?source=files'
 
+	;;
 
 
-elif [ "$1" = "update" ]
-then
+w32update)
+
 	echo ""
 	echo "Getting updates..."
 	echo ""
@@ -268,10 +282,11 @@ then
 	echo "Installing dependencies again"
 	"$0" dependencies
 
+	;;
 
 
-elif [ "$1" = "quick" ]
-then
+w32quick)
+
 	echo ""
 	echo "Doing a quick build"
 	echo ""
@@ -298,27 +313,34 @@ then
 	echo "sorting out the \"total mess...\" ;-)"
 	cp "src/rcx.exe" .
 
+	;;
 
 
-elif [ "$1" = "crossinstaller" ]
-then
+w32cross)
+
 	echo ""
 	echo "TODO!"
 	echo ""
 	exit 1
 
+	;;
 
 
-else
+*)
+
 	echo "Usage: \"$0 COMMAND\" where COMMAND is one of the following:"
-	echo "	installer	- compile and create w32 installer"
-	echo "	dependencies	- install everything needed for compiling+packing (+vim)"
-	echo "	update		- update everything (will delete \"$LIBDIR\")"
-	echo "	quick		- build and copy exe out of src (for devs, no installer)"
-	#echo "	crossinstaller	- cross-compile w32 installer"
-	#echo "	crossdependencies	- cross-compile libraries for w32"
+	echo "	w32inst		- compile and create w32 installer"
+	echo "	w32deps		- install everything needed for compiling+packing (+vim)"
+	echo "	w32update	- update everything (will delete \"$LIBDIR\")"
+	echo "	w32quick	- build and copy exe out of src (for devs, no installer)"
+	#echo "	w32crossinst	- cross-compile w32 installer"
+	#echo "	w32crossdeps	- cross-compile libraries for w32"
 	echo "(see README for more details)"
-fi
+
+	;;
+
+esac
+
 
 cd "$HOME"
 rm -rf "$BUILDDIR"

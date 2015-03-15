@@ -136,11 +136,11 @@ so you will need to run configure like this:
 
 On Windows things will be more difficult: since there is no package manager,
 you would have to install all requirements manually. There is however a script
-called "make_w32.sh" included to help automate the build process.
+called "build.sh" included to help automate the build process.
 
 First of all, install MinGW (a minimal port of GNU for windows - it provides
-compilers and standard libraries for compilation). The latest version can be
-downloaded here:
+compilers and standard libraries). The latest version can be downloaded here:
+
 http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
 
 TODO: new mingw installer is different, mention installing msys in the new gui,
@@ -151,24 +151,24 @@ here is the "MSYS Basic System", which provides a bash shell suitable for
 working with MinGW. It's not necessarily needed but working without it is much
 harder and you will not be able to use the automated script.
 
-Now use the msys bash shell to run the provided script "make_w32.sh" with the
-arguments to install the necessary libraries and compile (run "make_w32.sh
-help" for more details). Running "./make_w32.sh dependencies" will install the
+Now use the msys bash shell to run the provided script "build.sh" with the
+arguments to install the necessary libraries and compile (run "build.sh
+help" for more details). Running "./build.sh w32deps" will install the
 necessary libraries (in you home directory) and tools for compiling releases.
 
-Finally: Running "./make_w32.sh installer" should configure and build RCX
-for w32 with the necessary libraries statically linked (and strip out debug
-symbols and 
+Finally: Running "./build.sh w32inst" should configure and build RCX for w32
+with the necessary libraries statically linked (and strip out debug symbols
+and ... TODO!
 
 Alternatively you can compile and install the SDL, ODE and GLEW libraries
 manually, and install NSIS. This process will not be covered in detail here.
 Then cd into the src directory of rcx and run "./configure && make" to compile.
 But if you want to create a complete installer, instead run "./configure
 --enable-w32static --enable-w32console && make" to compile and then build the
-NSIS installer. Or just use "./make_w32.sh installer". The "--enable-w32static"
-option makes sure all libraries that would normally have to be included as dlls
-are linked into the exe, and "--enable-w32console" enables console log output
-(requires SDL to have been built with "--disable-stdio-redirect").
+NSIS installer. Or just use "./build.sh w32inst". The "--enable-w32static"
+option makes sure all libraries that would normally have to be included as
+dlls are linked into the exe, and "--enable-w32console" enables console log
+output (requires SDL to have been built with "--disable-stdio-redirect").
 
 
 
