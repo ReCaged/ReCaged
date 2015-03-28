@@ -101,31 +101,33 @@ FAILED="yes"
 
 if test "$1"; then
 
+	#try running program for flags
 	AC_MSG_CHECKING([for flags using $1 $2])
-	tmp_flags=$($1 $2 2>/dev/null)
 
-	if test "$tmp_flags"; then
-		FAILED="no"
+	if tmp_flags=$($1 $2 2>/dev/null); then
+		#ok
 		AC_MSG_RESULT([$tmp_flags])
-	else
-		AC_MSG_RESULT([no])
-	fi
 
-	AC_MSG_CHECKING([for libraries using $1 $3])
-	tmp_libs=$($1 $3 2>/dev/null)
+		#now try running it for libs
+		AC_MSG_CHECKING([for libraries using $1 $3])
 
-	if test "$tmp_libs"; then
-		FAILED="no"
-		AC_MSG_RESULT([$tmp_libs])
+		if tmp_libs=$($1 $3 2>/dev/null); then
+			#both were ok, make sure not performing fallback
+			FAILED="no"
+			AC_MSG_RESULT([$tmp_libs])
+
+			#safely provide these strings for building
+			RCX_FLAGS="$RCX_FLAGS $tmp_flags"
+			RCX_LIBS="$RCX_LIBS $tmp_libs"
+		else
+			AC_MSG_RESULT([failed])
+		fi
 	else
-		AC_MSG_RESULT([no])
+		AC_MSG_RESULT([failed])
 	fi
 fi
 
-if test "$FAILED" = "no"; then
-	RCX_FLAGS="$RCX_FLAGS $tmp_flags"
-	RCX_LIBS="$RCX_LIBS $tmp_libs"
-else
+if test "$FAILED" = "yes"; then
 	$4
 fi
 
