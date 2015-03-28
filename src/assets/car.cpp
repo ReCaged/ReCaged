@@ -248,8 +248,11 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 	else //else, limit by rotation speed
 		car->gear_limit = conf.gear_limit;
 
+	car->min_engine_vel = conf.min_engine_vel;
 
 	car->max_brake = conf.max_brake;
+	car->min_brake_vel = conf.min_brake_vel;
+
 	car->max_steer = conf.max_steer;
 	car->steerdecr = conf.steer_decrease;
 	car->min_steer = conf.min_steer;
