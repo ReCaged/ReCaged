@@ -28,7 +28,7 @@ SUBDIRS = config data icons man src w32
 
 #TODO!
 EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog \
-			  make_w32.sh \
+			  build.sh \
 			  licenses/CC0 \
 			  licenses/CC-BY-SA-4.0 \
 			  licenses/GPL-3
