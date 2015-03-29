@@ -95,7 +95,6 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/wheel.cpp \
 		simulation/wheel.hpp
 
-
 #remove w32 files on all platforms (just in case)
 CLEANFILES = resources.rc resources.o
 
