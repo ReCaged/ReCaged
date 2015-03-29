@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,23 +19,47 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#ifndef _RCX_SURFACE_H
-#define _RCX_SURFACE_H
-#include "ode/ode.h"
-//Geom: (meta)data for geometrical shape (for collision detection), for: 
-//contactpoint generation (friction and saftness/hardness). also contains
-//rendering data for geom
+#include "assets.hpp"
+#include "common/log.hpp"
+#include <stdio.h>
+#include <string.h>
 
-//surface properties:
-class Surface
+Assets *Assets::head = NULL;
+
+Assets::Assets(const char *n)
 {
-	public:
-		Surface(); //just sets default values
+	name = new char[strlen(n)+1];
+	strcpy (name, n);
 
-		//options
-		dReal mu, bounce;
-		dReal spring, damping;
-		dReal sensitivity, rollres;
-};
+	prev = NULL;
+	next = head;
+	head = this;
+}
 
-#endif
+Assets::~Assets()
+{
+	Log_Add(2, "removing asset called \"%s\"", name);
+
+	//remove from list
+	if (prev)
+		prev->next=next;
+	else
+		head=next;
+	if (next)
+		next->prev=prev;
+
+	//remove string name
+	delete[] name;
+
+	//child classes takes care of their own memory business!
+}
+
+void Assets::Clear_TMP()
+{
+	Log_Add(2, "destroying all assets");
+
+	while (head)
+		delete head;
+
+}
+

@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -23,16 +23,16 @@
 #include <SDL/SDL_mutex.h>
 #include <ode/ode.h>
 
-#include "shared/threads.hpp"
-#include "shared/internal.hpp"
-#include "shared/runlevel.hpp"
-#include "shared/track.hpp"
-#include "shared/log.hpp"
-#include "shared/body.hpp"
-#include "shared/geom.hpp"
-#include "shared/camera.hpp"
-#include "shared/car.hpp"
-#include "shared/joint.hpp"
+#include "common/threads.hpp"
+#include "common/internal.hpp"
+#include "common/runlevel.hpp"
+#include "common/log.hpp"
+#include "assets/track.hpp"
+#include "assets/car.hpp"
+#include "body.hpp"
+#include "geom.hpp"
+#include "camera.hpp"
+#include "joint.hpp"
 
 #include "collision_feedback.hpp"
 #include "event_buffers.hpp"

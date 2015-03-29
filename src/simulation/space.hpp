@@ -19,47 +19,27 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "racetime_data.hpp"
-#include "log.hpp"
-#include <stdio.h>
-#include <string.h>
+#ifndef _RCX_SPACE_H
+#define _RCX_SPACE_H
+#include "component.hpp"
+#include "assets/object.hpp"
 
-Racetime_Data *Racetime_Data::head = NULL;
-
-Racetime_Data::Racetime_Data(const char *n)
+//Space: (meta)data for spaces (collects geoms that should not collide)
+//(in contrary to other components, this can't be rendered or cause events)
+//
+//Dynamic allocation
+class Space: public Component
 {
-	name = new char[strlen(n)+1];
-	strcpy (name, n);
+	public:
+		//methods
+		Space (Object *obj);
+		~Space();
 
-	prev = NULL;
-	next = head;
-	head = this;
-}
+		//variables
+		dSpaceID space_id;
 
-Racetime_Data::~Racetime_Data()
-{
-	Log_Add(2, "removing racetime data called \"%s\"", name);
+	private:
+		//no need for global list of spaces...
+};
 
-	//remove from list
-	if (prev)
-		prev->next=next;
-	else
-		head=next;
-	if (next)
-		next->prev=prev;
-
-	//remove string name
-	delete[] name;
-	//child classes takes care of their own memory business!
-}
-
-void Racetime_Data::Destroy_All()
-{
-	Log_Add(2, "destroying all racetime data");
-
-	while (head)
-		delete head;
-
-	head = NULL;
-}
-
+#endif

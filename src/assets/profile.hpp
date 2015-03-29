@@ -25,8 +25,8 @@
 #include "SDL/SDL_keyboard.h"
 
 #include "car.hpp"
-#include "camera.hpp"
-#include "joint.hpp"
+#include "simulation/camera.hpp"
+#include "simulation/joint.hpp"
 
 //profile: stores the user's settings (including key list)
 struct Profile {

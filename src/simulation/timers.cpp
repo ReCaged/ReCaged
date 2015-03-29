@@ -20,8 +20,8 @@
  */ 
 
 #include "timers.hpp"
-#include "shared/object.hpp"
-#include "shared/geom.hpp"
+#include "geom.hpp"
+#include "assets/object.hpp"
 
 Animation_Timer *Animation_Timer::head = NULL;
 

@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,30 +19,29 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "space.hpp"
-#include "geom.hpp"
-#include "log.hpp"
-#include "track.hpp"
-#include <ode/ode.h>
+#include "component.hpp"
+#include "assets/object.hpp"
+#include "common/log.hpp"
 
-Space::Space(Object *obj): Component(obj)
+Component::Component(Object *obj)
 {
-	space_id = dSimpleSpaceCreate(space);
+	//rather simple: just add it to the top of obj list of components
+	next = obj->components;
+	prev = NULL;
+	obj->components = this;
 
-	Log_Add(2, "(autoselecting default space for object)");
-	obj->selected_space=space_id;
+	if (next) next->prev = this;
+
+	//keep track of owning object
+	object_parent = obj;
 }
 
-Space::~Space()
+Component::~Component()
 {
-	Geom *g;
+	//just unlink...
+	if (prev) prev->next = next;
+	else object_parent->components = next;
 
-	while (dSpaceGetNumGeoms(space_id)) //while contains geoms
-	{
-		//remove first geom - next time first will be the next geom
-		g = (Geom*)dGeomGetData(dSpaceGetGeom(space_id, 0));
-		delete g;
-	}
-
-	dSpaceDestroy(space_id);
+	if (next) next->prev = prev;
 }
+

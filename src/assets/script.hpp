@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,30 +19,24 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "profile.hpp"
+#ifndef _RCX_SCRIPT_H
+#define _RCX_SCRIPT_H
 
-Profile *profile_head = NULL;
+#include "assets.hpp"
 
-void Profile_Remove (Profile *target)
+//script: human readable (read: not _programming_) langue which will
+//describe what should be done when spawning an object (components, joints...),
+//and when an component is colliding ("sensor triggering", destroying and so on)
+//function arguments can point at 3d files and other scripts and so on...
+//
+//(currently not used)
+//
+//>Allocated at start
+class Script: public Assets
 {
-	Log_Add(2, "removing profile");
+	public:
+		Script(const char*);
+		~Script();
+};
 
-	//remove from list
-	if (!target->prev) //head
-		profile_head = target->next;
-	else //not head
-		target->prev->next = target->next;
-
-	if (target->next) //not last
-		target->next->prev = target->prev;
-
-	//remove profile
-	free (target);
-}
-
-void Profile_Remove_All()
-{
-	while (profile_head)
-		Profile_Remove(profile_head);
-}
-
+#endif

@@ -19,8 +19,8 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/trimesh.hpp"
-#include "shared/log.hpp"
+#include "trimesh.hpp"
+#include "common/log.hpp"
 #include "text_file.hpp"
 #include <string.h>
 

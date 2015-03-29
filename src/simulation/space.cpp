@@ -19,9 +19,30 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "track.hpp"
+#include "space.hpp"
+#include "geom.hpp"
+#include "common/log.hpp"
+#include "assets/track.hpp"
+#include <ode/ode.h>
 
-dWorldID world;
-dSpaceID space;
-dJointGroupID contactgroup;
-struct Track_Struct track = track_defaults;
+Space::Space(Object *obj): Component(obj)
+{
+	space_id = dSimpleSpaceCreate(space);
+
+	Log_Add(2, "(autoselecting default space for object)");
+	obj->selected_space=space_id;
+}
+
+Space::~Space()
+{
+	Geom *g;
+
+	while (dSpaceGetNumGeoms(space_id)) //while contains geoms
+	{
+		//remove first geom - next time first will be the next geom
+		g = (Geom*)dGeomGetData(dSpaceGetGeom(space_id, 0));
+		delete g;
+	}
+
+	dSpaceDestroy(space_id);
+}

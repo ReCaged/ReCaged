@@ -30,10 +30,10 @@
 #include <GL/glew.h>
 #include <ode/ode.h>
 
-#include "shared/racetime_data.hpp"
+#include "assets.hpp"
 
 //used to store texture version of image
-class Image_Texture: public Racetime_Data
+class Image_Texture: public Assets
 {
 	public:
 		GLuint GetID();

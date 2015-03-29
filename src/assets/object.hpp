@@ -23,11 +23,11 @@
 #define _RCX_OBJECT_H
 #include <ode/common.h>
 
-#include "racetime_data.hpp"
+#include "assets.hpp"
 #include "trimesh.hpp"
 #include "script.hpp"
-#include "component.hpp"
-#include "space.hpp"
+#include "simulation/space.hpp"
+#include "simulation/component.hpp"
 
 //object: one "thing" on the track, from a complex building to a tree, spawning
 //from "modules" using lua (in future versions). the most important role of
@@ -35,7 +35,7 @@
 //spawned object
 
 //template for spawning
-class Module:public Racetime_Data
+class Module:public Assets
 {
 	public:
 		static Module *Load(const char *path);

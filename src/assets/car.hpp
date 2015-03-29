@@ -25,13 +25,12 @@
 //scripting - used to keep track of components and objects (like weapons)
 //bellonging to the player during the race
 //Allocated at start
-#include "racetime_data.hpp"
+#include "assets.hpp"
 #include "object.hpp"
-#include "body.hpp"
-#include "geom.hpp"
 #include "trimesh.hpp"
-#include "surface.hpp"
-#include "assets/conf.hpp"
+#include "conf.hpp"
+#include "simulation/body.hpp"
+#include "simulation/geom.hpp"
 
 #include <vector>
 #include <string>
@@ -44,7 +43,7 @@ struct Car_Conf
 	float resize, rotate[3], offset[3];
 
 	//motor
-	dReal power, gear_limit, torque_limit;
+	dReal power, min_engine_vel, gear_limit, torque_limit;
 	dReal air_torque;
 	bool dist_motor[2];
 	bool diff;
@@ -52,9 +51,10 @@ struct Car_Conf
 	bool adapt_redist;
 	dReal redist_force;
 
-	//brak
+	//brake
 	dReal max_brake;
 	dReal dist_brake;
+	dReal min_brake_vel;
 
 	//steer
 	dReal max_steer;
@@ -96,7 +96,7 @@ const struct Car_Conf car_conf_defaults = {
 	"",
 	1.0, {0,0,0}, {0,0,0},
 
-	1600000.0, 0.0, 50000.0,
+	1600000.0, -1.0, 0.0, 50000.0,
 	500.0,
 	{false, true},
 	true,
@@ -105,6 +105,7 @@ const struct Car_Conf car_conf_defaults = {
 	100.0,
 
 	40000.0,
+	0.5,
 	0.5,
 
 	35.0,
@@ -147,6 +148,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"model:offset",	'f',3, offsetof(struct Car_Conf, offset)},
 
 	{"power",		'R',1, offsetof(struct Car_Conf, power)},
+	{"engine:min_vel",	'R',1, offsetof(struct Car_Conf, min_engine_vel)},
 	{"gear_limit",		'R',1, offsetof(struct Car_Conf, gear_limit)},
 	{"torque_limit",	'R',1, offsetof(struct Car_Conf, torque_limit)},
 	{"air_torque_limit",	'R',1, offsetof(struct Car_Conf, air_torque)},
@@ -156,8 +158,9 @@ const struct Conf_Index car_conf_index[] = {
 	{"adaptive_redistribution",'b',1, offsetof(struct Car_Conf, adapt_redist)},
 	{"redistribution_force",'R',1, offsetof(struct Car_Conf, redist_force)},
 
-	{"max_brake",		'R',1, offsetof(struct Car_Conf, max_brake)},
-	{"brake_distribution",	'R',1, offsetof(struct Car_Conf, dist_brake)},
+	{"brake:max",		'R',1, offsetof(struct Car_Conf, max_brake)},
+	{"brake:distribution",	'R',1, offsetof(struct Car_Conf, dist_brake)},
+	{"brake:min_vel",	'R',1, offsetof(struct Car_Conf, min_brake_vel)},
 
 	{"max_steer",		'R',1, offsetof(struct Car_Conf, max_steer)},
 	{"steer_distribution",	'R',1, offsetof(struct Car_Conf, dist_steer)},
@@ -223,7 +226,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"",0,0}};//end
 
 
-class Car_Module:public Racetime_Data
+class Car_Module:public Assets
 {
 	public:
 		static Car_Module *Load(const char *path);
@@ -269,14 +272,14 @@ class Car:public Object
 		friend class Camera; //needs access to car info
 
 		//configuration data (copied from Car_Module)
-		dReal power, gear_limit;
+		dReal power, min_engine_vel, gear_limit;
 		dReal airtorque;
 		dReal body_mass, wheel_mass;
 		dReal down_max, down_aero, down_mass;
 		bool down_air, elevation;
 
 		dReal max_steer, steerdecr, min_steer, limit_speed, oldsteerlimit;
-		dReal max_brake;
+		dReal max_brake, min_brake_vel;
 
 		bool diff;
 		bool fwd, rwd;

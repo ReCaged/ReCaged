@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,9 +19,9 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/car.hpp"
-#include "shared/track.hpp"
-#include "shared/internal.hpp"
+#include "assets/car.hpp"
+#include "assets/track.hpp"
+#include "common/internal.hpp"
 
 void Car::Physics_Step(dReal step)
 {
@@ -246,15 +246,15 @@ void Car::Physics_Step(dReal step)
 		//the torque we want to apply
 		dReal torque[4] = {0,0,0,0};
 
-
-		//useful values:
-		dReal kpower = carp->power*carp->throttle; //motor power
-		dReal krbrake = (1.0-carp->dbrake)*carp->max_brake*carp->throttle/2.0; //braking power for rear wheels
-		dReal kfbrake = carp->dbrake*carp->max_brake*carp->throttle/2.0; //braking power for front wheels
-		dReal kbrake[4] = {kfbrake, krbrake, krbrake, kfbrake}; //brake power for each wheel (to make things easier)
-
 		//max brake torque to be applied
 		dReal brake[4]={0,0,0,0};
+
+		//useful values:
+		dReal kpower = carp->power*carp->throttle; //motor power (with direction)
+		dReal krbrake = (1.0-carp->dbrake)*carp->max_brake*fabs(carp->throttle)/2.0; //braking power for rear wheels
+		dReal kfbrake = carp->dbrake*carp->max_brake*fabs(carp->throttle)/2.0; //braking power for front wheels
+		dReal kbrake[4] = {kfbrake, krbrake, krbrake, kfbrake}; //brake power for each wheel (to make things easier)
+		dReal rotdir = carp->throttle > 0.0? 1.0: -1.0; //direction of *wanted* rotation
 
 		//no fancy motor/brake solution, lock rear wheels to handbrake turn (oversteer)
 		if (carp->drift_brakes)
@@ -274,31 +274,39 @@ void Car::Physics_Step(dReal step)
 					dReal rotation;
 					if (carp->fwd&&carp->rwd) //4wd
 					{
-						rotation = fabs(rotv[0]+rotv[1]+rotv[2]+rotv[3])/4.0;
+						rotation = rotdir*(rotv[0]+rotv[1]+rotv[2]+rotv[3])/4.0;
 
 						//same torque for all wheels
 						torque[0]=torque[1]=torque[2]=torque[3]=kpower/4.0;
 					}
 					else if (carp->rwd) //rwd
 					{
-						rotation = fabs(rotv[1]+rotv[2])/2.0;
+						rotation = rotdir*(rotv[1]+rotv[2])/2.0;
 
 						//(wheel 0 and 3 = 0 -> torque=0)
 						torque[1]=torque[2]=kpower/2.0;
 					}
 					else //fwd
 					{
-						rotation = fabs(rotv[0]+rotv[3])/2.0;
+						rotation = rotdir*(rotv[0]+rotv[3])/2.0;
 						torque[0]=torque[3]=kpower/2.0;
 					}
 
-					//if less than optimal rotation (for gearbox), set to this level
-					if (rotation < carp->gear_limit)
-						rotation = carp->gear_limit;
+					//rotating fast enough?
+					if (rotation > carp->min_engine_vel)
+					{
+						//if less than optimal rotation (for gearbox), set to this level
+						//(also prevents negative)
+						if (rotation < carp->gear_limit)
+							rotation = carp->gear_limit;
 
-					//apply
-					for (i=0; i<4; ++i)
-						torque[i]/=rotation;
+						//apply
+						for (i=0; i<4; ++i)
+							torque[i]/=rotation;
+					}
+					else //no? make sure not applying torque
+						for (i=0; i<4; ++i)
+							torque[i]=0.0;
 				}
 				else //uneven: one motor+gearbox for each wheel....
 				{
@@ -311,10 +319,15 @@ void Car::Physics_Step(dReal step)
 
 					for (i=0; i<4; ++i)
 					{
-						if (fabs(rotv[i]) < carp->gear_limit)
-							torque[i]/=carp->gear_limit;
+						if (rotdir*rotv[i] > carp->min_engine_vel)
+						{
+							if (fabs(rotv[i]) < carp->gear_limit)
+								torque[i]/=carp->gear_limit;
+							else
+								torque[i]/=rotv[i];
+						}
 						else
-							torque[i]/=fabs(rotv[i]);
+							torque[i]=0.0;
 					}
 				}
 
@@ -322,8 +335,8 @@ void Car::Physics_Step(dReal step)
 				//dReal needed;
 				for (i=0; i<4; ++i)
 				{
-					//if rotating in the oposite way of wanted, use brakes
-					if (rotv[i]*carp->throttle < 0.0) //(different signs makes negative)
+					//if rotating in the opposite way of wanted, and fast enough, brake
+					if (rotv[i]*carp->throttle < 0.0 && fabs(rotv[i]) > carp->min_brake_vel)
 						brake[i]=kbrake[i];
 				}
 			}
@@ -408,12 +421,13 @@ void Car::Physics_Step(dReal step)
 		{
 			if (carp->gotwheel[i])
 			{
-				//finite rotation
+				//finite rotation (prevents bending wheel axles)
 				if (carp->finiterot)
 				{
 					dBodyVectorToWorld(carp->bodyid, cos(steer[i]), -sin(steer[i]), 0.0, axle);
 					dBodySetFiniteRotationAxis(carp->wheel_body[i], axle[0], axle[1], axle[2]);
 				}
+
 				//steering
 				dJointSetHinge2Param (carp->joint[i],dParamLoStop,steer[i]);
 				dJointSetHinge2Param (carp->joint[i],dParamHiStop,steer[i]);

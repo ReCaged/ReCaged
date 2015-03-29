@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -21,19 +21,31 @@
 
 #ifndef _RCX_GEOM_H
 #define _RCX_GEOM_H
-#include "ode/ode.h"
-#include "surface.hpp"
-#include "component.hpp"
-#include "body.hpp"
-#include "object.hpp"
-#include "trimesh.hpp"
-#include "script.hpp"
+#include <ode/ode.h>
+#include "simulation/component.hpp"
+#include "simulation/body.hpp"
 #include "simulation/wheel.hpp"
+#include "assets/object.hpp"
+#include "assets/trimesh.hpp"
+#include "assets/script.hpp"
 #include <SDL/SDL_stdinc.h> //definition for Uint32
 
 //Geom: (meta)data for geometrical shape (for collision detection), for: 
-//contactpoint generation (friction and saftness/hardness). also contains
+//contactpoint generation (friction and softness/hardness). Also contains
 //rendering data for geom
+
+//surface properties:
+class Surface
+{
+	public:
+		Surface(); //just sets default values
+
+		//options
+		dReal mu, bounce;
+		dReal spring, damping;
+		dReal sensitivity, rollres;
+};
+
 
 //geom tracking class
 class Geom: public Component

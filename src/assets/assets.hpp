@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,17 +19,17 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#ifndef _RCX_RACETIME_DATA_H
-#define _RCX_RACETIME_DATA_H
+#ifndef _RCX_ASSETS_H
+#define _RCX_ASSETS_H
 
 #include <typeinfo>
 #include <string.h>
-#include "shared/log.hpp"
+#include "common/log.hpp"
 
-class Racetime_Data
+class Assets
 {
 	public:
-		static void Destroy_All();
+		static void Clear_TMP(); //Temporary solution until completely automated reference/GC
 
 		//find data that matches specified name and type
 		//NOTE: actual function template declared in header, since each object that uses it must
@@ -37,7 +37,7 @@ class Racetime_Data
 		template<typename T>
 		static T *Find(const char *name)
 		{
-			Racetime_Data *tmp;
+			Assets *tmp;
 			T *casted;
 
 			for (tmp=head; tmp; tmp=tmp->next) //loop
@@ -45,7 +45,7 @@ class Racetime_Data
 				//type conversion+casting ok
 				if ((!strcmp(tmp->name, name)) && (casted=dynamic_cast<T*>(tmp)))
 				{
-					Log_Add(2, "racetime data already existed for \"%s\" (already loaded)", name);
+					Log_Add(2, "asset data already existed for \"%s\" (already loaded)", name);
 					return casted;
 				}
 			}
@@ -54,14 +54,14 @@ class Racetime_Data
 		}
 
 	protected:
-		Racetime_Data(const char *name);
+		Assets(const char *name);
 		//just make sure the subclass destructor gets called
-		virtual ~Racetime_Data();
+		virtual ~Assets();
 
 	private:
 		char *name; //name of specific data
 
-		static Racetime_Data *head;
-		Racetime_Data *prev, *next;
+		static Assets *head;
+		Assets *prev, *next;
 };
 #endif

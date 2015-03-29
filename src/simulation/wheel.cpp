@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -21,10 +21,10 @@
 
 
 #include "wheel.hpp"
-#include "shared/geom.hpp"
-#include "shared/internal.hpp" 
-#include "shared/track.hpp"
-#include "simulation/collision_feedback.hpp"
+#include "geom.hpp"
+#include "collision_feedback.hpp"
+#include "common/internal.hpp" 
+#include "assets/track.hpp"
 
 //This code tries to implement a reasonably simple and realistic tyre friction model.
 //(it's mostly inspired by different equations based on Pacejka's "magic formula")

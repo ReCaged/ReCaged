@@ -21,8 +21,8 @@
 
 #include <SDL/SDL.h>
 
-#include "shared/trimesh.hpp"
-#include "shared/log.hpp"
+#include "common/log.hpp"
+#include "trimesh.hpp"
 #include "text_file.hpp"
 
 

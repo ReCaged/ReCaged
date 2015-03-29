@@ -24,18 +24,18 @@
 //
 #include <SDL/SDL.h>
 #include <GL/glew.h>
-#include "internal.hpp"
 #include "trimesh.hpp"
-#include "assets/image.hpp"
-#include "assets/conf.hpp"
-#include "log.hpp"
-#include "directories.hpp"
+#include "image.hpp"
+#include "conf.hpp"
+#include "common/internal.hpp"
+#include "common/log.hpp"
+#include "common/directories.hpp"
 
 //length of vector
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
 
 //keep track of VBOs (new generated if not enough room in already existing)
-class VBO: public Racetime_Data
+class VBO: public Assets
 {
 	public:
 		//find a vbo with enough room, if not create a new one
@@ -97,10 +97,10 @@ class VBO: public Racetime_Data
 		bool dedicated;
 
 	private:
-		//normally, Racetime_Data is only for tracking loaded data, one class for each loaded...
+		//normally, Assets is only for tracking loaded data, one class for each loaded...
 		//but this is slightly different: one vbo class can store several model sets
-		//(making it a Racetime_Data makes sure all VBOs gets deleted at the same time as models)
-		VBO(GLuint target, bool dedicated): Racetime_Data("VBO tracking class") //name all vbo classes this...
+		//(making it a Assets makes sure all VBOs gets deleted at the same time as models)
+		VBO(GLuint target, bool dedicated): Assets("VBO tracking class") //name all vbo classes this...
 		{
 			//place on top of list
 			next=head;
@@ -128,7 +128,7 @@ VBO *VBO::head=NULL;
 
 //constructor
 Trimesh_3D::Trimesh_3D(const char *name, float r, GLuint vbo, Material *mpointer, unsigned int mcount):
-	Racetime_Data(name), materials(mpointer), material_count(mcount), radius(r), vbo_id(vbo)
+	Assets(name), materials(mpointer), material_count(mcount), radius(r), vbo_id(vbo)
 {
 }
 
@@ -145,7 +145,7 @@ Trimesh_3D *Trimesh_3D::Quick_Load(const char *name, float resize,
 		float offx, float offy, float offz)
 {
 	//check if already exists
-	if (Trimesh_3D *tmp=Racetime_Data::Find<Trimesh_3D>(name))
+	if (Trimesh_3D *tmp=Assets::Find<Trimesh_3D>(name))
 		return tmp;
 
 	//no, load
@@ -168,7 +168,7 @@ Trimesh_3D *Trimesh_3D::Quick_Load(const char *name, float resize,
 Trimesh_3D *Trimesh_3D::Quick_Load(const char *name)
 {
 	//check if already exists
-	if (Trimesh_3D *tmp=Racetime_Data::Find<Trimesh_3D>(name))
+	if (Trimesh_3D *tmp=Assets::Find<Trimesh_3D>(name))
 		return tmp;
 
 	//no, load
@@ -235,7 +235,7 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 Trimesh_3D *Trimesh::Create_3D()
 {
 	//already uploaded?
-	if (Trimesh_3D *tmp = Racetime_Data::Find<Trimesh_3D>(name.c_str()))
+	if (Trimesh_3D *tmp = Assets::Find<Trimesh_3D>(name.c_str()))
 		return tmp;
 
 	//check how many vertices (if any)
@@ -380,7 +380,7 @@ Trimesh_3D *Trimesh::Create_3D()
 			if (!materials[m].diffusetex.empty())
 			{
 				//check if already exists
-				if (Image_Texture *tmp=Racetime_Data::Find<Image_Texture>(materials[m].diffusetex.c_str()))
+				if (Image_Texture *tmp=Assets::Find<Image_Texture>(materials[m].diffusetex.c_str()))
 					material_list[mcount].diffusetex=tmp->GetID();
 
 				//no, load
@@ -417,7 +417,7 @@ Trimesh_3D *Trimesh::Create_3D()
 
 	//create Trimesh_3D class from this data:
 	//set the name. NOTE: both Trimesh_3D and Trimesh_Geom will have the same name
-	//this is not a problem since they are different classes and Racetime_Data::Find will notice that
+	//this is not a problem since they are different classes and Assets::Find will notice that
 	Trimesh_3D *mesh = new Trimesh_3D(name.c_str(), radius, vbo->id, material_list, mcount);
 
 	//assume this vbo is not bound

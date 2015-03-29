@@ -19,10 +19,10 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "internal.hpp"
 #include "trimesh.hpp"
-#include "geom.hpp"
-#include "log.hpp"
+#include "simulation/geom.hpp"
+#include "common/internal.hpp"
+#include "common/log.hpp"
 
 //length of vector
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
@@ -40,7 +40,7 @@ int mergecallback(dGeomID geom, int index1, int index2)
 Trimesh_Geom::Trimesh_Geom(const char *name,
 		Vector_Float *v, unsigned int vcount,
 		unsigned int *i, unsigned int icount,
-		Vector_Float *n): Racetime_Data(name), vertices(v), indices(i), normals(n) //set name and values
+		Vector_Float *n): Assets(name), vertices(v), indices(i), normals(n) //set name and values
 {
 	//just tell ode to create trimesh from this data
 	data = dGeomTriMeshDataCreate();
@@ -58,7 +58,7 @@ Trimesh_Geom *Trimesh_Geom::Quick_Load(const char *name, float resize,
 		float offx, float offy, float offz)
 {
 	//check if already exists
-	if (Trimesh_Geom *tmp=Racetime_Data::Find<Trimesh_Geom>(name))
+	if (Trimesh_Geom *tmp=Assets::Find<Trimesh_Geom>(name))
 		return tmp;
 
 	//no, load
@@ -80,7 +80,7 @@ Trimesh_Geom *Trimesh_Geom::Quick_Load(const char *name, float resize,
 Trimesh_Geom *Trimesh_Geom::Quick_Load(const char *name)
 {
 	//check if already exists
-	if (Trimesh_Geom *tmp=Racetime_Data::Find<Trimesh_Geom>(name))
+	if (Trimesh_Geom *tmp=Assets::Find<Trimesh_Geom>(name))
 		return tmp;
 
 	//no, load
@@ -153,7 +153,7 @@ Trimesh_Geom *Trimesh::Create_Geom()
 	Log_Add(2, "Creating collision trimesh");
 
 	//already created?
-	if (Trimesh_Geom *tmp = Racetime_Data::Find<Trimesh_Geom>(name.c_str()))
+	if (Trimesh_Geom *tmp = Assets::Find<Trimesh_Geom>(name.c_str()))
 		return tmp;
 
 	//check that we got any data (and how much?)

@@ -19,25 +19,75 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/internal.hpp"
-#include "shared/racetime_data.hpp"
-#include "shared/car.hpp"
-#include "shared/camera.hpp"
-#include "shared/log.hpp"
-#include "shared/track.hpp"
-#include "shared/geom.hpp"
-#include "shared/body.hpp"
-#include "shared/joint.hpp"
+#include "car.hpp"
 #include "text_file.hpp"
-#include "shared/directories.hpp"
+#include "assets.hpp"
+#include "assets/track.hpp"
+#include "common/internal.hpp"
+#include "common/log.hpp"
+#include "common/directories.hpp"
+#include "simulation/camera.hpp"
+#include "simulation/geom.hpp"
+#include "simulation/body.hpp"
+#include "simulation/joint.hpp"
+
+//for creation:
+Car_Module::Car_Module(const char *name) :Assets(name)
+{
+	conf = car_conf_defaults; //set conf values to default
+}
 
 
+
+Car *Car::head = NULL;
+
+//allocates car, add to list...
+Car::Car(void)
+{
+	Log_Add(2, "configuring Car class");
+
+	//default values
+	dir = 1; //initiate to 1 for default
+
+	//control values
+	drift_brakes = true; //if the user does nothing, lock wheels
+	throttle = 0;
+	steering = 0;
+	oldsteerlimit = 0;
+	velocity = 0;
+
+	//linking
+	next=head;
+	head=this;
+
+	if (next)
+		next->prev=this;
+
+	prev=NULL;
+}
+
+//run _before_ starting full erase of object/component lists (at race end)
+Car::~Car()
+{
+	Log_Add(2, "clearing Car class");
+
+	//remove from list
+	if (!prev) //head
+		head = next;
+	else //not head
+		prev->next = next;
+
+	if (next) //not last
+		next->prev = prev;
+}
+
+//loading/spawning:
 Car_Module *Car_Module::Load (const char *path)
 {
 	Log_Add(1, "Loading car: %s", path);
 
 	//see if already loaded
-	if (Car_Module *tmp=Racetime_Data::Find<Car_Module>(path))
+	if (Car_Module *tmp=Assets::Find<Car_Module>(path))
 		return tmp;
 
 	//apparently not
@@ -248,8 +298,11 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 	else //else, limit by rotation speed
 		car->gear_limit = conf.gear_limit;
 
+	car->min_engine_vel = conf.min_engine_vel;
 
 	car->max_brake = conf.max_brake;
+	car->min_brake_vel = conf.min_brake_vel;
+
 	car->max_steer = conf.max_steer;
 	car->steerdecr = conf.steer_decrease;
 	car->min_steer = conf.min_steer;

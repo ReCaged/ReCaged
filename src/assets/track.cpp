@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,18 +19,24 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/track.hpp"
-
-#include "shared/internal.hpp"
-#include "shared/camera.hpp"
-#include "shared/geom.hpp"
-#include "shared/log.hpp"
-#include "shared/object.hpp"
-#include "shared/directories.hpp"
-
-#include "text_file.hpp"
-
 #include <stdlib.h>
+
+#include "track.hpp"
+#include "text_file.hpp"
+#include "object.hpp"
+
+#include "common/internal.hpp"
+#include "common/log.hpp"
+#include "common/directories.hpp"
+
+#include "simulation/geom.hpp"
+#include "simulation/camera.hpp"
+
+//tmp global storage
+dWorldID world;
+dSpaceID space;
+dJointGroupID contactgroup;
+struct Track_Struct track = track_defaults;
 
 //
 //keep track of all loaded models (cleared between loading)

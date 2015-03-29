@@ -28,12 +28,12 @@ TODO: more stuff here!
 
  * Fixed various insufficient memory allocations
 
- * Separate tyre and rim models replaced by wheel models (by world/track)
+ * Separate tyre and rim models replaced by single wheel models (by world/track)
 
  * New models and tracks:
    * New wheels, ramps and stunt objects by CodieMorgan/MoruganKodi/コディ[KODI]
    * Scramble-like test road by orgyia
-   * superbowl and vertigo roads reworked to be much more pleasant
+   * superbowl and vertigo roads reworked to be much more pleasant to drive
 
  * New logging system:
    * Realtime log output now also on windows
@@ -61,7 +61,7 @@ TODO: more stuff here!
 
  * Car improvements:
    * New, more powerful, downforce
-   * Major reconfiguration of Venom car
+   * Major reconfiguration of "Venom" car
    * New tyre friction simulation model (more stable, easier to configure)
    * New tyre combined slip/grip model
    * New tyre/rim contact point evaluation
@@ -69,13 +69,16 @@ TODO: more stuff here!
    * Each wheel now stores its own set of parameters (independent of car, can
      support unattached wheels, different front/rear wheel handling and so on)
    * Wheel axles can now break (more a proof-of-concept than actual gameplay)
-   * New soft brake/brake-throttle transition code (more reliable at low speed)
+   * Smarter transition between brakes and throttle, more reliable at low speed
    * New rolling resistance code (more reliable at low speed/uneven terrain)
    * Less bending of wheel axles at high speeds (finite rotation for axles)
    *..... TODO!
 
- * Code reorganization:
-   * Renamed "loaders" to "assets"
-   * Removed "../" from header inclusions (src is now in the inclusion paths)
+ * Major code reorganizations:
+   * Renamed directory "shared" to "common"
+   * Renamed directory "loaders" to "assets"
+   * Renamed "Racetime_Data" to "Assets"
+   * Moved most code from "common" to "assets" and "simulation"
    * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
+   * Removed "../" from header inclusions (src is now in the inclusion paths)
 

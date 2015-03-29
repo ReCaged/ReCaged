@@ -29,8 +29,8 @@
 #include <GL/glew.h>
 #include <ode/ode.h>
 
-#include "racetime_data.hpp"
-#include "assets/image.hpp"
+#include "image.hpp"
+#include "assets.hpp"
 
 //definitions:
 struct Vector_Float{
@@ -68,7 +68,7 @@ struct Material_Float
 
 //optimized trimesh rendering
 #define DEFAULT_VBO_SIZE 4194304 //usual size for trimesh VBOs
-class Trimesh_3D: public Racetime_Data
+class Trimesh_3D: public Assets
 {
 	public:
 		//will load and modify a 3d file to use only as a rendering trimesh
@@ -123,7 +123,7 @@ class Trimesh_3D: public Racetime_Data
 };
 
 //for collision detection (geom) generation
-class Trimesh_Geom: public Racetime_Data
+class Trimesh_Geom: public Assets
 {
 	public:
 		//will load and modify a 3d file to use only as a collision trimesh
@@ -196,7 +196,7 @@ class Trimesh
 		//like Load, for material files (private)
 		bool Load_Material(const char*);
 
-		//just for the other trimesh classes (for Racetime_Data name)
+		//just for the other trimesh classes (for asset name)
 		std::string name;
 
 		//tools:

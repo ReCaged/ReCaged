@@ -27,8 +27,8 @@
 #include <png.h>
 #include <jpeglib.h>
 #include <setjmp.h> //for insanity of jpeg/png libraries
-#include "shared/internal.hpp"
-#include "shared/log.hpp"
+#include "common/internal.hpp"
+#include "common/log.hpp"
 #include "image.hpp"
 
 
@@ -519,7 +519,7 @@ Image_Texture *Image::Create_Texture()
 
 //constructor for setting up
 Image_Texture::Image_Texture(const char *name, GLuint newid):
-	Racetime_Data(name), id(newid)
+	Assets(name), id(newid)
 {
 }
 
