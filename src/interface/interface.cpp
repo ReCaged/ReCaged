@@ -22,14 +22,14 @@
 #include <SDL/SDL.h>
 #include <GL/glew.h>
 
-#include "shared/internal.hpp"
-#include "shared/track.hpp"
-#include "shared/runlevel.hpp"
-#include "shared/threads.hpp"
-#include "shared/log.hpp"
-#include "shared/profile.hpp"
+#include "common/internal.hpp"
+#include "assets/track.hpp"
+#include "assets/profile.hpp"
+#include "common/runlevel.hpp"
+#include "common/threads.hpp"
+#include "common/log.hpp"
 
-#include "shared/camera.hpp"
+#include "simulation/camera.hpp"
 #include "render_list.hpp"
 #include "geom_render.hpp"
 

@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -20,8 +20,8 @@
  */ 
 
 #include "component.hpp"
-#include "object.hpp"
-#include "log.hpp"
+#include "assets/object.hpp"
+#include "common/log.hpp"
 
 Component::Component(Object *obj)
 {

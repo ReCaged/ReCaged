@@ -24,7 +24,7 @@
 //TODO: make class
 //
 #include <ode/ode.h>
-#include "car.hpp"
+#include "assets/car.hpp"
 
 struct Camera_Settings {
 	float target[3];

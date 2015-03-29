@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,25 +19,109 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/object.hpp"
-
 #include <ode/ode.h>
+#include <stdlib.h>
 
-#include "shared/racetime_data.hpp"
-#include "shared/trimesh.hpp"
-#include "shared/log.hpp"
-#include "shared/track.hpp"
-#include "shared/joint.hpp"
-#include "shared/geom.hpp"
-#include "shared/body.hpp"
+#include "object.hpp"
+#include "assets.hpp"
+#include "trimesh.hpp"
+#include "track.hpp"
 
+#include "common/log.hpp"
+
+#include "simulation/joint.hpp"
+#include "simulation/geom.hpp"
+#include "simulation/body.hpp"
+#include "simulation/event_buffers.hpp"
+
+//allocate new script storage, and add it to list
+//(not used yet, only for storing 3d list pointers...)
+Module::Module(const char *name): Assets(name)
+{
+	//debug identification bools set to false
+	box = false;
+	funbox = false;
+	flipper = false;
+	NH4 = false;
+	building = false;
+	sphere = false;
+	pillar = false;
+	tetrahedron = false;
+
+	//make sure all model pointers are null
+	for (int i=0; i<10; ++i)
+		model[i]=NULL;
+
+	//and the same for trimesh geoms
+	for (int i=0; i<1; ++i)
+		geom[i]=NULL;
+}
+
+
+Object *Object::head = NULL;
+
+//allocate a new object, add it to the list and returns its pointer
+Object::Object ()
+{
+	prev=NULL;
+	next=head;
+	head=this;
+
+	if (next) next->prev = this;
+
+	//default values
+	components = NULL;
+	activity = 0;
+	selected_space = NULL;
+}
+
+//destroys an object
+Object::~Object()
+{
+	Log_Add(1, "Object removed");
+	//1: remove it from the list
+	if (prev == NULL) //first link
+		head = next;
+	else
+		prev->next = next;
+
+	if (next) //not last link
+		next->prev = prev;
+
+
+	//remove components
+	while (components)
+		delete components; //just removes the one in top each time
+
+	//make sure no events for this object is left
+	Event_Buffer_Remove_All(this);
+}
+
+//"activity": should be called "references", but don't bother change
+void Object::Increase_Activity()
+{
+	++activity;
+}
+
+void Object::Decrease_Activity()
+{
+	if ((--activity) == 0)
+		Event_Buffer_Add_Inactive(this);
+}
+
+//destroys all objects
+void Object::Destroy_All()
+{
+	while (head)
+		delete (head);
+}
 //load data for spawning object (object data), hard-coded debug version
 Module *Module::Load(const char *path)
 {
 	Log_Add(1, "Loading module: %s", path);
 
 	//see if already loaded
-	if (Module *tmp=Racetime_Data::Find<Module>(path))
+	if (Module *tmp=Assets::Find<Module>(path))
 	{
 		return tmp;
 	}

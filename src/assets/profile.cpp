@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,10 +19,35 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/profile.hpp"
-#include "shared/log.hpp"
-#include "shared/directories.hpp"
+#include "profile.hpp"
+#include "common/log.hpp"
+#include "common/directories.hpp"
 #include "text_file.hpp"
+
+Profile *profile_head = NULL;
+
+void Profile_Remove (Profile *target)
+{
+	Log_Add(2, "removing profile");
+
+	//remove from list
+	if (!target->prev) //head
+		profile_head = target->next;
+	else //not head
+		target->prev->next = target->next;
+
+	if (target->next) //not last
+		target->next->prev = target->prev;
+
+	//remove profile
+	free (target);
+}
+
+void Profile_Remove_All()
+{
+	while (profile_head)
+		Profile_Remove(profile_head);
+}
 
 
 //inputs (loaded from keys.lst)

@@ -19,9 +19,9 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/car.hpp"
-#include "shared/track.hpp"
-#include "shared/internal.hpp"
+#include "assets/car.hpp"
+#include "assets/track.hpp"
+#include "common/internal.hpp"
 
 void Car::Physics_Step(dReal step)
 {

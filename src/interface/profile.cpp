@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,7 +19,7 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/profile.hpp"
+#include "assets/profile.hpp"
 
 //extract state change for used inputs
 //LUA note: will be performed by a lua "module" in future

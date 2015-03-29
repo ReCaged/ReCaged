@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -23,16 +23,16 @@
 #define _RCX_WHEEL_H
 
 #include <ode/ode.h>
-#include "shared/surface.hpp"
-#include "shared/geom.hpp"
+#include "simulation/geom.hpp"
 
 //wheel friction simulation class (created by Car_Module, used by Physics/Geom.cpp)
 class Wheel
 {
 	public:
 		void Add_Contact(dBodyID b1, dBodyID b2, Geom *g1, Geom *g2,
-				bool wheelis1, dReal wheelaxle[], Surface *surface,
-				dContact *contact, dReal stepsize);
+				bool wheelis1, dReal wheelaxle[],
+				class Surface *surface, dContact *contact,
+				dReal stepsize);
 
 		static void Physics_Step();
 

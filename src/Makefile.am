@@ -1,7 +1,7 @@
 #
 # RCX - a Free Software, Futuristic, Racing Game
 #
-# Copyright (C) 2012, 2014 Mats Wahlberg
+# Copyright (C) 2012, 2014, 2015 Mats Wahlberg
 #
 # This file is part of RCX.
 #
@@ -32,77 +32,40 @@ LDADD = $(RCX_LIBS)
 
 bin_PROGRAMS = rcx
 
-rcx_SOURCES =		./rcx.cpp \
-			assets/car.cpp \
-			assets/conf.cpp \
-			assets/conf.hpp \
-			assets/obj.cpp \
-			assets/object.cpp \
-			assets/profile.cpp \
-			assets/road.cpp \
-			assets/text_file.cpp \
-			assets/text_file.hpp \
-			assets/track.cpp \
-			assets/trimesh.cpp \
-			interface/geom_render.cpp \
-			interface/geom_render.hpp \
-			interface/interface.cpp \
-			interface/profile.cpp \
-			interface/render_list.cpp \
-			interface/render_list.hpp \
-			shared/body.cpp \
-			shared/body.hpp \
-			shared/camera.cpp \
-			shared/camera.hpp \
-			shared/car.cpp \
-			shared/car.hpp \
-			shared/component.cpp \
-			shared/component.hpp \
-			shared/directories.cpp \
-			shared/directories.hpp \
-			shared/geom.cpp \
-			shared/geom.hpp \
-			shared/internal.cpp \
-			shared/internal.hpp \
-			shared/joint.cpp \
-			shared/joint.hpp \
-			shared/log.cpp \
-			shared/log.hpp \
-			shared/object.cpp \
-			shared/object.hpp \
-			shared/profile.cpp \
-			shared/profile.hpp \
-			shared/racetime_data.cpp \
-			shared/racetime_data.hpp \
-			shared/runlevel.cpp \
-			shared/runlevel.hpp \
-			shared/script.hpp \
-			shared/space.cpp \
-			shared/space.hpp \
-			shared/surface.cpp \
-			shared/surface.hpp \
-			shared/threads.cpp \
-			shared/threads.hpp \
-			shared/track.cpp \
-			shared/track.hpp \
-			shared/trimesh_3d.cpp \
-			shared/trimesh.cpp \
-			shared/trimesh_geom.cpp \
-			shared/trimesh.hpp \
-			simulation/body.cpp \
-			simulation/camera.cpp \
-			simulation/car.cpp \
-			simulation/collision_feedback.cpp \
-			simulation/collision_feedback.hpp \
-			simulation/event_buffers.cpp \
-			simulation/event_buffers.hpp \
-			simulation/geom.cpp \
-			simulation/joint.cpp \
-			simulation/simulation.cpp \
-			simulation/timers.cpp \
-			simulation/timers.hpp \
-			simulation/wheel.cpp \
-			simulation/wheel.hpp
+rcx_SOURCES =	./rcx.cpp \
+		assets/assets.cpp \
+		assets/car.cpp \
+		assets/conf.cpp \
+		assets/obj.cpp \
+		assets/object.cpp \
+		assets/profile.cpp \
+		assets/road.cpp \
+		assets/text_file.cpp \
+		assets/track.cpp \
+		assets/trimesh_3d.cpp \
+		assets/trimesh.cpp \
+		assets/trimesh_geom.cpp \
+		common/directories.cpp \
+		common/internal.cpp \
+		common/log.cpp \
+		common/runlevel.cpp \
+		common/threads.cpp \
+		interface/geom_render.cpp \
+		interface/interface.cpp \
+		interface/profile.cpp \
+		interface/render_list.cpp \
+		simulation/body.cpp \
+		simulation/camera.cpp \
+		simulation/car.cpp \
+		simulation/collision_feedback.cpp \
+		simulation/component.cpp \
+		simulation/event_buffers.cpp \
+		simulation/geom.cpp \
+		simulation/joint.cpp \
+		simulation/simulation.cpp \
+		simulation/space.cpp \
+		simulation/timers.cpp \
+		simulation/wheel.cpp
 
 #remove w32 files on all platforms (just in case)
 CLEANFILES = resources.rc resources.o

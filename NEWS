@@ -28,7 +28,7 @@ TODO: more stuff here!
 
  * Fixed various insufficient memory allocations
 
- * Separate tyre and rim models replaced by wheel models (by world/track)
+ * Separate tyre and rim models replaced by single wheel models (by world/track)
 
  * New models and tracks:
    * New wheels, ramps and stunt objects by CodieMorgan/MoruganKodi/コディ[KODI]
@@ -74,8 +74,11 @@ TODO: more stuff here!
    * Less bending of wheel axles at high speeds (finite rotation for axles)
    *..... TODO!
 
- * Code reorganization:
-   * Renamed "loaders" to "assets"
-   * Removed "../" from header inclusions (src is now in the inclusion paths)
+ * Major code reorganizations:
+   * Renamed directory "shared" to "common"
+   * Renamed directory "loaders" to "assets"
+   * Renamed "Racetime_Data" to "Assets"
+   * Moved most code from "common" to "assets" and "simulation"
    * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
+   * Removed "../" from header inclusions (src is now in the inclusion paths)
 

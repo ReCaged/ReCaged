@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -22,13 +22,13 @@
 #include <GL/glew.h>
 #include "render_list.hpp"
 
-#include "shared/threads.hpp"
-#include "shared/internal.hpp"
-#include "shared/log.hpp"
-#include "shared/trimesh.hpp"
-#include "shared/geom.hpp"
-#include "shared/body.hpp"
-#include "shared/camera.hpp"
+#include "assets/trimesh.hpp"
+#include "common/threads.hpp"
+#include "common/internal.hpp"
+#include "common/log.hpp"
+#include "simulation/geom.hpp"
+#include "simulation/body.hpp"
+#include "simulation/camera.hpp"
 
 #include <stdlib.h>
 #include <ode/ode.h>

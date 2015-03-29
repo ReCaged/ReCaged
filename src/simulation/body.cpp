@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,13 +19,65 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "shared/body.hpp"
-#include "shared/car.hpp"
-#include "shared/log.hpp"
-#include "shared/track.hpp"
-#include "shared/internal.hpp"
+#include "body.hpp"
+#include "common/log.hpp"
+#include "common/internal.hpp"
+#include "assets/object.hpp"
+#include "assets/car.hpp"
+#include "assets/track.hpp"
 #include "event_buffers.hpp"
 
+//for creation:
+Body *Body::head = NULL;
+
+Body::Body (dBodyID body, Object *obj): Component(obj)
+{
+	//increase object activity counter
+	object_parent->Increase_Activity();
+
+	//ad it to the list
+	next = head;
+	head = this;
+	prev = NULL;
+
+	if (next) next->prev = this;
+
+	//add it to the body
+	dBodySetData (body, (void*)(this));
+	body_id = body;
+
+	//default values
+	model = NULL; //don't render
+	Update_Mass(); //get current mass...
+	Set_Linear_Drag(internal.linear_drag); //...and set up drag
+	Set_Angular_Drag(internal.angular_drag);//...
+	buffer_event=false; //no events yet
+}
+
+//destroys a body, and removes it from the list
+Body::~Body()
+{
+	//remove all events
+	Event_Buffer_Remove_All(this);
+
+	//1: remove it from the list
+	if (!prev) //head in list, change head pointer
+		head = next;
+	else //not head in list, got a previous link to update
+		prev->next = next;
+
+	if (next) //not last link in list
+		next->prev = prev;
+
+	//2: remove it from memory
+
+	dBodyDestroy(body_id);
+
+	//decrease activity and check if 0
+	object_parent->Decrease_Activity();
+}
+
+//for physics:
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
 //functions for body drag
 

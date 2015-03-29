@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,30 +19,41 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "profile.hpp"
+#include "assets.hpp"
+#include "common/log.hpp"
+#include <stdio.h>
+#include <string.h>
 
-Profile *profile_head = NULL;
+Assets *Assets::head = NULL;
 
-void Profile_Remove (Profile *target)
+Assets::Assets(const char *n)
 {
-	Log_Add(2, "removing profile");
+	name = new char[strlen(n)+1];
+	strcpy (name, n);
 
-	//remove from list
-	if (!target->prev) //head
-		profile_head = target->next;
-	else //not head
-		target->prev->next = target->next;
-
-	if (target->next) //not last
-		target->next->prev = target->prev;
-
-	//remove profile
-	free (target);
+	next = head;
+	head = this;
 }
 
-void Profile_Remove_All()
+Assets::~Assets()
 {
-	while (profile_head)
-		Profile_Remove(profile_head);
+	Log_Add(2, "removing asset called \"%s\"", name);
+	delete[] name;
+}
+
+void Assets::Clear_TMP()
+{
+	Log_Add(2, "destroying all assets");
+
+	Assets *tmp, *data = head;
+	while (data)
+	{
+		tmp = data;
+		data=data->next;
+
+		delete tmp;
+	}
+
+	head = NULL;
 }
 

@@ -23,7 +23,7 @@
 #define _RCX_COLLISION_FEEDBACK_H
 
 #include <ode/ode.h>
-#include "shared/geom.hpp"
+#include "simulation/geom.hpp"
 
 //geoms can be "damaged" by collision forces, computed from feedback of ode "collision joint"s
 

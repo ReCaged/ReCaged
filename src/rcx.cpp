@@ -24,15 +24,16 @@
 #include <getopt.h>
 
 //local stuff:
-#include "shared/internal.hpp"
-#include "shared/threads.hpp"
-#include "shared/log.hpp"
-#include "shared/directories.hpp"
-#include "shared/runlevel.hpp"
-#include "shared/profile.hpp"
-#include "shared/track.hpp"
-#include "shared/trimesh.hpp"
-#include "shared/directories.hpp"
+#include "common/internal.hpp"
+#include "common/threads.hpp"
+#include "common/log.hpp"
+#include "common/directories.hpp"
+#include "common/runlevel.hpp"
+#include "common/directories.hpp"
+
+#include "assets/profile.hpp"
+#include "assets/track.hpp"
+#include "assets/trimesh.hpp"
 
 
 Uint32 starttime = 0;
@@ -130,7 +131,6 @@ bool tmp_menus()
 	else
 		strack+="Box";
 
-	//TODO: probably Racetime_Data::Destroy_All() here
 	if (!load_track(strack.c_str()))
 		return false; //GOTO: track selection menu
 
@@ -245,8 +245,8 @@ bool tmp_menus()
 	//MENU: race done, replay, play again, quit?
 	// - assuming quit -
 	
-	//remove loaded data (not all data, only "racetime" - for this race)
-	Racetime_Data::Destroy_All();
+	//remove loaded data (will be done automatically in future!)
+	Assets::Clear_TMP();
 
 	//MENU: back to main menu here
 	// - assuming player wants to log out -

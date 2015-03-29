@@ -20,7 +20,7 @@
  */ 
 
 #include "text_file.hpp"
-#include "shared/log.hpp"
+#include "common/log.hpp"
 
 #include <stdio.h>
 #include <stdlib.h>

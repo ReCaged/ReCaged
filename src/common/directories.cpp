@@ -38,7 +38,7 @@
 #endif
 
 #include "directories.hpp"
-#include "shared/log.hpp"
+#include "common/log.hpp"
 
 char *Directories::user_conf=NULL, *Directories::user_data=NULL, *Directories::user_cache=NULL;
 char *Directories::inst_conf=NULL, *Directories::inst_data=NULL;

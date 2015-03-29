@@ -19,30 +19,27 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "space.hpp"
-#include "geom.hpp"
-#include "log.hpp"
-#include "track.hpp"
-#include <ode/ode.h>
+#ifndef _RCX_SPACE_H
+#define _RCX_SPACE_H
+#include "component.hpp"
+#include "assets/object.hpp"
 
-Space::Space(Object *obj): Component(obj)
+//Space: (meta)data for spaces (collects geoms that should not collide)
+//(in contrary to other components, this can't be rendered or cause events)
+//
+//Dynamic allocation
+class Space: public Component
 {
-	space_id = dSimpleSpaceCreate(space);
+	public:
+		//methods
+		Space (Object *obj);
+		~Space();
 
-	Log_Add(2, "(autoselecting default space for object)");
-	obj->selected_space=space_id;
-}
+		//variables
+		dSpaceID space_id;
 
-Space::~Space()
-{
-	Geom *g;
+	private:
+		//no need for global list of spaces...
+};
 
-	while (dSpaceGetNumGeoms(space_id)) //while contains geoms
-	{
-		//remove first geom - next time first will be the next geom
-		g = (Geom*)dGeomGetData(dSpaceGetGeom(space_id, 0));
-		delete g;
-	}
-
-	dSpaceDestroy(space_id);
-}
+#endif

@@ -23,9 +23,12 @@
 #define _RCX_JOINT_H
 #include <ode/ode.h>
 #include <SDL/SDL.h>
-#include "object.hpp"
+
+#include "joint.hpp"
 #include "component.hpp"
-#include "script.hpp"
+
+#include "assets/object.hpp"
+#include "assets/script.hpp"
 
 //Joint: (meta)data for joint (connects bodies), is used for:
 //currently only for triggering event script (force threshold)

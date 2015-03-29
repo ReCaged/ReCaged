@@ -25,13 +25,12 @@
 //scripting - used to keep track of components and objects (like weapons)
 //bellonging to the player during the race
 //Allocated at start
-#include "racetime_data.hpp"
+#include "assets.hpp"
 #include "object.hpp"
-#include "body.hpp"
-#include "geom.hpp"
 #include "trimesh.hpp"
-#include "surface.hpp"
-#include "assets/conf.hpp"
+#include "conf.hpp"
+#include "simulation/body.hpp"
+#include "simulation/geom.hpp"
 
 #include <vector>
 #include <string>
@@ -227,7 +226,7 @@ const struct Conf_Index car_conf_index[] = {
 	{"",0,0}};//end
 
 
-class Car_Module:public Racetime_Data
+class Car_Module:public Assets
 {
 	public:
 		static Car_Module *Load(const char *path);

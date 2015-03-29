@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -56,7 +56,7 @@ int Simulation_Loop (void *d);
 
 
 //TMP: used for keeping track for objects spawning
-#include "object.hpp"
+#include "assets/object.hpp"
 extern Module *box;
 extern Module *sphere;
 extern Module *funbox;

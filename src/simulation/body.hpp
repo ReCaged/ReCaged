@@ -23,10 +23,10 @@
 #define _RCX_BODY_H
 #include <ode/ode.h>
 #include <SDL/SDL.h>
-#include "script.hpp"
-#include "object.hpp"
 #include "component.hpp"
-#include "script.hpp"
+#include "assets/script.hpp"
+#include "assets/object.hpp"
+#include "assets/script.hpp"
 
 //body_data: data for body (describes mass and mass positioning), used for:
 //currently only for triggering event script (force threshold and event variables)

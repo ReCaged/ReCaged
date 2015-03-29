@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,23 +19,30 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#ifndef _RCX_SURFACE_H
-#define _RCX_SURFACE_H
-#include "ode/ode.h"
-//Geom: (meta)data for geometrical shape (for collision detection), for: 
-//contactpoint generation (friction and saftness/hardness). also contains
-//rendering data for geom
+#include "space.hpp"
+#include "geom.hpp"
+#include "common/log.hpp"
+#include "assets/track.hpp"
+#include <ode/ode.h>
 
-//surface properties:
-class Surface
+Space::Space(Object *obj): Component(obj)
 {
-	public:
-		Surface(); //just sets default values
+	space_id = dSimpleSpaceCreate(space);
 
-		//options
-		dReal mu, bounce;
-		dReal spring, damping;
-		dReal sensitivity, rollres;
-};
+	Log_Add(2, "(autoselecting default space for object)");
+	obj->selected_space=space_id;
+}
 
-#endif
+Space::~Space()
+{
+	Geom *g;
+
+	while (dSpaceGetNumGeoms(space_id)) //while contains geoms
+	{
+		//remove first geom - next time first will be the next geom
+		g = (Geom*)dGeomGetData(dSpaceGetGeom(space_id, 0));
+		delete g;
+	}
+
+	dSpaceDestroy(space_id);
+}
