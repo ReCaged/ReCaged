@@ -34,38 +34,64 @@ bin_PROGRAMS = rcx
 
 rcx_SOURCES =	./rcx.cpp \
 		assets/assets.cpp \
+		assets/assets.hpp \
 		assets/car.cpp \
+		assets/car.hpp \
 		assets/conf.cpp \
+		assets/conf.hpp \
 		assets/obj.cpp \
 		assets/object.cpp \
+		assets/object.hpp \
 		assets/profile.cpp \
+		assets/profile.hpp \
 		assets/road.cpp \
+		assets/script.hpp \
 		assets/text_file.cpp \
+		assets/text_file.hpp \
 		assets/track.cpp \
+		assets/track.hpp \
 		assets/trimesh_3d.cpp \
 		assets/trimesh.cpp \
 		assets/trimesh_geom.cpp \
+		assets/trimesh.hpp \
 		common/directories.cpp \
+		common/directories.hpp \
 		common/internal.cpp \
+		common/internal.hpp \
 		common/log.cpp \
+		common/log.hpp \
 		common/runlevel.cpp \
+		common/runlevel.hpp \
 		common/threads.cpp \
+		common/threads.hpp \
 		interface/geom_render.cpp \
+		interface/geom_render.hpp \
 		interface/interface.cpp \
 		interface/profile.cpp \
 		interface/render_list.cpp \
+		interface/render_list.hpp \
 		simulation/body.cpp \
+		simulation/body.hpp \
 		simulation/camera.cpp \
+		simulation/camera.hpp \
 		simulation/car.cpp \
 		simulation/collision_feedback.cpp \
+		simulation/collision_feedback.hpp \
 		simulation/component.cpp \
+		simulation/component.hpp \
 		simulation/event_buffers.cpp \
+		simulation/event_buffers.hpp \
 		simulation/geom.cpp \
+		simulation/geom.hpp \
 		simulation/joint.cpp \
+		simulation/joint.hpp \
 		simulation/simulation.cpp \
 		simulation/space.cpp \
+		simulation/space.hpp \
 		simulation/timers.cpp \
-		simulation/wheel.cpp
+		simulation/timers.hpp \
+		simulation/wheel.cpp \
+		simulation/wheel.hpp
 
 #remove w32 files on all platforms (just in case)
 CLEANFILES = resources.rc resources.o
