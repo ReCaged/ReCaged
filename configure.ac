@@ -22,7 +22,7 @@
 #
 
 AC_PREREQ([2.60]) #should work (and be old enough)
-AC_INIT([RCX], [0.8.0wip], [rcxslinger@gmail.com], [rcx], [http://recaged.net])
+AC_INIT([RCX], [0.8.0~git], [rcxslinger@gmail.com], [rcx], [http://recaged.net])
 
 # Define codename and year (for title and version printout)
 AC_DEFINE([PACKAGE_CODENAME], ["The Devil's Mind is an Idle Workshop"])
