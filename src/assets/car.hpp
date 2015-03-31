@@ -29,6 +29,8 @@
 #include "object.hpp"
 #include "trimesh.hpp"
 #include "conf.hpp"
+#include "profile.hpp"
+#include "simulation/camera.hpp"
 #include "simulation/body.hpp"
 #include "simulation/geom.hpp"
 
@@ -225,18 +227,157 @@ const struct Conf_Index car_conf_index[] = {
 
 	{"",0,0}};//end
 
+//for loading camera.conf
+struct Camera_Conf
+{
+	//just store 4 camera settings structs
+	Camera_Settings cam[4];
+	int selected;
+};
+
+//default camera settings:
+const struct Camera_Conf camera_conf_defaults = {
+	{
+	//1:
+	{{0,5,0.5},
+	{0,3.4,0.5}, {0,0,0},
+	true,
+	0, 0,
+	0,
+	0,
+	0,
+	true,
+	0,
+	false, false,
+	0, 0,
+	0},
+	//2:
+	{{0,5,1.5},
+	{0,0,2}, {0,-10,0.5},
+	false,
+	0, 0,
+	500,
+	2000,
+	25,
+	true,
+	15,
+	true, false,
+	0, 0,
+	0},
+	//3:
+	{{0,3,2},
+	{0,0,0}, {0,-20,5},
+	false,
+	3, 70,
+	70,
+	700,
+	10,
+	false,
+	10,
+	true,true,
+	0.7, 0.4,
+	1.5},
+	//4:
+	{{0,0,0},
+	{0,0,0}, {0,-40,16},
+	false,
+	4, 60,
+	50,
+	500,
+	4,
+	false,
+	2,
+	true,true,
+	0.5, 0.5,
+	0}
+	},
+	//default selected camera (change by profile)
+	2
+	//end
+	};
+
+const struct Conf_Index camera_conf_index[] = {
+	{"camera1:target_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[0].target)},
+	{"camera1:anchor_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[0].anchor)},
+	{"camera1:anchor_distance",	'f' ,3 ,offsetof(Camera_Conf, cam[0].distance)},
+	{"camera1:hide_car",		'b' ,1 ,offsetof(Camera_Conf, cam[0].hide_car)},
+	{"camera1:collision_radius",	'f' ,1 ,offsetof(Camera_Conf, cam[0].radius)},
+	{"camera1:collision_angle",	'f' ,1 ,offsetof(Camera_Conf, cam[0].angle)},
+	{"camera1:linear_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[0].linear_stiffness)},
+	{"camera1:angular_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[0].angular_stiffness)},
+	{"camera1:damping",		'f' ,1 ,offsetof(Camera_Conf, cam[0].damping)},
+	{"camera1:relative_damping",	'b' ,1 ,offsetof(Camera_Conf, cam[0].relative_damping)},
+	{"camera1:rotation_speed",	'f' ,1 ,offsetof(Camera_Conf, cam[0].rotation_speed)},
+	{"camera1:enable_reverse",	'b' ,1 ,offsetof(Camera_Conf, cam[0].reverse)},
+	{"camera1:enable_in_air",	'b' ,1 ,offsetof(Camera_Conf, cam[0].in_air)},
+	{"camera1:air_time",		'f', 1, offsetof(Camera_Conf, cam[0].air_time)},
+	{"camera1:ground_time",		'f', 1, offsetof(Camera_Conf, cam[0].ground_time)},
+	{"camera1:offset_scale_speed",	'f', 1, offsetof(Camera_Conf, cam[0].offset_scale_speed)},
+
+	{"camera2:target_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[1].target)},
+	{"camera2:anchor_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[1].anchor)},
+	{"camera2:anchor_distance",	'f' ,3 ,offsetof(Camera_Conf, cam[1].distance)},
+	{"camera2:hide_car",		'b' ,1 ,offsetof(Camera_Conf, cam[1].hide_car)},
+	{"camera2:collision_radius",	'f' ,1 ,offsetof(Camera_Conf, cam[1].radius)},
+	{"camera2:collision_angle",	'f' ,1 ,offsetof(Camera_Conf, cam[1].angle)},
+	{"camera2:linear_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[1].linear_stiffness)},
+	{"camera2:angular_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[1].angular_stiffness)},
+	{"camera2:damping",		'f' ,1 ,offsetof(Camera_Conf, cam[1].damping)},
+	{"camera2:relative_damping",	'b' ,1 ,offsetof(Camera_Conf, cam[1].relative_damping)},
+	{"camera2:rotation_speed",	'f' ,1 ,offsetof(Camera_Conf, cam[1].rotation_speed)},
+	{"camera2:enable_reverse",	'b' ,1 ,offsetof(Camera_Conf, cam[1].reverse)},
+	{"camera2:enable_in_air",	'b' ,1 ,offsetof(Camera_Conf, cam[1].in_air)},
+	{"camera2:air_time",		'f', 1, offsetof(Camera_Conf, cam[1].air_time)},
+	{"camera2:ground_time",		'f', 1, offsetof(Camera_Conf, cam[1].ground_time)},
+	{"camera2:offset_scale_speed",	'f', 1, offsetof(Camera_Conf, cam[1].offset_scale_speed)},
+
+	{"camera3:target_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[2].target)},
+	{"camera3:anchor_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[2].anchor)},
+	{"camera3:anchor_distance",	'f' ,3 ,offsetof(Camera_Conf, cam[2].distance)},
+	{"camera3:hide_car",		'b' ,1 ,offsetof(Camera_Conf, cam[2].hide_car)},
+	{"camera3:collision_radius",	'f' ,1 ,offsetof(Camera_Conf, cam[2].radius)},
+	{"camera3:collision_angle",	'f' ,1 ,offsetof(Camera_Conf, cam[2].angle)},
+	{"camera3:linear_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[2].linear_stiffness)},
+	{"camera3:angular_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[2].angular_stiffness)},
+	{"camera3:damping",		'f' ,1 ,offsetof(Camera_Conf, cam[2].damping)},
+	{"camera3:relative_damping",	'b' ,1 ,offsetof(Camera_Conf, cam[2].relative_damping)},
+	{"camera3:rotation_speed",	'f' ,1 ,offsetof(Camera_Conf, cam[2].rotation_speed)},
+	{"camera3:enable_reverse",	'b' ,1 ,offsetof(Camera_Conf, cam[2].reverse)},
+	{"camera3:enable_in_air",	'b' ,1 ,offsetof(Camera_Conf, cam[2].in_air)},
+	{"camera3:air_time",		'f', 1, offsetof(Camera_Conf, cam[2].air_time)},
+	{"camera3:ground_time",		'f', 1, offsetof(Camera_Conf, cam[2].ground_time)},
+	{"camera3:offset_scale_speed",	'f', 1, offsetof(Camera_Conf, cam[2].offset_scale_speed)},
+
+	{"camera4:target_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[3].target)},
+	{"camera4:anchor_offset",	'f' ,3 ,offsetof(Camera_Conf, cam[3].anchor)},
+	{"camera4:anchor_distance",	'f' ,3 ,offsetof(Camera_Conf, cam[3].distance)},
+	{"camera4:hide_car",		'b' ,1 ,offsetof(Camera_Conf, cam[3].hide_car)},
+	{"camera4:collision_radius",	'f' ,1 ,offsetof(Camera_Conf, cam[3].radius)},
+	{"camera4:collision_angle",	'f' ,1 ,offsetof(Camera_Conf, cam[3].angle)},
+	{"camera4:linear_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[3].linear_stiffness)},
+	{"camera4:angular_stiffness",	'f' ,1 ,offsetof(Camera_Conf, cam[3].angular_stiffness)},
+	{"camera4:damping",		'f' ,1 ,offsetof(Camera_Conf, cam[3].damping)},
+	{"camera4:relative_damping",	'b' ,1 ,offsetof(Camera_Conf, cam[3].relative_damping)},
+	{"camera4:rotation_speed",	'f' ,1 ,offsetof(Camera_Conf, cam[3].rotation_speed)},
+	{"camera4:enable_reverse",	'b' ,1 ,offsetof(Camera_Conf, cam[3].reverse)},
+	{"camera4:enable_in_air",	'b' ,1 ,offsetof(Camera_Conf, cam[3].in_air)},
+	{"camera4:air_time",		'f', 1, offsetof(Camera_Conf, cam[3].air_time)},
+	{"camera4:ground_time",		'f', 1, offsetof(Camera_Conf, cam[3].ground_time)},
+	{"camera4:offset_scale_speed",	'f', 1, offsetof(Camera_Conf, cam[3].offset_scale_speed)},
+	{"",0,0}};
 
 class Car_Module:public Assets
 {
 	public:
 		static Car_Module *Load(const char *path);
-		class Car *Spawn(dReal x, dReal y, dReal z, Trimesh_3D *wheel);
+		class Car *Spawn(dReal x, dReal y, dReal z, Trimesh_3D *wheel, class Profile *profile);
 
 	private:
 		Car_Module(const char *name); //only allocate through spawn function
 
 		//conf:
-		struct Car_Conf conf; //loads from conf
+		Car_Conf conf; //loads from car.conf
+		Camera_Conf camera; //loads from camera.conf
 
 		//geoms
 		struct geom_properties { //can describe any supported geom
@@ -272,6 +413,7 @@ class Car:public Object
 		friend class Camera; //needs access to car info
 
 		//configuration data (copied from Car_Module)
+		Camera_Conf camera;
 		dReal power, min_engine_vel, gear_limit;
 		dReal airtorque;
 		dReal body_mass, wheel_mass;

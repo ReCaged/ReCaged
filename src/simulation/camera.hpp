@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -24,7 +24,6 @@
 //TODO: make class
 //
 #include <ode/ode.h>
-#include "assets/car.hpp"
 
 struct Camera_Settings {
 	float target[3];
@@ -41,6 +40,25 @@ struct Camera_Settings {
 	float offset_scale_speed;
 };
 
+#include <assets/car.hpp>
+#include <assets/object.hpp>
+
+//safety values for struct above
+const struct Camera_Settings camera_settings_default = {
+	{0.0, 0.0, 0.0},
+	{0.0, 0.0, 0.0}, {0.0, 0.0, 0.0},
+	false,
+	0.0, 0.0,
+	0.0,
+	0.0,
+	0.0,
+	false,
+	0.0,
+	false, false,
+	0.0, 0.0,
+	0.0};
+
+
 class Camera
 {
 	public:
@@ -51,7 +69,7 @@ class Camera
 		void Set_Settings(Camera_Settings *settings);
 
 		//focus on this car
-		void Set_Car(Car*);
+		void Set_Car(class Car*);
 
 		//sets position and target of camera from two points
 		void Set_Pos(float px, float py, float pz, float tx, float ty, float tz);
@@ -63,7 +81,7 @@ class Camera
 		void Physics_Step(dReal step);
 
 	private:
-		struct Camera_Settings *settings;
+		Camera_Settings settings;
 		Car *car;
 		Object *hide;
 
@@ -93,5 +111,5 @@ class Camera
 		void Rotate(dReal step);
 };
 
-extern Camera camera;
+extern Camera default_camera;
 #endif

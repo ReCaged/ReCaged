@@ -98,7 +98,7 @@ bool load_track (const char *path)
 	if (dirs.Find(conf, DATA, READ)) Load_Conf(dirs.Path(), (char *)&track, track_index);
 
 	//set camera default values, some from track specs
-	camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
+	default_camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
 			track.focus_start[0], track.focus_start[1], track.focus_start[2]);
 
 	//all data loaded, start building

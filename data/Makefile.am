@@ -61,6 +61,7 @@ nobase_dist_objects_DATA = \
 teamsdir = $(datadir)/rcx/
 nobase_dist_teams_DATA = \
 	teams/Nemesis/cars/Venom/car.conf \
+	teams/Nemesis/cars/Venom/camera.conf \
 	teams/Nemesis/cars/Venom/geoms.lst \
 	teams/Nemesis/cars/Venom/README \
 	teams/Nemesis/cars/Venom/Venom.mtl \

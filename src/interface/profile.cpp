@@ -99,15 +99,27 @@ void Profile_Input_Step(Uint32 step)
 		for (i=0; i<9; ++i)
 			digital[i] = prof->input[i].key_state||prof->input[i].button_state||prof->input[i].hat_state;
 
-		//set camera settings (fallback to analog)
-		if (digital[5]||prof->input[5].axis_state)
-			camera.Set_Settings (&prof->cam[0]);
-		else if (digital[6]||prof->input[6].axis_state)
-			camera.Set_Settings (&prof->cam[1]);
-		else if (digital[7]||prof->input[7].axis_state)
-			camera.Set_Settings (&prof->cam[2]);
-		else if (digital[8]||prof->input[8].axis_state)
-			camera.Set_Settings (&prof->cam[3]);
+		//set camera settings if got a car(input fallback to analog)
+		if (prof->car)
+		{
+			int camera_select=-1;
+
+			if (digital[5]||prof->input[5].axis_state)
+				camera_select=0;
+			else if (digital[6]||prof->input[6].axis_state)
+				camera_select=1;
+			else if (digital[7]||prof->input[7].axis_state)
+				camera_select=2;
+			else if (digital[8]||prof->input[8].axis_state)
+				camera_select=3;
+
+			if (camera_select != -1)
+			{
+				Camera_Conf *camera=&(prof->car->camera);
+				camera->selected=camera_select;
+				default_camera.Set_Settings (&camera->cam[camera->selected]);
+			}
+		}
 
 
 		//if selected car, read input

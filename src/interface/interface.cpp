@@ -366,7 +366,7 @@ int Interface_Loop ()
 
 								//set new car
 								profile_head->car = car;
-								camera.Set_Car(car);
+								default_camera.Set_Car(car);
 							}
 						break;
 
@@ -420,19 +420,19 @@ int Interface_Loop ()
 		Uint8 *keys = SDL_GetKeyState(NULL);
 
 		if (keys[SDLK_d]) //+x
-			camera.Move(+0.03*delta, 0, 0);
+			default_camera.Move(+0.03*delta, 0, 0);
 		if (keys[SDLK_a]) //-x
-			camera.Move(-0.03*delta, 0, 0);
+			default_camera.Move(-0.03*delta, 0, 0);
 
 		if (keys[SDLK_w]) //+y
-			camera.Move(0, +0.03*delta, 0);
+			default_camera.Move(0, +0.03*delta, 0);
 		if (keys[SDLK_s]) //-y
-			camera.Move(0, -0.03*delta, 0);
+			default_camera.Move(0, -0.03*delta, 0);
 
 		if (keys[SDLK_q]) //+z
-			camera.Move(0, 0, +0.03*delta);
+			default_camera.Move(0, 0, +0.03*delta);
 		if (keys[SDLK_e]) //-z
-			camera.Move(0, 0, -0.03*delta);
+			default_camera.Move(0, 0, -0.03*delta);
 		//
 
 		//car control

@@ -131,9 +131,9 @@ void Render_List_Clear_Simulation()
 void Render_List_Update()
 {
 	//TMP: store "camera" in rendering list
-	memcpy(buffer_generate->camera_pos, camera.pos, sizeof(float)*3);
-	memcpy(buffer_generate->camera_rot, camera.rotation, sizeof(float)*9);
-	buffer_generate->camera_hide = camera.hide;
+	memcpy(buffer_generate->camera_pos, default_camera.pos, sizeof(float)*3);
+	memcpy(buffer_generate->camera_rot, default_camera.rotation, sizeof(float)*9);
+	buffer_generate->camera_hide = default_camera.hide;
 
 	//add data as usual:
 

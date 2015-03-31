@@ -58,6 +58,8 @@ TODO: more stuff here!
    * More reliable movement (more responsive, bumper camera perfectly still)
    * New damping/drag simulation
    * Hopefully all potential NaN position/rotation results can now be avoided
+   * Camera settings are now car-specific, not defined in player profile
+   * Modified camera (position) can now be reset without restarting the game
 
  * Car improvements:
    * New, more powerful, downforce

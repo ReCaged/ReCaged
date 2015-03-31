@@ -23,6 +23,7 @@
 #include "common/log.hpp"
 #include "common/directories.hpp"
 #include "text_file.hpp"
+#include "conf.hpp"
 
 Profile *profile_head = NULL;
 
@@ -116,10 +117,11 @@ Profile *Profile_Load (const char *path)
 	if (dirs.Find(conf, CONFIG, READ)) Load_Conf(dirs.Path(), (char *)prof, profile_index); //try to load conf
 
 	//set camera
-	if (prof->camera >0 && prof->camera <5)
-		camera.Set_Settings (&(prof->cam[prof->camera -1]));
-	else
+	if (!(prof->camera_default >0 && prof->camera_default <5))
+	{
 		Log_Add(-1, "Default camera should be a value between 1 and 4!");
+		prof->camera_default=3;
+	}
 
 	//load key list
 	char list[strlen(path)+9+1];

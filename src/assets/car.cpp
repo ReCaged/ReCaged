@@ -34,10 +34,7 @@
 //for creation:
 Car_Module::Car_Module(const char *name) :Assets(name)
 {
-	conf = car_conf_defaults; //set conf values to default
 }
-
-
 
 Car *Car::head = NULL;
 
@@ -93,22 +90,35 @@ Car_Module *Car_Module::Load (const char *path)
 	//apparently not
 	Car_Module *target = new Car_Module(path);
 
-	//car.conf
-	char conf[strlen(path)+9+1];//+1 for \0
-	strcpy (conf,path);
-	strcat (conf,"/car.conf");
+	//set conf values to defaults
+	target->conf = car_conf_defaults;
+	target->camera = camera_conf_defaults;
 
+	//try loading confs (still got defaults if it fails):
+	std::string filepath;
 	Directories dirs;
-	if (!(dirs.Find(conf, DATA, READ) && Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
-		return NULL;
+
+	filepath=path;
+	filepath+="/car.conf";
+
+	if (! (dirs.Find(filepath.c_str(), DATA, READ) &&
+		Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index)) )
+		Log_Add(0, "WARNING: can not open car configuration (%s)!", filepath.c_str());
+
+
+	filepath=path;
+	filepath+="/camera.conf";
+
+	if (! (dirs.Find(filepath.c_str(), DATA, READ) &&
+		Load_Conf(dirs.Path(), (char *)&target->camera, camera_conf_index)) )
+		Log_Add(0, "WARNING: can not open camera configuration (%s)!", filepath.c_str());
 
 	//geoms.lst
-	char lst[strlen(path)+10+1];
-	strcpy (lst, path);
-	strcat (lst, "/geoms.lst");
+	filepath=path;
+	filepath+="/geoms.lst";
 
 	Text_File file;
-	if (dirs.Find(lst, DATA, READ) && file.Open(dirs.Path()))
+	if (dirs.Find(filepath.c_str(), DATA, READ) && file.Open(dirs.Path()))
 	{
 		//default surface parameters
 		Surface surface;
@@ -231,7 +241,7 @@ Car_Module *Car_Module::Load (const char *path)
 		}
 	}
 	else
-		Log_Add(0, "WARNING: can not open list of car geoms (%s)!", lst);
+		Log_Add(0, "WARNING: can not open list of car geoms (%s)!", filepath.c_str());
 
 	//helper datas:
 
@@ -283,13 +293,18 @@ Car_Module *Car_Module::Load (const char *path)
 }
 
 
-Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
+Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Trimesh_3D *wheel3D, Profile *profile)
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
 	//begin copying of needed configuration data
 	Car *car = new Car();
 
+	//copy camera settings (and set default, from player profile)
+	car->camera = camera;
+	car->camera.selected = profile->camera_default-1; //safe checked by profile, just change index
+
+	//hmmm.... should do the same for all below (just add safetychecks):
 	car->power = conf.power;
 
 	//if limit by torque
@@ -685,11 +700,11 @@ void Car::Respawn (dReal x, dReal y, dReal z)
 	//TODO: in future (with multiple cameras), loop through them all and change those that looks at this car
 	//for (Camera camera = Camera::head; camera; camera=camera->next)
 	//{
-		if (camera.car == this)
+		if (default_camera.car == this)
 		{
-			camera.pos[0] += (x-oldx);
-			camera.pos[1] += (y-oldy);
-			camera.pos[2] += (z-oldz);
+			default_camera.pos[0] += (x-oldx);
+			default_camera.pos[1] += (y-oldy);
+			default_camera.pos[2] += (z-oldz);
 		}
 	//}
 }

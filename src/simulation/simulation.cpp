@@ -130,7 +130,7 @@ int Simulation_Loop (void *d)
 				Collision_Feedback::Physics_Step(divided_stepsize); //forces from collisions
 				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
 				Joint::Physics_Step(divided_stepsize); //joint forces
-				camera.Physics_Step(divided_stepsize); //calculate velocity and move
+				default_camera.Physics_Step(divided_stepsize); //calculate velocity and move
 			}
 
 			//previous simulations might have caused events (to be processed by scripts)...

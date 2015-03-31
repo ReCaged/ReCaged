@@ -34,6 +34,7 @@
 #include "assets/profile.hpp"
 #include "assets/track.hpp"
 #include "assets/trimesh.hpp"
+#include "assets/car.hpp"
 
 
 Uint32 starttime = 0;
@@ -172,7 +173,8 @@ bool tmp_menus()
 					track.start[0], //x
 					track.start[1], //y
 					track.start[2], //z
-					wheel);
+					wheel, //wheel of choice
+					prof); //profile (for defaults)
 			}
 
 			//then break this loop...
@@ -228,13 +230,14 @@ bool tmp_menus()
 					(track.start[0]+atof(file.words[1])), //x
 					(track.start[1]+atof(file.words[2])), //y
 					(track.start[2]), //z
-					wheel); //wheel of choice
+					wheel, //wheel of choice
+					prof); //profile (for defaults)
 		}
 	}
 
-	//this single player/profile controls all cars for now... and ladt one by default
+	//this single player/profile controls all cars for now...
 	prof->car = car;
-	camera.Set_Car(car);
+	default_camera.Set_Car(car);
 
 	//MENU: race configured, start? yes!
 	Run_Race();
