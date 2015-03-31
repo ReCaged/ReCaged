@@ -138,6 +138,8 @@ On Windows things will be more difficult: since there is no package manager,
 you would have to install all requirements manually. There is however a script
 called "build.sh" included to help automate the build process.
 
+TODO: build.sh cross compiling!
+
 First of all, install MinGW (a minimal port of GNU for windows - it provides
 compilers and standard libraries). The latest version can be downloaded here:
 
