@@ -238,6 +238,11 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 
 ])
 
+#LUA:
+RCX_FLAGS="$RCX_FLAGS -I/usr/include/lua5.2"
+RCX_LIBS="$RCX_LIBS -llua5.2"
+
+
 #static stop (if enabled and on w32)
 if test "$RCX_TARGET" = "w32" && test "$STATIC" != "no"; then
 	RCX_LIBS="$RCX_LIBS -Wl,-Bdynamic"

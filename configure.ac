@@ -3,7 +3,7 @@
 #
 # RCX - a Free Software, Futuristic, Racing Simulator
 #
-# Copyright (C) 2012, 2013, 2014 Mats Wahlberg
+# Copyright (C) 2012, 2013, 2014, 2015 Mats Wahlberg
 #
 # This file is part of RCX.
 #
@@ -22,7 +22,7 @@
 #
 
 AC_PREREQ([2.60]) #should work (and be old enough)
-AC_INIT([RCX], [0.8.0~git], [rcxslinger@gmail.com], [rcx], [http://recaged.net])
+AC_INIT([RCX], [0.9.0~git], [rcxslinger@gmail.com], [rcx], [http://recaged.net])
 
 # Define codename and year (for title and version printout)
 AC_DEFINE([PACKAGE_CODENAME], ["The Devil's Mind is an Idle Workshop"])

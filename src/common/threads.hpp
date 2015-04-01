@@ -33,6 +33,8 @@
 #include <SDL/SDL_mutex.h>
 #include <ode/ode.h>
 
+#include "lua.hpp"
+
 //use a "runlevel" (enum) variable to make all threads/loops aware of status
 typedef enum {running, paused, done} runlevel_type;
 
@@ -41,6 +43,9 @@ struct Thread {
 
 	//for controlling thread (request termination/etc)
 	runlevel_type runlevel;
+
+	//lua state
+	lua_State *lua_state;
 
 	//for interface thread
 	bool render_models;
@@ -66,6 +71,7 @@ struct Thread {
 
 const Thread thread_defaults = {
 	done, //runlevel
+	NULL,
 	true,
 	true,
 	NULL,

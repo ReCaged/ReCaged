@@ -26,6 +26,7 @@
 #include "common/threads.hpp"
 #include "common/internal.hpp"
 #include "common/log.hpp"
+#include "common/lua.hpp"
 #include "common/threads.hpp"
 #include "assets/track.hpp"
 #include "assets/car.hpp"
@@ -55,6 +56,11 @@ bool Simulation_Init(void)
 		return false;
 	}
 
+	//create lua state for this thread
+	simulation_thread.lua_state = luaL_newstate();
+	luaL_openlibs(simulation_thread.lua_state);
+
+	//more ode stuff
 	simulation_thread.world = dWorldCreate();
 
 	//set global ode parameters (except those specific to track)
@@ -191,6 +197,7 @@ int Simulation_Loop (void *d)
 void Simulation_Quit (void)
 {
 	Log_Add(1, "Quit simulation");
+	lua_close(simulation_thread.lua_state);
 	dJointGroupDestroy (simulation_thread.contactgroup);
 	dSpaceDestroy (simulation_thread.space);
 	dWorldDestroy (simulation_thread.world);

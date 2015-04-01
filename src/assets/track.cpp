@@ -27,6 +27,7 @@
 
 #include "common/internal.hpp"
 #include "common/log.hpp"
+#include "common/lua.hpp"
 #include "common/directories.hpp"
 #include "common/threads.hpp"
 
@@ -329,60 +330,14 @@ bool load_track (const char *path)
 	//
 	char olist[strlen(path)+12+1];
 	strcpy (olist,path);
-	strcat (olist,"/objects.lst");
+	strcat (olist,"/objects.lua");
 
 	Log_Add(2, "Loading track object list: %s", olist);
 
-	//each object is loaded/selected at a time (NULL if none loaded so far)
-	Module *obj = NULL;
-
 	//don't fail if can't find file, maybe there is no need for it anyway
-	if (dirs.Find(olist, DATA, READ) && file.Open(dirs.Path()))
+	if (dirs.Find(olist, DATA, READ) && !luaL_dofile(simulation_thread.lua_state, dirs.Path()))
 	{
-		while (file.Read_Line())
-		{
-			//object load request
-			if (file.word_count==2 && !strcmp(file.words[0], ">"))
-			{
-				Log_Add(2, "object load request: %s", file.words[1]);
-				char obj_name[8+strlen(file.words[1])+1];
-				strcpy (obj_name, "objects/");
-				strcat (obj_name, file.words[1]);
-
-				if (!(obj = Module::Load(obj_name))) //NULL if failure
-				{
-					Log_Add(-1, "Could not load object \"%s\" (requested by track)", obj_name);
-					delete track.object;
-					return false;
-				}
-			}
-			//three words (x, y and z coord for spawning): spawning
-			else if (file.word_count == 3)
-			{
-				Log_Add(2, "object spawn request");
-				//in case no object has been loaded yet
-				if (!obj)
-				{
-					Log_Add(-1, "Track is trying to spawn object without specifying what object!");
-					continue; //go to next
-				}
-
-				//translate words to values
-				float x,y,z;
-
-				//assume conversion is succesfully (not reliable, but it shouldn't be a problem)
-				x = atof(file.words[0]);
-				y = atof(file.words[1]);
-				z = atof(file.words[2]);
-
-				obj->Spawn(x, y, z);
-			}
-			else
-			{
-				Log_Add(0, "WARNING: did not understand line in object list!");
-				break;
-			}
-		}
+		Log_Add(1, "Ran lua script: %s", dirs.Path());
 	}
 	else
 		Log_Add(1, "WARNING: no object list for track, no default objects spawned");

@@ -28,7 +28,7 @@ nobase_dist_objects_DATA = \
 	objects/misc/beachball/sphere.obj \
 	objects/misc/box/box.mtl \
 	objects/misc/box/box.obj \
-	objects/misc/box/object.script \
+	objects/misc/box/module.lua \
 	objects/misc/box/README \
 	objects/misc/building/pillar.mtl \
 	objects/misc/building/pillar.obj \
@@ -76,7 +76,7 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/figure_8.road \
 	worlds/Sandbox/tracks/Box/geoms.lst \
 	worlds/Sandbox/tracks/Box/in_a_spin.road \
-	worlds/Sandbox/tracks/Box/objects.lst \
+	worlds/Sandbox/tracks/Box/objects.lua \
 	worlds/Sandbox/tracks/Box/ramp.obj \
 	worlds/Sandbox/tracks/Box/ramp.mtl \
 	worlds/Sandbox/tracks/Box/README \
