@@ -26,6 +26,7 @@
 #include "common/internal.hpp"
 #include "common/log.hpp"
 #include "common/directories.hpp"
+#include "common/threads.hpp"
 #include "simulation/camera.hpp"
 #include "simulation/geom.hpp"
 #include "simulation/body.hpp"
@@ -34,10 +35,7 @@
 //for creation:
 Car_Module::Car_Module(const char *name) :Assets(name)
 {
-	conf = car_conf_defaults; //set conf values to default
 }
-
-
 
 Car *Car::head = NULL;
 
@@ -93,22 +91,35 @@ Car_Module *Car_Module::Load (const char *path)
 	//apparently not
 	Car_Module *target = new Car_Module(path);
 
-	//car.conf
-	char conf[strlen(path)+9+1];//+1 for \0
-	strcpy (conf,path);
-	strcat (conf,"/car.conf");
+	//set conf values to defaults
+	target->conf = car_conf_defaults;
+	target->camera = camera_conf_defaults;
 
+	//try loading confs (still got defaults if it fails):
+	std::string filepath;
 	Directories dirs;
-	if (!(dirs.Find(conf, DATA, READ) && Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index))) //try to load conf
-		return NULL;
+
+	filepath=path;
+	filepath+="/car.conf";
+
+	if (! (dirs.Find(filepath.c_str(), DATA, READ) &&
+		Load_Conf(dirs.Path(), (char *)&target->conf, car_conf_index)) )
+		Log_Add(0, "WARNING: can not open car configuration (%s)!", filepath.c_str());
+
+
+	filepath=path;
+	filepath+="/camera.conf";
+
+	if (! (dirs.Find(filepath.c_str(), DATA, READ) &&
+		Load_Conf(dirs.Path(), (char *)&target->camera, camera_conf_index)) )
+		Log_Add(0, "WARNING: can not open camera configuration (%s)!", filepath.c_str());
 
 	//geoms.lst
-	char lst[strlen(path)+10+1];
-	strcpy (lst, path);
-	strcat (lst, "/geoms.lst");
+	filepath=path;
+	filepath+="/geoms.lst";
 
 	Text_File file;
-	if (dirs.Find(lst, DATA, READ) && file.Open(dirs.Path()))
+	if (dirs.Find(filepath.c_str(), DATA, READ) && file.Open(dirs.Path()))
 	{
 		//default surface parameters
 		Surface surface;
@@ -179,7 +190,7 @@ Car_Module *Car_Module::Load (const char *path)
 					strcat(model, "/");
 					strcat(model, file.words[1]);
 
-					tmp_geom.mesh = Trimesh_Geom::Quick_Load(model, atof(file.words[2]), 0, 0, 0, 0, 0, 0);
+					tmp_geom.mesh = Model_Mesh::Quick_Load(model, atof(file.words[2]), 0, 0, 0, 0, 0, 0);
 
 					//failed to load
 					if (!tmp_geom.mesh)
@@ -231,7 +242,7 @@ Car_Module *Car_Module::Load (const char *path)
 		}
 	}
 	else
-		Log_Add(0, "WARNING: can not open list of car geoms (%s)!", lst);
+		Log_Add(0, "WARNING: can not open list of car geoms (%s)!", filepath.c_str());
 
 	//helper datas:
 
@@ -272,7 +283,7 @@ Car_Module *Car_Module::Load (const char *path)
 		strcat(file, "/");
 		strcat(file, target->conf.model);
 
-		if ( !(target->model = Trimesh_3D::Quick_Load(file,
+		if ( !(target->model = Model_Draw::Quick_Load(file,
 				target->conf.resize,
 				target->conf.rotate[0], target->conf.rotate[1], target->conf.rotate[2],
 				target->conf.offset[0], target->conf.offset[1], target->conf.offset[2])) )
@@ -283,13 +294,18 @@ Car_Module *Car_Module::Load (const char *path)
 }
 
 
-Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
+Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile *profile)
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
 	//begin copying of needed configuration data
 	Car *car = new Car();
 
+	//copy camera settings (and set default, from player profile)
+	car->camera = camera;
+	car->camera.selected = profile->camera_default-1; //safe checked by profile, just change index
+
+	//hmmm.... should do the same for all below (just add safetychecks):
 	car->power = conf.power;
 
 	//if limit by torque
@@ -339,7 +355,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 	new Space(car);
 
 	dMass m;
-	car->bodyid = dBodyCreate (world);
+	car->bodyid = dBodyCreate (simulation_thread.world);
 	dBodySetAutoDisableFlag (car->bodyid, 0); //never disable main body
 	
 
@@ -387,7 +403,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 		}
 		else // (tmp_geom.type == 3) //trimesh
 		{
-			gdata = tmp_geom.mesh->Create_Geom(car);
+			gdata = tmp_geom.mesh->Create_Mesh(car);
 			geom = gdata->geom_id;
 		}
 
@@ -476,7 +492,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 
 
 		//(body)
-		wheel_body[i] = dBodyCreate (world);
+		wheel_body[i] = dBodyCreate (simulation_thread.world);
 
 		//never disable wheel body
 		dBodySetAutoDisableFlag (wheel_body[i], 0);
@@ -555,7 +571,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z,  Trimesh_3D *wheel3D)
 	Joint *jointd;
 	for (int i=0; i<4; ++i)
 	{
-		car->joint[i]=dJointCreateHinge2 (world, 0);
+		car->joint[i]=dJointCreateHinge2 (simulation_thread.world, 0);
 		jointd = new Joint(car->joint[i], car);
 		jointd->carwheel = &car->gotwheel[i];
 
@@ -646,7 +662,7 @@ void Car::Respawn (dReal x, dReal y, dReal z)
 	{
 		if (!gotwheel[i])
 		{
-			joint[i]=dJointCreateHinge2 (world, 0);
+			joint[i]=dJointCreateHinge2 (simulation_thread.world, 0);
 			jointd = new Joint(joint[i], this);
 			jointd->carwheel = &gotwheel[i];
 
@@ -685,11 +701,11 @@ void Car::Respawn (dReal x, dReal y, dReal z)
 	//TODO: in future (with multiple cameras), loop through them all and change those that looks at this car
 	//for (Camera camera = Camera::head; camera; camera=camera->next)
 	//{
-		if (camera.car == this)
+		if (default_camera.car == this)
 		{
-			camera.pos[0] += (x-oldx);
-			camera.pos[1] += (y-oldy);
-			camera.pos[2] += (z-oldz);
+			default_camera.pos[0] += (x-oldx);
+			default_camera.pos[1] += (y-oldy);
+			default_camera.pos[2] += (z-oldz);
 		}
 	//}
 }

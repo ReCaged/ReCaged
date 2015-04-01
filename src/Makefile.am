@@ -41,6 +41,10 @@ rcx_SOURCES =	./rcx.cpp \
 		assets/conf.hpp \
 		assets/image.cpp \
 		assets/image.hpp \
+		assets/model.cpp \
+		assets/model_draw.cpp \
+		assets/model.hpp \
+		assets/model_mesh.cpp \
 		assets/obj.cpp \
 		assets/object.cpp \
 		assets/object.hpp \
@@ -52,18 +56,12 @@ rcx_SOURCES =	./rcx.cpp \
 		assets/text_file.hpp \
 		assets/track.cpp \
 		assets/track.hpp \
-		assets/trimesh_3d.cpp \
-		assets/trimesh.cpp \
-		assets/trimesh_geom.cpp \
-		assets/trimesh.hpp \
 		common/directories.cpp \
 		common/directories.hpp \
 		common/internal.cpp \
 		common/internal.hpp \
 		common/log.cpp \
 		common/log.hpp \
-		common/runlevel.cpp \
-		common/runlevel.hpp \
 		common/threads.cpp \
 		common/threads.hpp \
 		interface/geom_render.cpp \

@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -25,16 +25,10 @@
 #include "object.hpp"
 #include <GL/glew.h>
 #include <ode/ode.h>
-//track: the main "world", contains simulation and rendering data for one
-//large 3D file for the rigid environment, and more simulation data (like
-//gravity)
-
-extern dWorldID world;
-extern dSpaceID space;
-extern dJointGroupID contactgroup;
 
 //Allocated at start
 //(in contrary to the other structs, this is actually not allocated on runtime!)
+//TODO: all this will be moved to Thread and new rendering System (with lua)
 extern struct Track_Struct {
 	//placeholder for stuff like if it's raining/snowing and lightsources
 	float sky[4]; //background/fog colour

@@ -58,6 +58,8 @@ TODO: more stuff here!
    * More reliable movement (more responsive, bumper camera perfectly still)
    * New damping/drag simulation
    * Hopefully all potential NaN position/rotation results can now be avoided
+   * Camera settings are now car-specific, not defined in player profile
+   * Modified camera (position) can now be reset without restarting the game
 
  * Car improvements:
    * New, more powerful, downforce
@@ -79,6 +81,8 @@ TODO: more stuff here!
    * Renamed directory "loaders" to "assets"
    * Renamed "Racetime_Data" to "Assets"
    * Moved most code from "common" to "assets" and "simulation"
+   * Created "Thread" struct for thread local data (will become important)
    * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
+   * Renamed "Trimesh" and "..._Geom/_3D" to "Model" and "..._Mesh/_Draw"
    * Removed "../" from header inclusions (src is now in the inclusion paths)
 

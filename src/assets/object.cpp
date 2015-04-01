@@ -24,10 +24,11 @@
 
 #include "object.hpp"
 #include "assets.hpp"
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "track.hpp"
 
 #include "common/log.hpp"
+#include "common/threads.hpp"
 
 #include "simulation/joint.hpp"
 #include "simulation/geom.hpp"
@@ -139,7 +140,7 @@ Module *Module::Load(const char *path)
 		obj->box = true;
 
 		//the debug box will only spawn one component - one "3D file"
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/box/box.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/box/box.obj")))
 			return NULL;
 
 	//end of test
@@ -152,7 +153,7 @@ Module *Module::Load(const char *path)
 		obj->funbox = true; //id
 
 		//graphics
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/funbox/box.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/funbox/box.obj")))
 			return NULL;
 
 	}
@@ -164,7 +165,7 @@ Module *Module::Load(const char *path)
 		obj->flipper = true; //id
 
 		//graphics
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/flipper/Flipper.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/flipper/Flipper.obj")))
 			return NULL;
 
 	}
@@ -176,8 +177,8 @@ Module *Module::Load(const char *path)
 		obj->NH4 = true;
 
 		//graphics
-		if (	!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/NH4/Atom1.obj")) ||
-			!(obj->model[1] = Trimesh_3D::Quick_Load("objects/misc/NH4/Atom2.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/NH4/Atom1.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/NH4/Atom2.obj"))	)
 			return NULL;
 
 	}
@@ -187,7 +188,7 @@ Module *Module::Load(const char *path)
 
 		obj = new Module(path);
 		obj->sphere = true;
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/beachball/sphere.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/beachball/sphere.obj")))
 			return NULL;
 	}
 	else if (!strcmp(path, "objects/misc/building"))
@@ -198,9 +199,9 @@ Module *Module::Load(const char *path)
 		obj->building = true;
 
 		//graphics
-		if (	!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/building/pillar.obj")) ||
-			!(obj->model[1] = Trimesh_3D::Quick_Load("objects/misc/building/roof.obj")) ||
-			!(obj->model[2] = Trimesh_3D::Quick_Load("objects/misc/building/wall.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/building/pillar.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/building/roof.obj")) ||
+			!(obj->model[2] = Model_Draw::Quick_Load("objects/misc/building/wall.obj"))	)
 			return NULL;
 
 	}
@@ -213,8 +214,8 @@ Module *Module::Load(const char *path)
 		obj->pillar = true;
 
 		//graphics
-		if (	!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/pillar/Pillar.obj")) ||
-			!(obj->model[1] = Trimesh_3D::Quick_Load("objects/misc/pillar/Broken.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/pillar/Pillar.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/pillar/Broken.obj"))	)
 			return NULL;
 
 	}
@@ -227,10 +228,10 @@ Module *Module::Load(const char *path)
 		obj->tetrahedron = true;
 
 		//try to load and generate needed vertices (render+collision)
-		Trimesh mesh;
+		Model mesh;
 		if (	!(mesh.Load("objects/misc/tetrahedron/model.obj")) ||
-			!(obj->model[0] = mesh.Create_3D()) ||
-			!(obj->geom[0] = mesh.Create_Geom())	)
+			!(obj->model[0] = mesh.Create_Draw()) ||
+			!(obj->geom[0] = mesh.Create_Mesh())	)
 			return NULL;
 	}
 	else
@@ -247,7 +248,7 @@ Module *Module::Load(const char *path)
 void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 {
 	dJointID joint;
-	joint = dJointCreateFixed (world, 0);
+	joint = dJointCreateFixed (simulation_thread.world, 0);
 	Joint *jd = new Joint(joint, obj);
 	dJointAttach (joint, body1, body2);
 	dJointSetFixed (joint);
@@ -278,7 +279,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
-	dBodyID body = dBodyCreate (world);
+	dBodyID body = dBodyCreate (simulation_thread.world);
 
 	dMass m;
 	dMassSetBoxTotal (&m,400,1,1,1); //mass+sides
@@ -306,7 +307,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	new Space(obj);
 
 	//one body to which all geoms are added
-	dBodyID body1 = dBodyCreate (world);
+	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	//mass
 	dMass m;
@@ -439,7 +440,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
 
-	dBodyID body1 = dBodyCreate (world);
+	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	dMass m;
 	dMassSetSphereTotal (&m,60,1); //mass and radius
@@ -471,7 +472,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
-	body = dBodyCreate (world);
+	body = dBodyCreate (simulation_thread.world);
 
 	dMassSetSphereTotal (&m,30,0.5); //mass and radius
 	dBodySetMass (body, &m);
@@ -487,7 +488,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 
 	//connect to main sphere
 	
-	joint = dJointCreateBall (world, 0);
+	joint = dJointCreateBall (simulation_thread.world, 0);
 
 	Joint *jd = new Joint(joint, obj);
 	jd->Set_Buffer_Event(1000, 50000, (Script*)1337);
@@ -513,7 +514,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(1000, 1500, (Script*)1337);
-	dBodyID body1 = dBodyCreate (world);
+	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	dMass m;
 	dMassSetSphereTotal (&m,20,1); //mass+radius
@@ -562,7 +563,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 			data->surface.mu = 1.0;
 			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
 
-			body1[i] = dBodyCreate (world);
+			body1[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body1[i]);
 
 			dMass m;
@@ -620,7 +621,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 			data->surface.mu = 1.0;
 			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
 
-			body2[i] = dBodyCreate (world);
+			body2[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body2[i]);
 
 			dMass m;
@@ -683,7 +684,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 			data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
 			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
-			body[i] = dBodyCreate (world);
+			body[i] = dBodyCreate (simulation_thread.world);
 	
 			dMass m;
 			dMassSetCapsuleTotal (&m,400,3,1,0.5); //mass, direction (3=z-axis), radius and length
@@ -763,14 +764,14 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 
 		Object *obj = new Object();
 
-		Geom *g = geom[0]->Create_Geom(obj);
+		Geom *g = geom[0]->Create_Mesh(obj);
 		g->model = model[0];
 
 		//properties:
 		g->surface.mu = 1.0;
 		g->Set_Buffer_Event(100000, 50000, (Script*)1337);
 
-		dBodyID body = dBodyCreate (world);
+		dBodyID body = dBodyCreate (simulation_thread.world);
 		dMass m;
 		dMassSetTrimeshTotal (&m,10,g->geom_id); //built-in feature in ode!
 

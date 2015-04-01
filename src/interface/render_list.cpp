@@ -22,7 +22,7 @@
 #include <GL/glew.h>
 #include "render_list.hpp"
 
-#include "assets/trimesh.hpp"
+#include "assets/model.hpp"
 #include "common/threads.hpp"
 #include "common/internal.hpp"
 #include "common/log.hpp"
@@ -45,7 +45,7 @@ bool fog=false;
 struct list_element
 {
 	GLfloat matrix[16]; //4x4
-	Trimesh_3D *model; //model to render
+	Model_Draw *model; //model to render
 	Object *object; //object to which this component belongs
 };
 
@@ -86,7 +86,7 @@ void Render_List_Clear_Interface()
 	}
 
 	//don't know which thread will clear
-	SDL_mutexP(render_list_mutex);
+	SDL_mutexP(interface_thread.render_list_mutex);
 	if (buffer_switch->size)
 	{
 		buffer_switch->updated=false;
@@ -95,7 +95,7 @@ void Render_List_Clear_Interface()
 		delete[] buffer_switch->list;
 		buffer_switch->list=NULL;
 	}
-	SDL_mutexV(render_list_mutex);
+	SDL_mutexV(interface_thread.render_list_mutex);
 }
 
 //remove allocated data in buffers
@@ -111,7 +111,7 @@ void Render_List_Clear_Simulation()
 	}
 
 	//don't know which thread will clear
-	SDL_mutexP(render_list_mutex);
+	SDL_mutexP(interface_thread.render_list_mutex);
 	if (buffer_switch->size)
 	{
 		buffer_switch->updated=false;
@@ -120,7 +120,7 @@ void Render_List_Clear_Simulation()
 		delete[] buffer_switch->list;
 		buffer_switch->list=NULL;
 	}
-	SDL_mutexV(render_list_mutex);
+	SDL_mutexV(interface_thread.render_list_mutex);
 }
 
 
@@ -128,9 +128,9 @@ void Render_List_Clear_Simulation()
 void Render_List_Update()
 {
 	//TMP: store "camera" in rendering list
-	memcpy(buffer_generate->camera_pos, camera.pos, sizeof(float)*3);
-	memcpy(buffer_generate->camera_rot, camera.rotation, sizeof(float)*9);
-	buffer_generate->camera_hide = camera.hide;
+	memcpy(buffer_generate->camera_pos, default_camera.pos, sizeof(float)*3);
+	memcpy(buffer_generate->camera_rot, default_camera.rotation, sizeof(float)*9);
+	buffer_generate->camera_hide = default_camera.hide;
 
 	//add data as usual:
 
@@ -246,11 +246,11 @@ void Render_List_Update()
 	buffer_generate->updated=true;
 
 	//move...
-	SDL_mutexP(render_list_mutex);
+	SDL_mutexP(interface_thread.render_list_mutex);
 	list_buffer *p=buffer_switch;
 	buffer_switch=buffer_generate;
 	buffer_generate=p;
-	SDL_mutexV(render_list_mutex);
+	SDL_mutexV(interface_thread.render_list_mutex);
 }
  
 //just to make it possible to check from outside
@@ -269,11 +269,11 @@ void Render_List_Prepare()
 	//only if anything to do
 	if (Render_List_Updated())
 	{
-		SDL_mutexP(render_list_mutex);
+		SDL_mutexP(interface_thread.render_list_mutex);
 		list_buffer *p=buffer_switch;
 		buffer_switch=buffer_render; //old buffer, not needed
 		buffer_render= p;
-		SDL_mutexV(render_list_mutex);
+		SDL_mutexV(interface_thread.render_list_mutex);
 
 		//build matrix for camera projection:
 		//rotation (right, up, forward)
@@ -317,10 +317,10 @@ void Render_List_Render()
 
 	//variables/pointers
 	unsigned int m_loop;
-	Trimesh_3D *model;
+	Model_Draw *model;
 	Material_Float *material;
 	float *matrix;
-	Trimesh_3D::Material *materials;
+	Model_Draw::Material *materials;
 	unsigned int material_count;
 	float radius;
 
@@ -375,9 +375,9 @@ void Render_List_Render()
 
 	//NOTE: new opengl vbo rendering commands (2.0 I think). For compatibility lets stick to 1.5 instead
 	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Trimesh_3D::Vertex), (BUFFER_OFFSET(0)));
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Model_Draw::Vertex), (BUFFER_OFFSET(0)));
 	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(sizeof(float)*3));
 
 	for (size_t i=0; i<(*count); ++i)
 	{
@@ -424,9 +424,9 @@ void Render_List_Render()
 				glBindBuffer(GL_ARRAY_BUFFER, model->vbo_id);
 
 				//configure attributes
-				glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
-				glTexCoordPointer(2, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
-				glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*5));
+				glVertexPointer(3, GL_FLOAT, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(0));
+				glTexCoordPointer(2, GL_FLOAT, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+				glNormalPointer(GL_FLOAT, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(sizeof(float)*5));
 
 				//indicate this is used now
 				bound_vbo = model->vbo_id;

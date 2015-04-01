@@ -28,23 +28,21 @@
 #include "common/internal.hpp"
 #include "common/log.hpp"
 #include "common/directories.hpp"
+#include "common/threads.hpp"
 
 #include "simulation/geom.hpp"
 #include "simulation/camera.hpp"
 
-//tmp global storage
-dWorldID world;
-dSpaceID space;
-dJointGroupID contactgroup;
+//TODO: remove this!
 struct Track_Struct track = track_defaults;
 
 //
 //keep track of all loaded models (cleared between loading)
 //
-std::vector<Trimesh*> trimeshes;
+std::vector<Model*> models;
 
 //helper function for finding or loading model files
-Trimesh *FindOrLoadMesh(const char *path, const char *name)
+Model *FindOrLoadMesh(const char *path, const char *name)
 {
 	//merge path and name (path+/+name+\0)...
 	char file[strlen(path)+1+strlen(name)+1];
@@ -53,18 +51,18 @@ Trimesh *FindOrLoadMesh(const char *path, const char *name)
 	strcat(file, name);
 
 	//already loaded?
-	for (size_t i=0; i!=trimeshes.size(); ++i)
-		if (trimeshes[i]->Compare_Name(file))
+	for (size_t i=0; i!=models.size(); ++i)
+		if (models[i]->Compare_Name(file))
 		{
 			Log_Add(2, "model already loaded");
-			return trimeshes[i];
+			return models[i];
 		}
 
 	//else, try loading...
-	Trimesh *mesh = new Trimesh();
+	Model *mesh = new Model();
 	if (mesh->Load(file))
 	{
-		trimeshes.push_back(mesh);
+		models.push_back(mesh);
 		return mesh; //ok, worked
 	}
 	//else¸ failure
@@ -75,9 +73,9 @@ Trimesh *FindOrLoadMesh(const char *path, const char *name)
 //remove all loading meshes
 void RemoveMeshes()
 {
-	for (size_t i=0; i!=trimeshes.size(); ++i)
-		delete trimeshes[i];
-	trimeshes.clear();
+	for (size_t i=0; i!=models.size(); ++i)
+		delete models[i];
+	models.clear();
 }
 //
 //
@@ -98,7 +96,7 @@ bool load_track (const char *path)
 	if (dirs.Find(conf, DATA, READ)) Load_Conf(dirs.Path(), (char *)&track, track_index);
 
 	//set camera default values, some from track specs
-	camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
+	default_camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
 			track.focus_start[0], track.focus_start[1], track.focus_start[2]);
 
 	//all data loaded, start building
@@ -112,7 +110,7 @@ bool load_track (const char *path)
 	glLightfv (GL_LIGHT0, GL_POSITION, track.position);
 
 	//set track specific global ode params:
-	dWorldSetGravity (world, track.gravity[0], track.gravity[1], track.gravity[2]);
+	dWorldSetGravity (simulation_thread.world, track.gravity[0], track.gravity[1], track.gravity[2]);
 
 	//
 	//geoms
@@ -146,7 +144,7 @@ bool load_track (const char *path)
 				{
 					Log_Add(2, "overriding model properties");
 
-					Trimesh *mesh = FindOrLoadMesh(path, file.words[2]);
+					Model *mesh = FindOrLoadMesh(path, file.words[2]);
 
 					if (!mesh)
 					{
@@ -185,7 +183,7 @@ bool load_track (const char *path)
 						}
 						else
 						{
-							Log_Add(0, "WARNING: trimesh loading option \"%s\" not known", file.words[pos]);
+							Log_Add(0, "WARNING: models loading option \"%s\" not known", file.words[pos]);
 							++pos;
 						}
 					}
@@ -237,7 +235,7 @@ bool load_track (const char *path)
 						else if (!strcmp(file.words[pos], "rollres"))
 							surface->rollres = atof(file.words[++pos]);
 						else
-							Log_Add(0, "WARNING: trimesh surface option \"%s\" unknown", file.words[pos]);
+							Log_Add(0, "WARNING: models surface option \"%s\" unknown", file.words[pos]);
 
 						//one step forward
 						pos+=1;
@@ -251,17 +249,17 @@ bool load_track (const char *path)
 			//geom to create
 			else if (file.word_count == 8 || file.word_count == 7)
 			{
-				Trimesh *mesh1, *mesh2;
-				Trimesh_3D *model;
-				Trimesh_Geom *geom;
+				Model *mesh1, *mesh2;
+				Model_Draw *model;
+				Model_Mesh *geom;
 				float x,y,z;
 
 				//no alternative render model
 				if ( file.word_count == 7)
 				{
 					if (	!(mesh1 = FindOrLoadMesh(path, file.words[6])) ||
-						!(geom = mesh1->Create_Geom()) ||
-						!(model = mesh1->Create_3D()) )
+						!(geom = mesh1->Create_Mesh()) ||
+						!(model = mesh1->Create_Draw()) )
 					{
 						RemoveMeshes();
 						delete track.object;
@@ -273,8 +271,8 @@ bool load_track (const char *path)
 				{
 					if (	!(mesh1 = FindOrLoadMesh(path, file.words[6])) ||
 						!(mesh2 = FindOrLoadMesh(path, file.words[7])) ||
-						!(geom = mesh1->Create_Geom()) ||
-						!(model = mesh2->Create_3D()) )
+						!(geom = mesh1->Create_Mesh()) ||
+						!(model = mesh2->Create_Draw()) )
 					{
 						RemoveMeshes();
 						delete track.object;
@@ -288,7 +286,7 @@ bool load_track (const char *path)
 				}
 
 				//ok, now geom and model should contain useful data...
-				latestgeom = geom->Create_Geom(track.object); //create geom from geom-trimesh
+				latestgeom = geom->Create_Mesh(track.object); //create geom from geom-trimesh
 				
 				//configure geom
 				latestgeom->model = model; //render geom with model

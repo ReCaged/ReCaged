@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,8 +19,8 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#ifndef _RCX_TRIMESH_H
-#define _RCX_TRIMESH_H
+#ifndef _RCX_MODEL_H
+#define _RCX_MODEL_H
 
 #include <vector>
 #include <string>
@@ -66,19 +66,23 @@ struct Material_Float
 
 //specialized trimesh classes:
 
-//optimized trimesh rendering
+//for rendering (node) generation
 #define DEFAULT_VBO_SIZE 4194304 //usual size for trimesh VBOs
-class Trimesh_3D: public Assets
+class Model_Draw: public Assets
 {
 	public:
+		//TODO: REMOVE ALL 3!
 		//will load and modify a 3d file to use only as a rendering trimesh
-		static Trimesh_3D *Quick_Load(const char* name, float resize,
+		static Model_Draw *Quick_Load(const char* name, float resize,
 				float rotx, float roty, float rotz,
 				float offx, float offy, float offz);
 		//the same, but no modification needed
-		static Trimesh_3D *Quick_Load(const char* name);
+		static Model_Draw *Quick_Load(const char* name);
 		//all data provided by conf
-		static Trimesh_3D *Quick_Load_Conf(const char* path, const char* file);
+		static Model_Draw *Quick_Load_Conf(const char* path, const char* file);
+
+		//creates rendering node (TODO)
+		//class Node *Create_Node(class Object *obj);
 
 	private:
 		//
@@ -104,9 +108,9 @@ class Trimesh_3D: public Assets
 			Material_Float material;
 		};
 
-		Trimesh_3D(const char* n, float r, GLuint vbo, Material* m, unsigned int mc); //constructor
-		~Trimesh_3D(); //destructor
-		friend class Trimesh; //only Trimesh is allowed to create this...
+		Model_Draw(const char* n, float r, GLuint vbo, Material* m, unsigned int mc); //constructor
+		~Model_Draw(); //destructor
+		friend class Model; //only Model is allowed to create this...
 		friend class VBO; //...and VBO tracking (needs vertex definition)
 
 		//everything needed to render:
@@ -123,17 +127,19 @@ class Trimesh_3D: public Assets
 };
 
 //for collision detection (geom) generation
-class Trimesh_Geom: public Assets
+class Model_Mesh: public Assets
 {
 	public:
+		//TODO: REMOVE ALL 2!
 		//will load and modify a 3d file to use only as a collision trimesh
-		static Trimesh_Geom *Quick_Load(const char* name, float resize,
+		static Model_Mesh *Quick_Load(const char* name, float resize,
 				float rotx, float roty, float rotz,
 				float offx, float offy, float offz);
 		//the same, but no modification needed
-		static Trimesh_Geom *Quick_Load(const char* name);
+		static Model_Mesh *Quick_Load(const char* name);
 
-		class Geom *Create_Geom(class Object *obj); //creates geom from trimesh
+		//creates geom from trimesh
+		class Geom *Create_Mesh(class Object *obj);
 
 		//definition needed
 		struct Material
@@ -143,13 +149,13 @@ class Trimesh_Geom: public Assets
 		};
 
 	private:
-		Trimesh_Geom(const char*, //name
+		Model_Mesh(const char*, //name
 				Vector_Float *v, unsigned int vcount, //vertices
 				unsigned int *i, unsigned int icount, //indices
 				Vector_Float *n); //normals
-		~Trimesh_Geom();
+		~Model_Mesh();
 
-		friend class Trimesh; //only Trimesh is allowed to create this...
+		friend class Model; //only Model is allowed to create this...
 
 		//
 		//data for trimesh:
@@ -166,8 +172,8 @@ class Trimesh_Geom: public Assets
 
 
 
-//trimesh storage class - not used during race, only while loading/processing
-class Trimesh
+//model storage class - not used during race, only while loading/processing
+class Model
 {
 	public:
 
@@ -181,10 +187,11 @@ class Trimesh
 		//void Generate_Capsule(...
 		//void Repaint(...
 
-		//create "dedicated" (used during race) timeshes from this one:
-		Trimesh_3D *Create_3D();
-		Trimesh_Geom *Create_Geom();
+		//create "dedicated" (used during race) meshes from this one:
+		Model_Draw *Create_Draw(); //for rendering
+		Model_Mesh *Create_Mesh(); //for collision
 
+		//TODO: remove tools (move to creation of actual assets!)
 		//tools:
 		void Resize(float);
 		void Rotate(float,float,float);
@@ -196,6 +203,7 @@ class Trimesh
 		//like Load, for material files (private)
 		bool Load_Material(const char*);
 
+		//TODO: can be used for delaying loading!
 		//just for the other trimesh classes (for asset name)
 		std::string name;
 

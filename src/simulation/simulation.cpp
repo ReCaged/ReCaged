@@ -25,8 +25,8 @@
 
 #include "common/threads.hpp"
 #include "common/internal.hpp"
-#include "common/runlevel.hpp"
 #include "common/log.hpp"
+#include "common/threads.hpp"
 #include "assets/track.hpp"
 #include "assets/car.hpp"
 #include "body.hpp"
@@ -40,11 +40,6 @@
 
 #include "interface/render_list.hpp"
 
-
-unsigned int simulation_count = 0;
-unsigned int simulation_lag_count = 0;
-Uint32 simulation_lag_time = 0;
-Uint32 simulation_time = 0;
 
 bool Simulation_Init(void)
 {
@@ -60,30 +55,33 @@ bool Simulation_Init(void)
 		return false;
 	}
 
-	world = dWorldCreate();
+	simulation_thread.world = dWorldCreate();
 
 	//set global ode parameters (except those specific to track)
 
-	space = dHashSpaceCreate(0);
-	dHashSpaceSetLevels(space, internal.hash_levels[0], internal.hash_levels[1]);
+	simulation_thread.space = dHashSpaceCreate(0);
+	dHashSpaceSetLevels(simulation_thread.space, internal.hash_levels[0], internal.hash_levels[1]);
 
-	contactgroup = dJointGroupCreate(0);
+	simulation_thread.contactgroup = dJointGroupCreate(0);
 
-	dWorldSetQuickStepNumIterations (world, internal.iterations);
+	dWorldSetQuickStepNumIterations (simulation_thread.world, internal.iterations);
 
 	//autodisable
-	dWorldSetAutoDisableFlag (world, 1);
-	dWorldSetAutoDisableLinearThreshold (world, internal.dis_linear);
-	dWorldSetAutoDisableAngularThreshold (world, internal.dis_angular);
-	dWorldSetAutoDisableSteps (world, internal.dis_steps);
-	dWorldSetAutoDisableTime (world, internal.dis_time);
+	dWorldSetAutoDisableFlag (simulation_thread.world, 1);
+	dWorldSetAutoDisableLinearThreshold (simulation_thread.world, internal.dis_linear);
+	dWorldSetAutoDisableAngularThreshold (simulation_thread.world, internal.dis_angular);
+	dWorldSetAutoDisableSteps (simulation_thread.world, internal.dis_steps);
+	dWorldSetAutoDisableTime (simulation_thread.world, internal.dis_time);
 
 	//joint softness
-	dWorldSetERP (world, internal.erp);
-	dWorldSetCFM (world, internal.cfm);
+	dWorldSetERP (simulation_thread.world, internal.erp);
+	dWorldSetCFM (simulation_thread.world, internal.cfm);
 
 	//surface layer depth
-	dWorldSetContactSurfaceLayer(world, internal.surface_layer);
+	dWorldSetContactSurfaceLayer(simulation_thread.world, internal.surface_layer);
+
+	//okay, ready:
+	simulation_thread.runlevel = running;
 
 	return true;
 }
@@ -93,29 +91,29 @@ int Simulation_Loop (void *d)
 {
 	Log_Add(1, "Starting simulation loop");
 
-	simulation_time = SDL_GetTicks(); //set simulated time to realtime
-	simulation_count=0;
-	simulation_lag_count=0;
-	simulation_lag_time=0;
+	Uint32 simulation_time = SDL_GetTicks(); //set simulated time to realtime
+	simulation_thread.count=0;
+	simulation_thread.lag_count=0;
+	simulation_thread.lag_time=0;
 
 	Uint32 time; //real time
 	Uint32 stepsize_ms = (Uint32) (internal.stepsize*1000.0+0.0001);
 	dReal divided_stepsize = internal.stepsize/internal.multiplier;
 
 	//keep running until done
-	while (runlevel != done)
+	while (simulation_thread.runlevel != done)
 	{
 		//only if in active mode do we simulate
-		if (runlevel == running)
+		if (simulation_thread.runlevel == running)
 		{
 			//technically, collision detection doesn't need locking, but this is easier
-			SDL_mutexP(ode_mutex);
+			SDL_mutexP(simulation_thread.ode_mutex);
 
 			for (int i=0; i<internal.multiplier; ++i)
 			{
 				//perform collision detection
 				Geom::Clear_Collisions(); //clear all collision flags
-				dSpaceCollide (space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
+				dSpaceCollide (simulation_thread.space, (void*)(&divided_stepsize), &Geom::Collision_Callback);
 
 				//special
 				Wheel::Physics_Step(); //create contacts and rolling resistance
@@ -123,14 +121,14 @@ int Simulation_Loop (void *d)
 				Geom::Physics_Step(); //sensor/radar handling
 
 				//simulate
-				dWorldQuickStep (world, divided_stepsize);
-				dJointGroupEmpty (contactgroup); //clean up collision joints
+				dWorldQuickStep (simulation_thread.world, divided_stepsize);
+				dJointGroupEmpty (simulation_thread.contactgroup); //clean up collision joints
 
 				//more
 				Collision_Feedback::Physics_Step(divided_stepsize); //forces from collisions
 				Body::Physics_Step(divided_stepsize); //drag (air/liquid "friction") and respawning
 				Joint::Physics_Step(divided_stepsize); //joint forces
-				camera.Physics_Step(divided_stepsize); //calculate velocity and move
+				default_camera.Physics_Step(divided_stepsize); //calculate velocity and move
 			}
 
 			//previous simulations might have caused events (to be processed by scripts)...
@@ -140,7 +138,7 @@ int Simulation_Loop (void *d)
 			Animation_Timer::Events_Step(internal.stepsize);
 
 			//done with ode
-			SDL_mutexV(ode_mutex);
+			SDL_mutexV(simulation_thread.ode_mutex);
 
 			//opdate for interface:
 			Render_List_Update(); //make copy of position/rotation for rendering
@@ -151,9 +149,9 @@ int Simulation_Loop (void *d)
 		//broadcast to wake up sleeping threads
 		if (internal.sync_interface)
 		{
-			SDL_mutexP(sync_mutex);
-			SDL_CondBroadcast (sync_cond);
-			SDL_mutexV(sync_mutex);
+			SDL_mutexP(simulation_thread.sync_mutex);
+			SDL_CondBroadcast (simulation_thread.sync_cond);
+			SDL_mutexV(simulation_thread.sync_mutex);
 		}
 
 		simulation_time += stepsize_ms;
@@ -174,14 +172,14 @@ int Simulation_Loop (void *d)
 			}
 			else //oh no, we're lagging behind!
 			{
-				++simulation_lag_count; //increase lag step counter
-				simulation_lag_time+=time-simulation_time; //add lag time
+				++simulation_thread.lag_count; //increase lag step counter
+				simulation_thread.lag_time+=time-simulation_time; //add lag time
 				simulation_time=time; //and pretend like nothing just hapened...
 			}
 		}
 
 		//count how many steps
-		++simulation_count;
+		++simulation_thread.count;
 	}
 
 	//remove buffers for building rendering list
@@ -193,9 +191,9 @@ int Simulation_Loop (void *d)
 void Simulation_Quit (void)
 {
 	Log_Add(1, "Quit simulation");
-	dJointGroupDestroy (contactgroup);
-	dSpaceDestroy (space);
-	dWorldDestroy (world);
+	dJointGroupDestroy (simulation_thread.contactgroup);
+	dSpaceDestroy (simulation_thread.space);
+	dWorldDestroy (simulation_thread.world);
 	dCloseODE();
 }
 

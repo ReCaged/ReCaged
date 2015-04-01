@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -22,7 +22,7 @@
 #include <SDL/SDL.h>
 
 #include "common/log.hpp"
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "text_file.hpp"
 
 
@@ -43,9 +43,9 @@ char *FindRelPath(const char *start, const char *file)
 	return filename;
 }
 
-bool Trimesh::Load_OBJ(const char *f)
+bool Model::Load_OBJ(const char *f)
 {
-	Log_Add(2, "Loading trimesh from OBJ file \"%s\"", f);
+	Log_Add(2, "Loading model from OBJ file %s", f);
 
 	Text_File file;
 
@@ -257,9 +257,9 @@ bool Trimesh::Load_OBJ(const char *f)
 	return true;
 }
 
-bool Trimesh::Load_MTL(const char *f)
+bool Model::Load_MTL(const char *f)
 {
-	Log_Add(2, "Loading trimesh material(s) from MTL file %s", f);
+	Log_Add(2, "Loading model material(s) from MTL file %s", f);
 
 	Text_File file;
 	Material_Float *material;

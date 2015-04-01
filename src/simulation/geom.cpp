@@ -25,6 +25,7 @@
 
 #include "common/internal.hpp"
 #include "common/log.hpp"
+#include "common/threads.hpp"
 
 #include "assets/track.hpp"
 #include "assets/conf.hpp"
@@ -47,7 +48,7 @@ Geom::Geom (dGeomID geom, Object *obj): Component(obj) //pass object argument to
 	//parent object
 	if (obj->selected_space) dSpaceAdd (obj->selected_space, geom);
 	else //add geom to global space
-		dSpaceAdd (space, geom);
+		dSpaceAdd (simulation_thread.space, geom);
 
 	//add it to the geom list
 	next = Geom::head;
@@ -368,7 +369,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 		else
 		{
 			//create the contactjoints for normal collisions (not wheels)
-			dJointID c = dJointCreateContact (world,contactgroup,&contact[i]);
+			dJointID c = dJointCreateContact (simulation_thread.world,simulation_thread.contactgroup,&contact[i]);
 			dJointAttach (c,b1,b2);
 
 			//if any of the geoms responds to forces or got a body that responds to force, enable force feedback

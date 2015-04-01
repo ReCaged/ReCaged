@@ -28,6 +28,21 @@
 # It will be extended for android builds in future versions
 #
 
+#native or cross compiling?
+case "$(uname -s)" in
+	MINGW32*|MSYS*) #mingw/msys
+		echo '(detected native build, mingw/msys)'
+		BUILDTYPE="W32NATIVE"
+		;;
+	*)
+		echo '(detected cross-compilation build)'
+		BUILDTYPE="W32CROSS"
+		echo "WARNING: CROSS COMPILING NOT IMPLEMENTED YET!"
+		exit 1
+		;;
+esac
+
+
 #paths:
 #this would be ideal:
 #BASEDIR="$HOME/RCX"
@@ -42,7 +57,7 @@ case $HOME in
 		BASEDIR="$HOME/.rcxdev"
 		;;
 esac
-		
+
 
 #the actual dirs, based on the one above:
 BUILDDIR="$BASEDIR/BUILD"
@@ -339,41 +354,18 @@ w32update)
 w32quick)
 
 	echo ""
-	echo "Doing a quick build"
+	echo "Doing a quick configuration for manual builds"
 	echo ""
 
-	if [ ! -e "configure" ]
-	then
-		echo "autoreconf..."
-		autoreconf -fvi || exit 1
-	else
-		echo "autoreconf not needed"
-	fi
+	echo "autoreconf..."
+	autoreconf -fvi || exit 1
 
-	if [ ! -e "Makefile" ]
-	then
-		echo "./configure..."
-		./configure --enable-w32static --enable-w32console || exit 1
-	else
-		echo "configure not needed"
-	fi
-
-	echo "make..."
-	make || exit 1
-
-	echo "sorting out the \"total mess...\" ;-)"
-	cp "src/rcx.exe" .
-
-	;;
-
-
-w32cross)
+	echo "./configure..."
+	./configure --enable-w32static --enable-w32console || exit 1
 
 	echo ""
-	echo "TODO!"
+	echo "Okay! Now just type \"make\" to compile! (and \"src/rcx\" to run)"
 	echo ""
-	exit 1
-
 	;;
 
 
@@ -383,9 +375,7 @@ w32cross)
 	echo "	w32inst		- compile and create w32 installer"
 	echo "	w32deps		- install everything needed for compiling+packing (+vim)"
 	echo "	w32update	- update everything (will delete \"$LIBDIR\")"
-	echo "	w32quick	- build and copy exe out of src (for devs, no installer)"
-	#echo "	w32crossinst	- cross-compile w32 installer"
-	#echo "	w32crossdeps	- cross-compile libraries for w32"
+	echo "	w32quick	- configure for manual+repeated builds (for developers)"
 	echo "(see README for more details)"
 
 	;;

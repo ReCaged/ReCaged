@@ -23,16 +23,16 @@
 
 #include "camera.hpp"
 #include "common/internal.hpp"
-#include "common/runlevel.hpp"
+#include "common/threads.hpp"
 #include "assets/track.hpp"
 
 //for creation:
-Camera camera; //single instance for now (one camera)
+Camera default_camera; //single instance for now (one camera)
 
-//just make sure all variables are zeroed
+//just make sure all variables are initialized to safe defaults
 Camera::Camera()
 {
-	settings=NULL;
+	settings = camera_settings_default;
 	car = NULL;
 	hide = NULL;
 
@@ -57,25 +57,21 @@ Camera::Camera()
 
 void Camera::Set_Settings (Camera_Settings *set)
 {
-	settings = set;
+	settings = *set;
 
-	if (settings)
+	//if this camera mode doesn't have reverse enabled, make sure camera isn't stuck in reverse
+	if (!settings.reverse)
+		reverse = false;
+
+	//if this camera mode has "air mode" disabled, make sure camera isn't stuck in "in air" mode from before
+	if (!settings.in_air)
 	{
-
-		//if this camera mode doesn't have reverse enabled, make sure camera isn't stuck in reverse
-		if (!settings->reverse)
-			reverse = false;
-
-		//if this camera mode has "air mode" disabled, make sure camera isn't stuck in "in air" mode from before
-		if (!settings->in_air)
-		{
-			in_air = false;
-			offset_scale = 1;
-		}
+		in_air = false;
+		offset_scale = 1;
 	}
 
 	//if not rendering car
-	if (settings->hide_car)
+	if (settings.hide_car)
 		hide=car;
 	else
 		hide=NULL;
@@ -85,8 +81,14 @@ void Camera::Set_Car (Car *c)
 {
 	car = c;
 
+	//if this was a real car (not NULL), configure settings accordingly, or rest
+	if (car)
+		Set_Settings(&car->camera.cam[car->camera.selected]);
+	else
+		settings = camera_settings_default;
+
 	//just make sure car stays hidden if current settings wants that
-	if (settings && settings->hide_car)
+	if (settings.hide_car)
 		hide=car;
 	else
 		hide=NULL;
@@ -159,11 +161,11 @@ void Camera::Set_Pos(float px, float py, float pz, float tx, float ty, float tz)
 
 void Camera::Move(float x, float y, float z)
 {
-	if (settings && runlevel == running)
+	if (simulation_thread.runlevel == running)
 	{
-		settings->distance[0] += x;
-		settings->distance[1] += y;
-		settings->distance[2] += z;
+		settings.distance[0] += x;
+		settings.distance[1] += y;
+		settings.distance[2] += z;
 	}
 	else //camera got no settings, or is paused
 	{
@@ -196,15 +198,15 @@ void Camera::Accelerate(dReal step)
 	dVector3 result;
 
 	if (reverse && !in_air) //move target and position to opposite side (if not just spinning in air)
-		dBodyVectorToWorld(car->bodyid, settings->distance[0]*car->dir, -settings->distance[1], settings->distance[2]*car->dir, result);
+		dBodyVectorToWorld(car->bodyid, settings.distance[0]*car->dir, -settings.distance[1], settings.distance[2]*car->dir, result);
 	else //normal
-		dBodyVectorToWorld(car->bodyid, settings->distance[0]*car->dir, settings->distance[1], settings->distance[2]*car->dir, result);
+		dBodyVectorToWorld(car->bodyid, settings.distance[0]*car->dir, settings.distance[1], settings.distance[2]*car->dir, result);
 
 	float c_pos[3]={(float)result[0], (float)result[1], (float)result[2]};
 
 	//position and velocity of anchor
 	dVector3 a_pos;
-	dBodyGetRelPointPos (car->bodyid, settings->anchor[0], settings->anchor[1], settings->anchor[2]*car->dir, a_pos);
+	dBodyGetRelPointPos (car->bodyid, settings.anchor[0], settings.anchor[1], settings.anchor[2]*car->dir, a_pos);
 
 	//relative pos and vel of camera (from anchor)
 	float r_pos[3] = {(float)(pos[0]-a_pos[0]), (float)(pos[1]-a_pos[1]), (float)(pos[2]-a_pos[2])};
@@ -232,7 +234,7 @@ void Camera::Accelerate(dReal step)
 	//"linear spring" between anchor and camera (based on distance)
 	float dist = r_pos_l-c_pos_l;
 
-	if (settings->linear_stiffness == 0) //disabled smooth movement, jump directly
+	if (settings.linear_stiffness == 0) //disabled smooth movement, jump directly
 	{
 		//chanses are we have an anchor distance of 0, then vel=0
 		if (c_pos_l == 0)
@@ -267,7 +269,7 @@ void Camera::Accelerate(dReal step)
 	else //smooth movement
 	{
 		//how much acceleration (based on distance from wanted distance)
-		float acceleration = step*(settings->linear_stiffness)*dist;
+		float acceleration = step*(settings.linear_stiffness)*dist;
 
 		vel[0]-=r_pos_u[0]*acceleration;
 		vel[1]-=r_pos_u[1]*acceleration;
@@ -286,7 +288,7 @@ void Camera::Accelerate(dReal step)
 			float angle = acos(dot);
 
 			//how much acceleration
-			float accel = step*angle*(settings->angular_stiffness);
+			float accel = step*angle*(settings.angular_stiffness);
 
 			//direction of acceleration (remove part of wanted that's along current pos)
 			float dir[3];
@@ -310,9 +312,9 @@ void Camera::Collide(dReal step)
 	//check for collision, and if so, remove possible movement into collision direction
 	//
 
-	if (settings->radius > 0)
+	if (settings.radius > 0)
 	{
-		dGeomID geom = dCreateSphere (0, settings->radius);
+		dGeomID geom = dCreateSphere (0, settings.radius);
 		dGeomSetPosition(geom, pos[0], pos[1], pos[2]);
 
 		dContactGeom contact[internal.contact_points];
@@ -321,7 +323,7 @@ void Camera::Collide(dReal step)
 		int i;
 		float V;
 		float A;
-		float Amax = cos(settings->angle*M_PI/180.0);
+		float Amax = cos(settings.angle*M_PI/180.0);
 
 		for (i=0; i<count; ++i)
 		{
@@ -357,10 +359,10 @@ void Camera::Damp(dReal step)
 
 	//if relative damping, convert velocity
 	dVector3 a_vel; //anchor velocity
-	if (settings->relative_damping)
+	if (settings.relative_damping)
 	{
 		//damping (of relative movement)
-		dBodyGetRelPointVel (car->bodyid, settings->anchor[0], settings->anchor[1], settings->anchor[2]*car->dir, a_vel);
+		dBodyGetRelPointVel (car->bodyid, settings.anchor[0], settings.anchor[1], settings.anchor[2]*car->dir, a_vel);
 
 		//make velocity relative car
 		vel[0]-=(float)a_vel[0];
@@ -369,13 +371,13 @@ void Camera::Damp(dReal step)
 	}
 
 	//apply to velocity
-	float damping=expf(-settings->damping*step);
+	float damping=expf(-settings.damping*step);
 	vel[0]*=damping;
 	vel[1]*=damping;
 	vel[2]*=damping;
 
 	//and back (if relative)
-	if (settings->relative_damping)
+	if (settings.relative_damping)
 	{
 		//back to world velocity
 		vel[0]+=(float)a_vel[0];
@@ -476,13 +478,13 @@ void Camera::Rotate(dReal step)
 
 	dVector3 result;
 	if (reverse && !in_air) //move target and position to opposite side (if not just spinning in air)
-		dBodyGetRelPointPos (car->bodyid, settings->target[0]*car->dir, -settings->target[1], settings->target[2]*car->dir, result);
+		dBodyGetRelPointPos (car->bodyid, settings.target[0]*car->dir, -settings.target[1], settings.target[2]*car->dir, result);
 	else //normal
 	{
 		dBodyGetRelPointPos (car->bodyid,
-				settings->target[0]*offset_scale*car->dir,
-				settings->target[1]*offset_scale,
-				settings->target[2]*car->dir*offset_scale, result);
+				settings.target[0]*offset_scale*car->dir,
+				settings.target[1]*offset_scale,
+				settings.target[2]*car->dir*offset_scale, result);
 	}
 
 	t_dir[0]=result[0]-pos[0];
@@ -526,7 +528,7 @@ void Camera::Rotate(dReal step)
 
 
 	//no smooth rotation?...
-	if (settings->rotation_speed == 0.0)
+	if (settings.rotation_speed == 0.0)
 	{
 		rotation[0]=t_right[0]; rotation[1]=t_dir[0]; rotation[2]=t_up[0];
 		rotation[3]=t_right[1]; rotation[4]=t_dir[1]; rotation[5]=t_up[1];
@@ -616,7 +618,7 @@ void Camera::Rotate(dReal step)
 		Vmax=M_PI; //180°
 
 	//and how much to rotate!
-	float Vspeed = step*settings->rotation_speed*Vmax;
+	float Vspeed = step*settings.rotation_speed*Vmax;
 
 	//check if we can reach target in this step, if so just jump
 	if (Vspeed > Vmax)
@@ -660,7 +662,7 @@ void Camera::Rotate(dReal step)
 //collide camera with track, generate acceleration on camera if colliding
 void Camera::Physics_Step(dReal step)
 {
-	if (car && settings)
+	if (car)
 	{
 		//
 		//perform movement based on last velocity
@@ -674,7 +676,7 @@ void Camera::Physics_Step(dReal step)
 		//
 
 		//check if reverse
-		if (settings->reverse) //enabled
+		if (settings.reverse) //enabled
 		{
 			if (car->dir*car->throttle > 0.0 && car->velocity > 0.0) //wanting and going forward
 				reverse = false;
@@ -683,21 +685,21 @@ void Camera::Physics_Step(dReal step)
 		}
 
 		//and if in air
-		if (settings->in_air) //in air enabled
+		if (settings.in_air) //in air enabled
 		{
 			if (!(car->sensor1->colliding) && !(car->sensor2->colliding)) //in air
 			{
 				if (in_air) //in ground mode
 				{
 					//smooth transition between offset and center (and needed)
-					if (settings->offset_scale_speed != 0 && offset_scale > 0)
-						offset_scale -= (settings->offset_scale_speed*step);
+					if (settings.offset_scale_speed != 0 && offset_scale > 0)
+						offset_scale -= (settings.offset_scale_speed*step);
 					else //jump directly
 						offset_scale = 0;
 				}
 				if (!in_air) //camera not in "air mode"
 				{
-					if (air_timer > settings->air_time)
+					if (air_timer > settings.air_time)
 					{
 						in_air = true; //go to air mode
 						air_timer = 0; //reset timer
@@ -710,7 +712,7 @@ void Camera::Physics_Step(dReal step)
 			{
 				if (in_air) //camera in "air mode"
 				{
-					if (air_timer > settings->ground_time)
+					if (air_timer > settings.ground_time)
 					{
 						in_air = false; //leave air mode
 						air_timer = 0; //reset timer
@@ -721,8 +723,8 @@ void Camera::Physics_Step(dReal step)
 				else //camera in "ground mode"
 				{
 					//smooth transition between center and offset (and needed)
-					if (settings->offset_scale_speed != 0 && offset_scale < 1)
-						offset_scale += (settings->offset_scale_speed*step);
+					if (settings.offset_scale_speed != 0 && offset_scale < 1)
+						offset_scale += (settings.offset_scale_speed*step);
 					else //jump directly
 						offset_scale = 1;
 				}

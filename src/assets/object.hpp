@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -24,7 +24,7 @@
 #include <ode/common.h>
 
 #include "assets.hpp"
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "script.hpp"
 #include "simulation/space.hpp"
 #include "simulation/component.hpp"
@@ -49,9 +49,9 @@ class Module:public Assets
 		Script *spawn;
 
 		//tmp vbo test graphics
-		Trimesh_3D *model[10];
+		Model_Draw *model[10];
 		//tmp trimesh test model
-		Trimesh_Geom *geom[1];
+		Model_Mesh *geom[1];
 
 		//temporary solution
 		bool box;

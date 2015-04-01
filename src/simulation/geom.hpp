@@ -26,7 +26,7 @@
 #include "simulation/body.hpp"
 #include "simulation/wheel.hpp"
 #include "assets/object.hpp"
-#include "assets/trimesh.hpp"
+#include "assets/model.hpp"
 #include "assets/script.hpp"
 #include <SDL/SDL_stdinc.h> //definition for Uint32
 
@@ -86,13 +86,13 @@ class Geom: public Component
 
 		//End of physics data
 		
-		Trimesh_3D *model; //points at model
+		Model_Draw *model; //points at model
 
 		//debug variables
 		dGeomID flipper_geom;
 
 		bool TMP_pillar_geom;
-		Trimesh_3D *TMP_pillar_graphics; //TMP
+		Model_Draw *TMP_pillar_graphics; //TMP
 
 		//for buffer events
 		void Set_Buffer_Event(dReal thresh, dReal buff, Script *scr);
@@ -125,7 +125,7 @@ class Geom: public Component
 		//trimesh: how many triangles (0 if not trimesh/disabled) and which colliding:
 		int triangle_count, material_count;
 		bool *triangle_colliding;
-		Trimesh_Geom::Material *parent_materials;
+		Model_Mesh::Material *parent_materials;
 		Surface *material_surfaces;
 		//end
 
@@ -135,7 +135,7 @@ class Geom: public Component
 		Geom *prev;
 		Geom *next;
 
-		friend class Trimesh_Geom; //will be required to modify triangle_* stuff above
+		friend class Model_Mesh; //will be required to modify triangle_* stuff above
 		friend void Render_List_Update(); //to allow loop through geoms
 		friend void Event_Buffers_Process(dReal); //to allow looping
 		friend void Body::Physics_Step (dReal step); //dito
