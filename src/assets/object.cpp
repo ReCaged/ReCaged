@@ -24,7 +24,7 @@
 
 #include "object.hpp"
 #include "assets.hpp"
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "track.hpp"
 
 #include "common/log.hpp"
@@ -140,7 +140,7 @@ Module *Module::Load(const char *path)
 		obj->box = true;
 
 		//the debug box will only spawn one component - one "3D file"
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/box/box.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/box/box.obj")))
 			return NULL;
 
 	//end of test
@@ -153,7 +153,7 @@ Module *Module::Load(const char *path)
 		obj->funbox = true; //id
 
 		//graphics
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/funbox/box.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/funbox/box.obj")))
 			return NULL;
 
 	}
@@ -165,7 +165,7 @@ Module *Module::Load(const char *path)
 		obj->flipper = true; //id
 
 		//graphics
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/flipper/Flipper.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/flipper/Flipper.obj")))
 			return NULL;
 
 	}
@@ -177,8 +177,8 @@ Module *Module::Load(const char *path)
 		obj->NH4 = true;
 
 		//graphics
-		if (	!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/NH4/Atom1.obj")) ||
-			!(obj->model[1] = Trimesh_3D::Quick_Load("objects/misc/NH4/Atom2.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/NH4/Atom1.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/NH4/Atom2.obj"))	)
 			return NULL;
 
 	}
@@ -188,7 +188,7 @@ Module *Module::Load(const char *path)
 
 		obj = new Module(path);
 		obj->sphere = true;
-		if (!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/beachball/sphere.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/beachball/sphere.obj")))
 			return NULL;
 	}
 	else if (!strcmp(path, "objects/misc/building"))
@@ -199,9 +199,9 @@ Module *Module::Load(const char *path)
 		obj->building = true;
 
 		//graphics
-		if (	!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/building/pillar.obj")) ||
-			!(obj->model[1] = Trimesh_3D::Quick_Load("objects/misc/building/roof.obj")) ||
-			!(obj->model[2] = Trimesh_3D::Quick_Load("objects/misc/building/wall.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/building/pillar.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/building/roof.obj")) ||
+			!(obj->model[2] = Model_Draw::Quick_Load("objects/misc/building/wall.obj"))	)
 			return NULL;
 
 	}
@@ -214,8 +214,8 @@ Module *Module::Load(const char *path)
 		obj->pillar = true;
 
 		//graphics
-		if (	!(obj->model[0] = Trimesh_3D::Quick_Load("objects/misc/pillar/Pillar.obj")) ||
-			!(obj->model[1] = Trimesh_3D::Quick_Load("objects/misc/pillar/Broken.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/pillar/Pillar.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/pillar/Broken.obj"))	)
 			return NULL;
 
 	}
@@ -228,10 +228,10 @@ Module *Module::Load(const char *path)
 		obj->tetrahedron = true;
 
 		//try to load and generate needed vertices (render+collision)
-		Trimesh mesh;
+		Model mesh;
 		if (	!(mesh.Load("objects/misc/tetrahedron/model.obj")) ||
-			!(obj->model[0] = mesh.Create_3D()) ||
-			!(obj->geom[0] = mesh.Create_Geom())	)
+			!(obj->model[0] = mesh.Create_Draw()) ||
+			!(obj->geom[0] = mesh.Create_Mesh())	)
 			return NULL;
 	}
 	else
@@ -764,7 +764,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 
 		Object *obj = new Object();
 
-		Geom *g = geom[0]->Create_Geom(obj);
+		Geom *g = geom[0]->Create_Mesh(obj);
 		g->model = model[0];
 
 		//properties:

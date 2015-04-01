@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,7 +19,7 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "common/log.hpp"
 #include "text_file.hpp"
 #include <string.h>
@@ -409,9 +409,9 @@ void Position(float *pos, float *p0, float *p1, float *p2, float *p3, float t)
 	pos[2]=p0[2]*(1.0-t)*(1.0-t)*(1.0-t) +3.0*p1[2]*(1.0-t)*(1.0-t)*t +3.0*p2[2]*(1.0-t)*t*t +p3[2]*t*t*t;
 }
 
-bool Trimesh::Load_Road(const char *f)
+bool Model::Load_Road(const char *f)
 {
-	Log_Add(2, "Loading trimesh from ROAD file %s", f);
+	Log_Add(2, "Loading model from ROAD file %s", f);
 
 	Text_File file;
 

@@ -22,7 +22,7 @@
 #include <GL/glew.h>
 #include "render_list.hpp"
 
-#include "assets/trimesh.hpp"
+#include "assets/model.hpp"
 #include "common/threads.hpp"
 #include "common/internal.hpp"
 #include "common/log.hpp"
@@ -48,7 +48,7 @@ bool fog=false;
 struct list_element
 {
 	GLfloat matrix[16]; //4x4
-	Trimesh_3D *model; //model to render
+	Model_Draw *model; //model to render
 	Object *object; //object to which this component belongs
 };
 
@@ -317,10 +317,10 @@ void Render_List_Render()
 
 	//variables/pointers
 	unsigned int m_loop;
-	Trimesh_3D *model;
+	Model_Draw *model;
 	Material_Float *material;
 	float *matrix;
-	Trimesh_3D::Material *materials;
+	Model_Draw::Material *materials;
 	unsigned int material_count;
 	float radius;
 
@@ -369,9 +369,9 @@ void Render_List_Render()
 
 	//NOTE: new opengl vbo rendering commands (2.0 I think). For compatibility lets stick to 1.5 instead
 	//glEnableVertexAttribArray(0);
-	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Trimesh_3D::Vertex), (BUFFER_OFFSET(0)));
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Model_Draw::Vertex), (BUFFER_OFFSET(0)));
 	//glEnableVertexAttribArray(1);
-	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(sizeof(float)*3));
 
 	for (size_t i=0; i<(*count); ++i)
 	{
@@ -416,8 +416,8 @@ void Render_List_Render()
 			{
 				//bind and configure the new vbo
 				glBindBuffer(GL_ARRAY_BUFFER, model->vbo_id);
-				glVertexPointer(3, GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(0));
-				glNormalPointer(GL_FLOAT, sizeof(Trimesh_3D::Vertex), BUFFER_OFFSET(sizeof(float)*3));
+				glVertexPointer(3, GL_FLOAT, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(0));
+				glNormalPointer(GL_FLOAT, sizeof(Model_Draw::Vertex), BUFFER_OFFSET(sizeof(float)*3));
 
 				//indicate this is used now
 				bound_vbo = model->vbo_id;

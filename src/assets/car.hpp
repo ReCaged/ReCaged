@@ -27,7 +27,7 @@
 //Allocated at start
 #include "assets.hpp"
 #include "object.hpp"
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "conf.hpp"
 #include "profile.hpp"
 #include "simulation/camera.hpp"
@@ -370,7 +370,7 @@ class Car_Module:public Assets
 {
 	public:
 		static Car_Module *Load(const char *path);
-		class Car *Spawn(dReal x, dReal y, dReal z, Trimesh_3D *wheel, class Profile *profile);
+		class Car *Spawn(dReal x, dReal y, dReal z, Model_Draw *wheel, class Profile *profile);
 
 	private:
 		Car_Module(const char *name); //only allocate through spawn function
@@ -383,7 +383,7 @@ class Car_Module:public Assets
 		struct geom_properties { //can describe any supported geom
 			int type;
 			dReal size[3];
-			Trimesh_Geom *mesh;
+			Model_Mesh *mesh;
 			dReal pos[3];
 			dReal rot[3];
 			Surface surf;
@@ -392,7 +392,7 @@ class Car_Module:public Assets
 		std::vector<geom_properties> geoms;
 
 		//3D rendering model
-		Trimesh_3D *model;
+		Model_Draw *model;
 };
 
 class Car:public Object

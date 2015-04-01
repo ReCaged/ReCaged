@@ -190,7 +190,7 @@ Car_Module *Car_Module::Load (const char *path)
 					strcat(model, "/");
 					strcat(model, file.words[1]);
 
-					tmp_geom.mesh = Trimesh_Geom::Quick_Load(model, atof(file.words[2]), 0, 0, 0, 0, 0, 0);
+					tmp_geom.mesh = Model_Mesh::Quick_Load(model, atof(file.words[2]), 0, 0, 0, 0, 0, 0);
 
 					//failed to load
 					if (!tmp_geom.mesh)
@@ -283,7 +283,7 @@ Car_Module *Car_Module::Load (const char *path)
 		strcat(file, "/");
 		strcat(file, target->conf.model);
 
-		if ( !(target->model = Trimesh_3D::Quick_Load(file,
+		if ( !(target->model = Model_Draw::Quick_Load(file,
 				target->conf.resize,
 				target->conf.rotate[0], target->conf.rotate[1], target->conf.rotate[2],
 				target->conf.offset[0], target->conf.offset[1], target->conf.offset[2])) )
@@ -294,7 +294,7 @@ Car_Module *Car_Module::Load (const char *path)
 }
 
 
-Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Trimesh_3D *wheel3D, Profile *profile)
+Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile *profile)
 {
 	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
 
@@ -403,7 +403,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Trimesh_3D *wheel3D, Profile 
 		}
 		else // (tmp_geom.type == 3) //trimesh
 		{
-			gdata = tmp_geom.mesh->Create_Geom(car);
+			gdata = tmp_geom.mesh->Create_Mesh(car);
 			geom = gdata->geom_id;
 		}
 

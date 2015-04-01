@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -57,7 +57,7 @@ class Body: public Component
 		dBodyID body_id;
 
 		//if rendering body, point at model
-		Trimesh_3D *model;
+		Model_Draw *model;
 
 		//buffer events (sent from geoms)
 		void Set_Buffer_Event(dReal thresh, dReal buff, Script *scr);

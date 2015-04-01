@@ -39,6 +39,10 @@ rcx_SOURCES =	./rcx.cpp \
 		assets/car.hpp \
 		assets/conf.cpp \
 		assets/conf.hpp \
+		assets/model.cpp \
+		assets/model_draw.cpp \
+		assets/model.hpp \
+		assets/model_mesh.cpp \
 		assets/obj.cpp \
 		assets/object.cpp \
 		assets/object.hpp \
@@ -50,10 +54,6 @@ rcx_SOURCES =	./rcx.cpp \
 		assets/text_file.hpp \
 		assets/track.cpp \
 		assets/track.hpp \
-		assets/trimesh_3d.cpp \
-		assets/trimesh.cpp \
-		assets/trimesh_geom.cpp \
-		assets/trimesh.hpp \
 		common/directories.cpp \
 		common/directories.hpp \
 		common/internal.cpp \

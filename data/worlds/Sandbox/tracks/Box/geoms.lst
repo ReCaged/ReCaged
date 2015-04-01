@@ -55,7 +55,7 @@
 #specify the default global mu for all future geoms
 > surface global mu 1
 
-#spawning of trimesh geom (with overrideable rendering model):
+#spawning of trimesh geom (with override-able rendering model):
 # POSITION ROTATION GEOM_MODEL [RENDER_MODEL]
   0 0 0    0 0 0    "Box.obj"  #"Box.obj"
 

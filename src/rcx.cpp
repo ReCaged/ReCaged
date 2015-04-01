@@ -32,7 +32,7 @@
 
 #include "assets/profile.hpp"
 #include "assets/track.hpp"
-#include "assets/trimesh.hpp"
+#include "assets/model.hpp"
 #include "assets/car.hpp"
 
 
@@ -107,7 +107,7 @@ bool tmp_menus()
 
 	Car_Module *car_template = NULL;
 	Car *car = NULL;
-	Trimesh_3D *wheel = NULL;
+	Model_Draw *wheel = NULL;
 
 	while (1)
 	{
@@ -127,7 +127,7 @@ bool tmp_menus()
 
 				//try to load tyre and rim (if possible)
 				if (!wheel)
-					wheel = Trimesh_3D::Quick_Load_Conf("worlds/Sandbox/wheels/Reckon", "wheel.conf");
+					wheel = Model_Draw::Quick_Load_Conf("worlds/Sandbox/wheels/Reckon", "wheel.conf");
 				//good, spawn
 				car = car_template->Spawn(
 					track.start[0], //x
@@ -167,14 +167,14 @@ bool tmp_menus()
 			swheel += file.words[1];
 
 			//if failure...
-			if (! (wheel = Trimesh_3D::Quick_Load_Conf(swheel.c_str(), "wheel.conf")) )
+			if (! (wheel = Model_Draw::Quick_Load_Conf(swheel.c_str(), "wheel.conf")) )
 			{
 				//try seing if its track specific tyre
 				swheel = strack;
 				swheel += "/wheels/";
 				swheel += file.words[1];
 
-				wheel = Trimesh_3D::Quick_Load_Conf(swheel.c_str(), "wheel.conf");
+				wheel = Model_Draw::Quick_Load_Conf(swheel.c_str(), "wheel.conf");
 			}
 		}
 		//manual position required for spawning

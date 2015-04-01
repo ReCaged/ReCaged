@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,7 +19,9 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "trimesh.hpp"
+//code related to creating ode trimesh (collision) from loaded model
+
+#include "model.hpp"
 #include "simulation/geom.hpp"
 #include "common/internal.hpp"
 #include "common/log.hpp"
@@ -28,16 +30,17 @@
 #define v_length(x, y, z) (sqrt( (x)*(x) + (y)*(y) + (z)*(z) ))
 
 //override index when merging of contacts (tmp solution until next version of ode!)
+//(see Geom *Model_Mesh::Create_Mesh(Object *obj) below for details)
 int mergecallback(dGeomID geom, int index1, int index2)
 {
-	//probably needs better decicion on which to use... but hey, this is hackish anyway!
+	//probably needs better decision on which to use... but hey, this is hackish anyway!
 	return index1; //set index to first
 }
 
 //
 //for geom 3d collision detection trimesh:
 //
-Trimesh_Geom::Trimesh_Geom(const char *name,
+Model_Mesh::Model_Mesh(const char *name,
 		Vector_Float *v, unsigned int vcount,
 		unsigned int *i, unsigned int icount,
 		Vector_Float *n): Assets(name), vertices(v), indices(i), normals(n) //set name and values
@@ -53,48 +56,48 @@ Trimesh_Geom::Trimesh_Geom(const char *name,
 	//perhaps use dGeomTriMeshDataPreprocess here, but it takes a long time to complete...
 }
 
-Trimesh_Geom *Trimesh_Geom::Quick_Load(const char *name, float resize,
+Model_Mesh *Model_Mesh::Quick_Load(const char *name, float resize,
 		float rotx, float roty, float rotz,
 		float offx, float offy, float offz)
 {
 	//check if already exists
-	if (Trimesh_Geom *tmp=Assets::Find<Trimesh_Geom>(name))
+	if (Model_Mesh *tmp=Assets::Find<Model_Mesh>(name))
 		return tmp;
 
 	//no, load
-	Trimesh mesh;
+	Model model;
 
 	//failure to load
-	if (!mesh.Load(name))
+	if (!model.Load(name))
 		return NULL;
 
 	//pass modification requests (will be ignored if defaults)
-	mesh.Resize(resize);
-	mesh.Rotate(rotx, roty, rotz);
-	mesh.Offset(offx, offy, offz);
+	model.Resize(resize);
+	model.Rotate(rotx, roty, rotz);
+	model.Offset(offx, offy, offz);
 
 	//create a geom from this and return it
-	return mesh.Create_Geom();
+	return model.Create_Mesh();
 }
 
-Trimesh_Geom *Trimesh_Geom::Quick_Load(const char *name)
+Model_Mesh *Model_Mesh::Quick_Load(const char *name)
 {
 	//check if already exists
-	if (Trimesh_Geom *tmp=Assets::Find<Trimesh_Geom>(name))
+	if (Model_Mesh *tmp=Assets::Find<Model_Mesh>(name))
 		return tmp;
 
 	//no, load
-	Trimesh mesh;
+	Model model;
 
 	//failure to load
-	if (!mesh.Load(name))
+	if (!model.Load(name))
 		return NULL;
 
 	//create a geom from this and return it
-	return mesh.Create_Geom();
+	return model.Create_Mesh();
 }
 
-Geom *Trimesh_Geom::Create_Geom(Object *obj)
+Geom *Model_Mesh::Create_Mesh(Object *obj)
 {
 	//create a trimesh geom (with usual global space for now)
 	dGeomID g = dCreateTriMesh(0, data, 0, 0, 0);
@@ -133,7 +136,7 @@ Geom *Trimesh_Geom::Create_Geom(Object *obj)
 	return geom;
 }
 
-Trimesh_Geom::~Trimesh_Geom()
+Model_Mesh::~Model_Mesh()
 {
 	delete[] vertices;
 	delete[] indices;
@@ -147,13 +150,13 @@ Trimesh_Geom::~Trimesh_Geom()
 	dGeomTriMeshDataDestroy(data);
 }
 
-//method Trimesh_Geom from Trimesh
-Trimesh_Geom *Trimesh::Create_Geom()
+//method Model_Mesh from Trimesh
+Model_Mesh *Model::Create_Mesh()
 {
 	Log_Add(2, "Creating collision trimesh");
 
 	//already created?
-	if (Trimesh_Geom *tmp = Assets::Find<Trimesh_Geom>(name.c_str()))
+	if (Model_Mesh *tmp = Assets::Find<Model_Mesh>(name.c_str()))
 		return tmp;
 
 	//check that we got any data (and how much?)
@@ -188,12 +191,12 @@ Trimesh_Geom *Trimesh::Create_Geom()
 	//allocate
 	Vector_Float *v, *n;
 	unsigned int *i;
-	Trimesh_Geom::Material *m;
+	Model_Mesh::Material *m;
 
 	v = new Vector_Float[verts]; //one vertex per vertex
 	i = new unsigned int[tris*3]; //3 indices per triangle
 	n = new Vector_Float[tris]; //one normal per triangle
-	m = new Trimesh_Geom::Material[mats]; //one material per material
+	m = new Model_Mesh::Material[mats]; //one material per material
 
 	//copy
 	//vertices
@@ -267,7 +270,7 @@ Trimesh_Geom *Trimesh::Create_Geom()
 		}
 
 	//create
-	Trimesh_Geom *result = new Trimesh_Geom(name.c_str(),
+	Model_Mesh *result = new Model_Mesh(name.c_str(),
 			v, verts,
 			i, 3*tris,
 			n);

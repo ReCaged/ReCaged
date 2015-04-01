@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -23,7 +23,7 @@
 //for vbo 3d rendering trimesh:
 //
 #include <GL/glew.h>
-#include "trimesh.hpp"
+#include "model.hpp"
 #include "conf.hpp"
 #include "common/internal.hpp"
 #include "common/log.hpp"
@@ -123,67 +123,67 @@ class VBO: public Assets
 VBO *VBO::head=NULL;
 
 //
-//Trimesh_3D stuff:
+//Model_Draw stuff:
 //
 
 //constructor
-Trimesh_3D::Trimesh_3D(const char *name, float r, GLuint vbo, Material *mpointer, unsigned int mcount):
+Model_Draw::Model_Draw(const char *name, float r, GLuint vbo, Material *mpointer, unsigned int mcount):
 	Assets(name), materials(mpointer), material_count(mcount), radius(r), vbo_id(vbo)
 {
 }
 
 //only called together with all other racetime_data destruction (at end of race)
-Trimesh_3D::~Trimesh_3D()
+Model_Draw::~Model_Draw()
 {
 	//remove local data:
 	delete[] materials;
 }
 
 //loading of a 3d model directly
-Trimesh_3D *Trimesh_3D::Quick_Load(const char *name, float resize,
+Model_Draw *Model_Draw::Quick_Load(const char *name, float resize,
 		float rotx, float roty, float rotz,
 		float offx, float offy, float offz)
 {
 	//check if already exists
-	if (Trimesh_3D *tmp=Assets::Find<Trimesh_3D>(name))
+	if (Model_Draw *tmp=Assets::Find<Model_Draw>(name))
 		return tmp;
 
 	//no, load
-	Trimesh mesh;
+	Model model;
 
 	//failure to load
-	if (!mesh.Load(name))
+	if (!model.Load(name))
 		return NULL;
 
 	//pass modification requests (will be ignored if defaults)
-	mesh.Resize(resize);
-	mesh.Rotate(rotx, roty, rotz);
-	mesh.Offset(offx, offy, offz);
+	model.Resize(resize);
+	model.Rotate(rotx, roty, rotz);
+	model.Offset(offx, offy, offz);
 
 	//create a geom from this and return it
-	return mesh.Create_3D();
+	return model.Create_Draw();
 }
 
 //simplified
-Trimesh_3D *Trimesh_3D::Quick_Load(const char *name)
+Model_Draw *Model_Draw::Quick_Load(const char *name)
 {
 	//check if already exists
-	if (Trimesh_3D *tmp=Assets::Find<Trimesh_3D>(name))
+	if (Model_Draw *tmp=Assets::Find<Model_Draw>(name))
 		return tmp;
 
 	//no, load
-	Trimesh mesh;
+	Model model;
 
 	//failure to load
-	if (!mesh.Load(name))
+	if (!model.Load(name))
 		return NULL;
 
 	//create a geom from this and return it
-	return mesh.Create_3D();
+	return model.Create_Draw();
 }
 
 //even simpler: all data grabbed from conf file...
-Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
+Model_Draw *Model_Draw::Quick_Load_Conf(const char *path, const char *file)
 {
 	//small conf for filename and model manipulation stuff
 	struct mconf {
@@ -226,16 +226,16 @@ Trimesh_3D *Trimesh_3D::Quick_Load_Conf(const char *path, const char *file)
 	strcat(model, modelconf.model);
 
 	//load
-	return Trimesh_3D::Quick_Load(model, modelconf.resize,
+	return Model_Draw::Quick_Load(model, modelconf.resize,
 			modelconf.rotate[0], modelconf.rotate[1], modelconf.rotate[2],
 			modelconf.offset[0], modelconf.offset[1], modelconf.offset[2]);
 }
 
-//method for creating a Trimesh_3D from Trimesh
-Trimesh_3D *Trimesh::Create_3D()
+//method for creating a Model_Draw from Trimesh
+Model_Draw *Model::Create_Draw()
 {
 	//already uploaded?
-	if (Trimesh_3D *tmp = Assets::Find<Trimesh_3D>(name.c_str()))
+	if (Model_Draw *tmp = Assets::Find<Model_Draw>(name.c_str()))
 		return tmp;
 
 	//check how many vertices (if any)
@@ -261,8 +261,8 @@ Trimesh_3D *Trimesh::Create_3D()
 	}
 	//mcount is always secured
 
-	//each triangle requires 3 vertices - vertex defined as "Vertex" in "Trimesh_3D"
-	unsigned int needed_vbo_size = sizeof(Trimesh_3D::Vertex)*(vcount);
+	//each triangle requires 3 vertices - vertex defined as "Vertex" in "Model_Draw"
+	unsigned int needed_vbo_size = sizeof(Model_Draw::Vertex)*(vcount);
 	VBO *vbo = VBO::Find_Enough_Room(needed_vbo_size);
 
 	if (!vbo)
@@ -281,10 +281,10 @@ Trimesh_3D *Trimesh::Create_3D()
 	//to vbo (graphics memory), and list of materials (with no duplicates or unused)
 
 	//first: how big should vertex list be?
-	Trimesh_3D::Vertex *vertex_list = new Trimesh_3D::Vertex[vcount];
+	Model_Draw::Vertex *vertex_list = new Model_Draw::Vertex[vcount];
 
 	//make material list as big as the number of materials
-	Trimesh_3D::Material *material_list = new Trimesh_3D::Material[mcount];
+	Model_Draw::Material *material_list = new Model_Draw::Material[mcount];
 
 
 	//some values needed:
@@ -366,7 +366,7 @@ Trimesh_3D *Trimesh::Create_3D()
 			//actually, the start should be offsetted by the current usage of vbo
 			//(since this new data will be placed after the last model)
 			//NOTE: instead of counting in bytes, this is counting in "vertices"
-			material_list[mcount].start += (vbo->usage)/sizeof(Trimesh_3D::Vertex);
+			material_list[mcount].start += (vbo->usage)/sizeof(Model_Draw::Vertex);
 
 			//next time, this count will be needed
 			vcount_old=vcount;
@@ -378,10 +378,10 @@ Trimesh_3D *Trimesh::Create_3D()
 
 	Log_Add(2, "number of (used) materials: %u", mcount);
 
-	//create Trimesh_3D class from this data:
-	//set the name. NOTE: both Trimesh_3D and Trimesh_Geom will have the same name
+	//create Model_Draw class from this data:
+	//set the name. NOTE: both Model_Draw and Model_Mesh will have the same name
 	//this is not a problem since they are different classes and Assets::Find will notice that
-	Trimesh_3D *mesh = new Trimesh_3D(name.c_str(), radius, vbo->id, material_list, mcount);
+	Model_Draw *mesh = new Model_Draw(name.c_str(), radius, vbo->id, material_list, mcount);
 
 	//assume this vbo is not bound
 	glBindBuffer(GL_ARRAY_BUFFER, vbo->id);

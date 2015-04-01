@@ -19,7 +19,10 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#include "trimesh.hpp"
+//"helper"/loader functions, code for creating collision detection/rendering
+//models is in the other model_*.cpp files (became too much for a single file!)
+
+#include "model.hpp"
 #include "common/log.hpp"
 #include "common/directories.hpp"
 #include <limits.h>
@@ -32,7 +35,7 @@
 //
 
 //default values for material
-const Trimesh::Material Trimesh::Material_Default = 
+const Model::Material Model::Material_Default = 
 {
 	"unknown material",
 	{
@@ -46,7 +49,7 @@ const Trimesh::Material Trimesh::Material_Default =
 };
 
 
-unsigned int Trimesh::Find_Material(const char *name)
+unsigned int Model::Find_Material(const char *name)
 {
 	size_t end = materials.size();
 
@@ -61,7 +64,7 @@ unsigned int Trimesh::Find_Material(const char *name)
 	return INDEX_ERROR;
 }
 
-bool Trimesh::Compare_Name(const char *n)
+bool Model::Compare_Name(const char *n)
 {
 	if (!name.compare(n))
 		return true;
@@ -69,7 +72,7 @@ bool Trimesh::Compare_Name(const char *n)
 }
 
 //makes sure all normals are unit
-void Trimesh::Normalize_Normals()
+void Model::Normalize_Normals()
 {
 	Log_Add(2, "Making sure all normals are unit for trimesh");
 
@@ -87,7 +90,7 @@ void Trimesh::Normalize_Normals()
 
 //creates missing normals (if needed)
 //counter-clockwise order of triangles assumed
-void Trimesh::Generate_Missing_Normals()
+void Model::Generate_Missing_Normals()
 {
 	Log_Add(2, "Generating missing normals for trimesh");
 
@@ -156,7 +159,7 @@ void Trimesh::Generate_Missing_Normals()
 }
 
 //resize, rotate, change offset stuff (TODO: DELETE THIS!):
-void Trimesh::Resize(float r)
+void Model::Resize(float r)
 {
 	if (r == 1.0) //no need
 		return;
@@ -178,7 +181,7 @@ void Trimesh::Resize(float r)
 	}
 }
 
-void Trimesh::Rotate(float x, float y, float z)
+void Model::Rotate(float x, float y, float z)
 {
 	if (x==0 && y==0 && z==0)
 		return;
@@ -215,7 +218,7 @@ void Trimesh::Rotate(float x, float y, float z)
 	}
 }
 
-void Trimesh::Offset(float x, float y, float z)
+void Model::Offset(float x, float y, float z)
 {
 	if (x==0 && y==0 && z==0)
 		return;
@@ -232,7 +235,7 @@ void Trimesh::Offset(float x, float y, float z)
 }
 
 //uggly: change to bounding box instead of sphere...
-float Trimesh::Find_Longest_Distance()
+float Model::Find_Longest_Distance()
 {
 	size_t end = vertices.size();
 	size_t i;
@@ -257,7 +260,7 @@ float Trimesh::Find_Longest_Distance()
 //
 
 //wrapper for loading
-bool Trimesh::Load(const char *file)
+bool Model::Load(const char *file)
 {
 	Log_Add(2, "Loading trimesh from file \"%s\" (identifying suffix)", file);
 
@@ -298,7 +301,7 @@ bool Trimesh::Load(const char *file)
 }
 
 //for materials
-bool Trimesh::Load_Material(const char *file)
+bool Model::Load_Material(const char *file)
 {
 	Log_Add(2, "Loading material from file \"%s\" (identifying suffix)", file);
 
