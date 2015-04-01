@@ -25,7 +25,6 @@
 #include "common/internal.hpp"
 #include "assets/track.hpp"
 #include "assets/profile.hpp"
-#include "common/runlevel.hpp"
 #include "common/threads.hpp"
 #include "common/log.hpp"
 
@@ -44,9 +43,6 @@ Module *box = NULL;
 Module *sphere = NULL;
 Module *funbox = NULL;
 Module *molecule = NULL;
-
-//count frames
-unsigned int interface_count = 0;
 
 //needed by graphics_buffers:
 float view_angle_rate_x=0.0;
@@ -259,6 +255,9 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	glHint(GL_TEXTURE_COMPRESSION_HINT, GL_NICEST);
 	*/
 
+	//okay, ready:
+	interface_thread.runlevel = running;
+
 	//everything ok
 	return true;
 }
@@ -271,21 +270,23 @@ int Interface_Loop ()
 
 	//just make sure not rendering geoms yet
 	geom_render_level = 0;
+	interface_thread.count=0;
 
 	//store current time
 	Uint32 time_old = SDL_GetTicks();
 
 	//only stop render if done with race
-	while (runlevel != done)
+	while (interface_thread.runlevel != done)
 	{
 		//make sure only render frame after it's been simulated
 		//quckly lock mutex in order to listen to simulation broadcasts
 		//(but only if there is no new frame already)
 		if (internal.sync_interface && !Render_List_Updated())
 		{
-			SDL_mutexP(sync_mutex);
-			SDL_CondWaitTimeout (sync_cond, sync_mutex, 500); //if no signal in half a second, stop waiting
-			SDL_mutexV(sync_mutex);
+			SDL_mutexP(simulation_thread.sync_mutex);
+			//if no signal in half a second, stop waiting
+			SDL_CondWaitTimeout (simulation_thread.sync_cond, simulation_thread.sync_mutex, 500);
+			SDL_mutexV(simulation_thread.sync_mutex);
 		}
 
 		//get time
@@ -309,7 +310,8 @@ int Interface_Loop ()
 				break;
 
 				case SDL_QUIT:
-					runlevel = done;
+					interface_thread.runlevel = done;
+					simulation_thread.runlevel = done;
 				break;
 
 				case SDL_ACTIVEEVENT:
@@ -322,35 +324,36 @@ int Interface_Loop ()
 					switch (event.key.keysym.sym)
 					{
 						case SDLK_ESCAPE:
-							runlevel = done;
+							interface_thread.runlevel = done;
+							simulation_thread.runlevel = done;
 						break;
 
 						//box spawning
 						case SDLK_F5:
-							SDL_mutexP(ode_mutex);
+							SDL_mutexP(simulation_thread.ode_mutex);
 							box->Spawn (0,0,10);
-							SDL_mutexV(ode_mutex);
+							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
 						//sphere spawning
 						case SDLK_F6:
-							SDL_mutexP(ode_mutex);
+							SDL_mutexP(simulation_thread.ode_mutex);
 							sphere->Spawn (0,0,10);
-							SDL_mutexV(ode_mutex);
+							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
 						//spawn funbox
 						case SDLK_F7:
-							SDL_mutexP(ode_mutex);
+							SDL_mutexP(simulation_thread.ode_mutex);
 							funbox->Spawn (0,0,10);
-							SDL_mutexV(ode_mutex);
+							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
 						//molecule
 						case SDLK_F8:
-							SDL_mutexP(ode_mutex);
+							SDL_mutexP(simulation_thread.ode_mutex);
 							molecule->Spawn (0,0,10);
-							SDL_mutexV(ode_mutex);
+							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
 						//switch car
@@ -374,18 +377,18 @@ int Interface_Loop ()
 						case SDLK_F10:
 							if (car)
 							{
-								SDL_mutexP(ode_mutex);
+								SDL_mutexP(simulation_thread.ode_mutex);
 								car->Respawn(track.start[0], track.start[1], track.start[2]);
-								SDL_mutexV(ode_mutex);
+								SDL_mutexV(simulation_thread.ode_mutex);
 							}
 						break;
 
-						//paus physics
+						//pause physics
 						case SDLK_F11:
-							if (runlevel == paused)
-								runlevel = running;
+							if (simulation_thread.runlevel == paused)
+								simulation_thread.runlevel = running;
 							else
-								runlevel = paused;
+								simulation_thread.runlevel = paused;
 						break;
 
 						//switch what to render
@@ -405,7 +408,7 @@ int Interface_Loop ()
 			}
 
 			//make sure not performing anything else
-			if (runlevel == done)
+			if (interface_thread.runlevel == done)
 				break;
 
 			//and always send this to profiles
@@ -413,7 +416,7 @@ int Interface_Loop ()
 		}
 
 		//again, not performing anything else
-		if (runlevel == done)
+		if (interface_thread.runlevel == done)
 			break;
 
 		//(tmp) camera movement keys:
@@ -436,13 +439,9 @@ int Interface_Loop ()
 		//
 
 		//car control
-		if (runlevel == running)
+		if (simulation_thread.runlevel == running)
 			Profile_Input_Step(delta);
 
-
-
-		//done with sdl
-		SDL_mutexV(sdl_mutex);
 
 		//start rendering
 
@@ -482,7 +481,7 @@ int Interface_Loop ()
 		SDL_GL_SwapBuffers();
 
 		//keep track of how many rendered frames
-		++interface_count;
+		++interface_thread.count;
 	}
 
 	//during rendering, memory might be allocated

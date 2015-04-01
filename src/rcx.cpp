@@ -28,7 +28,6 @@
 #include "common/threads.hpp"
 #include "common/log.hpp"
 #include "common/directories.hpp"
-#include "common/runlevel.hpp"
 #include "common/directories.hpp"
 
 #include "assets/profile.hpp"
@@ -37,45 +36,6 @@
 #include "assets/car.hpp"
 
 
-Uint32 starttime = 0;
-Uint32 racetime = 0;
-Uint32 start_time = 0;
-void Run_Race(void)
-{
-	//start
-	Log_Add (0, "Starting Race");
-
-	ode_mutex = SDL_CreateMutex(); //create mutex for ode locking
-	sdl_mutex = SDL_CreateMutex(); //only use sdl in 1 thread
-
-	sync_mutex = SDL_CreateMutex();
-	sync_cond = SDL_CreateCond();
-
-	render_list_mutex = SDL_CreateMutex(); //prevent (unlikely) update/render collision
-
-	runlevel  = running;
-
-	starttime = SDL_GetTicks(); //how long it took for race to start
-
-	//launch threads
-	SDL_Thread *simulation = SDL_CreateThread (Simulation_Loop, NULL);
-	Interface_Loop(); //we already got opengl context in main thread
-
-	//wait for threads
-	SDL_WaitThread (simulation, NULL);
-
-	//cleanup
-	SDL_DestroyMutex(ode_mutex);
-	SDL_DestroyMutex(sdl_mutex);
-	SDL_DestroyMutex(sync_mutex);
-	SDL_DestroyMutex(render_list_mutex);
-	SDL_DestroyCond(sync_cond);
-
-	//done!
-	Log_Add(0, "Race Done!");
-
-	racetime = SDL_GetTicks() - starttime;
-}
 
 //
 //tmp:
@@ -240,7 +200,7 @@ bool tmp_menus()
 	default_camera.Set_Car(car);
 
 	//MENU: race configured, start? yes!
-	Run_Race();
+	Threads_Launch();
 
 	//race done, remove all objects...
 	Object::Destroy_All();
@@ -491,7 +451,6 @@ Log_puts(1, "\
 
 	//ok, start loading
 	Log_Add(1, "Loading...");
-	runlevel = loading;
 
 	//initiate interface
 	if (!Interface_Init(window, fullscreen, xres, yres))
@@ -513,16 +472,16 @@ Log_puts(1, "\
 	Log_Add(1, "Race time:			%ums", racetime);
 
 	Log_Add(1, "Average simulations/second:	%u steps/second (%u total steps)",
-						(1000*simulation_count)/racetime,
-						simulation_count);
+						(1000*simulation_thread.count)/racetime,
+						simulation_thread.count);
 
 	Log_Add(1, "Simulation lag:		%ums, %u steps (%u%% of total steps)",
-						simulation_lag_time, simulation_lag_count,
-						(100*simulation_lag_count)/simulation_count);
+						simulation_thread.lag_time, simulation_thread.lag_count,
+						(100*simulation_thread.lag_count)/simulation_thread.count);
 
 	Log_Add(1, "Average frames/second:	%u FPS (%u%% of simulation steps)",
-						(1000*interface_count)/racetime,
-						(100*interface_count)/simulation_count);
+						(1000*interface_thread.count)/racetime,
+						(100*interface_thread.count)/simulation_thread.count);
 
 	Log_puts(1, "\n Bye!\n\n");
 

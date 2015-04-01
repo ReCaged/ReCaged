@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -242,7 +242,7 @@ void Geom_Render()
 
 	//lock ode: make sure no geoms change while we build render
 	//(not likely, but just to be sure)
-	SDL_mutexP(ode_mutex);
+	SDL_mutexP(simulation_thread.ode_mutex);
 	for (geom=Geom::head; geom; geom=geom->next)
 	{
 		g = geom->geom_id;
@@ -534,7 +534,7 @@ void Geom_Render()
 		index_usage+=new_indices;
 	}
 	//unlock ode access
-	SDL_mutexV(ode_mutex);
+	SDL_mutexV(simulation_thread.ode_mutex);
 
 	//send and configure data
 	//NOTE: using glBufferData to allocate vbo and send data to it in one step.

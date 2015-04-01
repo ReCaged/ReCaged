@@ -23,7 +23,7 @@
 
 #include "camera.hpp"
 #include "common/internal.hpp"
-#include "common/runlevel.hpp"
+#include "common/threads.hpp"
 #include "assets/track.hpp"
 
 //for creation:
@@ -161,7 +161,7 @@ void Camera::Set_Pos(float px, float py, float pz, float tx, float ty, float tz)
 
 void Camera::Move(float x, float y, float z)
 {
-	if (runlevel == running)
+	if (simulation_thread.runlevel == running)
 	{
 		settings.distance[0] += x;
 		settings.distance[1] += y;

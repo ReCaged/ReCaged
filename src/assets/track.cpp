@@ -28,14 +28,12 @@
 #include "common/internal.hpp"
 #include "common/log.hpp"
 #include "common/directories.hpp"
+#include "common/threads.hpp"
 
 #include "simulation/geom.hpp"
 #include "simulation/camera.hpp"
 
-//tmp global storage
-dWorldID world;
-dSpaceID space;
-dJointGroupID contactgroup;
+//TODO: remove this!
 struct Track_Struct track = track_defaults;
 
 //
@@ -112,7 +110,7 @@ bool load_track (const char *path)
 	glLightfv (GL_LIGHT0, GL_POSITION, track.position);
 
 	//set track specific global ode params:
-	dWorldSetGravity (world, track.gravity[0], track.gravity[1], track.gravity[2]);
+	dWorldSetGravity (simulation_thread.world, track.gravity[0], track.gravity[1], track.gravity[2]);
 
 	//
 	//geoms

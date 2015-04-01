@@ -89,7 +89,7 @@ void Render_List_Clear_Interface()
 	}
 
 	//don't know which thread will clear
-	SDL_mutexP(render_list_mutex);
+	SDL_mutexP(interface_thread.render_list_mutex);
 	if (buffer_switch->size)
 	{
 		buffer_switch->updated=false;
@@ -98,7 +98,7 @@ void Render_List_Clear_Interface()
 		delete[] buffer_switch->list;
 		buffer_switch->list=NULL;
 	}
-	SDL_mutexV(render_list_mutex);
+	SDL_mutexV(interface_thread.render_list_mutex);
 }
 
 //remove allocated data in buffers
@@ -114,7 +114,7 @@ void Render_List_Clear_Simulation()
 	}
 
 	//don't know which thread will clear
-	SDL_mutexP(render_list_mutex);
+	SDL_mutexP(interface_thread.render_list_mutex);
 	if (buffer_switch->size)
 	{
 		buffer_switch->updated=false;
@@ -123,7 +123,7 @@ void Render_List_Clear_Simulation()
 		delete[] buffer_switch->list;
 		buffer_switch->list=NULL;
 	}
-	SDL_mutexV(render_list_mutex);
+	SDL_mutexV(interface_thread.render_list_mutex);
 }
 
 
@@ -249,11 +249,11 @@ void Render_List_Update()
 	buffer_generate->updated=true;
 
 	//move...
-	SDL_mutexP(render_list_mutex);
+	SDL_mutexP(interface_thread.render_list_mutex);
 	list_buffer *p=buffer_switch;
 	buffer_switch=buffer_generate;
 	buffer_generate=p;
-	SDL_mutexV(render_list_mutex);
+	SDL_mutexV(interface_thread.render_list_mutex);
 }
  
 //just to make it possible to check from outside
@@ -272,11 +272,11 @@ void Render_List_Prepare()
 	//only if anything to do
 	if (Render_List_Updated())
 	{
-		SDL_mutexP(render_list_mutex);
+		SDL_mutexP(interface_thread.render_list_mutex);
 		list_buffer *p=buffer_switch;
 		buffer_switch=buffer_render; //old buffer, not needed
 		buffer_render= p;
-		SDL_mutexV(render_list_mutex);
+		SDL_mutexV(interface_thread.render_list_mutex);
 
 		//build matrix for camera projection:
 		//rotation (right, up, forward)

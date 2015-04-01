@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -22,12 +22,13 @@
 #include "space.hpp"
 #include "geom.hpp"
 #include "common/log.hpp"
+#include "common/threads.hpp"
 #include "assets/track.hpp"
 #include <ode/ode.h>
 
 Space::Space(Object *obj): Component(obj)
 {
-	space_id = dSimpleSpaceCreate(space);
+	space_id = dSimpleSpaceCreate(simulation_thread.space);
 
 	Log_Add(2, "(autoselecting default space for object)");
 	obj->selected_space=space_id;

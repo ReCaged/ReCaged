@@ -24,6 +24,7 @@
 #include "geom.hpp"
 #include "collision_feedback.hpp"
 #include "common/internal.hpp" 
+#include "common/threads.hpp" 
 #include "assets/track.hpp"
 
 //This code tries to implement a reasonably simple and realistic tyre friction model.
@@ -123,7 +124,7 @@ Wheel::Wheel()
 	alt_load_damp = true;
 
 	rollrestorque=0.0;
-	rollresjoint=dJointCreateAMotor(world, 0);
+	rollresjoint=dJointCreateAMotor(simulation_thread.world, 0);
 	rollreswbody=NULL;
 	rollresobody=NULL;
 }
@@ -184,7 +185,7 @@ void Wheel::Physics_Step()
 			contact->surface.mu2 /= wheeldivide[i];
 
 			//create
-			joint = dJointCreateContact (world, contactgroup, contact);
+			joint = dJointCreateContact (simulation_thread.world, simulation_thread.contactgroup, contact);
 			dJointAttach (joint, wheel->points[i].b1, wheel->points[i].b2);
 
 			//check if reading collision data
@@ -265,7 +266,7 @@ void Wheel::Add_Contact(	dBodyID b1, dBodyID b2, Geom *g1, Geom *g2,
 	//(rim mu calculated as the already defaults)
 	if (fabs(VDot (Z, wheelaxle)) > rim_dot) //angle angle between normal and wheel axis
 	{
-		dJointID c = dJointCreateContact (world,contactgroup,contact);
+		dJointID c = dJointCreateContact (simulation_thread.world,simulation_thread.contactgroup,contact);
 		dJointAttach (c,b1,b2);
 
 		if (g1->buffer_event || g2->buffer_event || g1->force_to_body || g2->force_to_body)

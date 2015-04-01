@@ -28,6 +28,7 @@
 #include "track.hpp"
 
 #include "common/log.hpp"
+#include "common/threads.hpp"
 
 #include "simulation/joint.hpp"
 #include "simulation/geom.hpp"
@@ -247,7 +248,7 @@ Module *Module::Load(const char *path)
 void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 {
 	dJointID joint;
-	joint = dJointCreateFixed (world, 0);
+	joint = dJointCreateFixed (simulation_thread.world, 0);
 	Joint *jd = new Joint(joint, obj);
 	dJointAttach (joint, body1, body2);
 	dJointSetFixed (joint);
@@ -278,7 +279,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
-	dBodyID body = dBodyCreate (world);
+	dBodyID body = dBodyCreate (simulation_thread.world);
 
 	dMass m;
 	dMassSetBoxTotal (&m,400,1,1,1); //mass+sides
@@ -306,7 +307,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	new Space(obj);
 
 	//one body to which all geoms are added
-	dBodyID body1 = dBodyCreate (world);
+	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	//mass
 	dMass m;
@@ -439,7 +440,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
 
-	dBodyID body1 = dBodyCreate (world);
+	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	dMass m;
 	dMassSetSphereTotal (&m,60,1); //mass and radius
@@ -471,7 +472,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
-	body = dBodyCreate (world);
+	body = dBodyCreate (simulation_thread.world);
 
 	dMassSetSphereTotal (&m,30,0.5); //mass and radius
 	dBodySetMass (body, &m);
@@ -487,7 +488,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 
 	//connect to main sphere
 	
-	joint = dJointCreateBall (world, 0);
+	joint = dJointCreateBall (simulation_thread.world, 0);
 
 	Joint *jd = new Joint(joint, obj);
 	jd->Set_Buffer_Event(1000, 50000, (Script*)1337);
@@ -513,7 +514,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
 	data->Set_Buffer_Event(1000, 1500, (Script*)1337);
-	dBodyID body1 = dBodyCreate (world);
+	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	dMass m;
 	dMassSetSphereTotal (&m,20,1); //mass+radius
@@ -562,7 +563,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 			data->surface.mu = 1.0;
 			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
 
-			body1[i] = dBodyCreate (world);
+			body1[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body1[i]);
 
 			dMass m;
@@ -620,7 +621,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 			data->surface.mu = 1.0;
 			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
 
-			body2[i] = dBodyCreate (world);
+			body2[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body2[i]);
 
 			dMass m;
@@ -683,7 +684,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 			data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
 			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
-			body[i] = dBodyCreate (world);
+			body[i] = dBodyCreate (simulation_thread.world);
 	
 			dMass m;
 			dMassSetCapsuleTotal (&m,400,3,1,0.5); //mass, direction (3=z-axis), radius and length
@@ -770,7 +771,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 		g->surface.mu = 1.0;
 		g->Set_Buffer_Event(100000, 50000, (Script*)1337);
 
-		dBodyID body = dBodyCreate (world);
+		dBodyID body = dBodyCreate (simulation_thread.world);
 		dMass m;
 		dMassSetTrimeshTotal (&m,10,g->geom_id); //built-in feature in ode!
 

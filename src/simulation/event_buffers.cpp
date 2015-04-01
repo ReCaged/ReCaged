@@ -20,6 +20,7 @@
  */ 
 
 #include "assets/track.hpp"
+#include "common/threads.hpp"
 #include "event_buffers.hpp"
 #include "timers.hpp"
 
@@ -184,7 +185,7 @@ void Event_Buffers_Process(dReal step)
 				gd->Set_Buffer_Event(150000, 1000, (Script*)1337);
 
 				//body1
-				dBodyID b = dBodyCreate(world);
+				dBodyID b = dBodyCreate(simulation_thread.world);
 				dMass m;
 				dMassSetBoxTotal (&m, 100, 2,2,5.0/2.0);
 				dBodySetMass(b, &m);
@@ -202,7 +203,7 @@ void Event_Buffers_Process(dReal step)
 				gd->Set_Buffer_Event(150000, 1000, (Script*)1337);
 
 				//body2
-				b = dBodyCreate(world);
+				b = dBodyCreate(simulation_thread.world);
 				dMassSetBoxTotal (&m, 100, 2,2,5.0/2.0);
 				dBodySetMass(b, &m);
 				new Body(b, geom->object_parent);
@@ -222,7 +223,7 @@ void Event_Buffers_Process(dReal step)
 			if (geom->TMP_pillar_geom)
 			{
 				//pillar that should be getting a body (to detach), and buffer refill
-				dBodyID body = dBodyCreate(world);
+				dBodyID body = dBodyCreate(simulation_thread.world);
 
 				//mass
 				dMass m;

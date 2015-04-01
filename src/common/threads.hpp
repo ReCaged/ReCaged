@@ -19,32 +19,75 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
+//This is a kind of "thread local storage," without using any non-portable
+//platform/compiler features. Each thread got its own "Thread" struct, which it
+//should pass on through function calls where needed. In the future multiple
+//simulation/worker threads will be able to run in parallell, but for now this
+//is just preparatory/transitional.
+
+//TODO: this should probably become a class, and sim/int threads inherited
+
 #ifndef _RCX_THREADS_H
 #define _RCX_THREADS_H
 
 #include <SDL/SDL_mutex.h>
+#include <ode/ode.h>
 
-//mutexes
-extern SDL_mutex *ode_mutex;
-extern SDL_mutex *sdl_mutex;
-extern SDL_mutex *sync_mutex;
-extern SDL_mutex *render_list_mutex;
-extern SDL_cond  *sync_cond;
-//
+//use a "runlevel" (enum) variable to make all threads/loops aware of status
+typedef enum {running, paused, done} runlevel_type;
+
+struct Thread {
+	//TODO: type{sim, int, ...}, or dynamic_cast<*>(...) safety checks!
+
+	//for controlling thread (request termination/etc)
+	runlevel_type runlevel;
+
+	//for interface thread
+	bool render_models;
+	bool render_geoms;
+
+	SDL_mutex *render_list_mutex; //prevents switching buffers at same time
+	//(probability is low, but it could occur)
+
+	//for simulation threads
+	SDL_mutex *ode_mutex; //prevent simultaneous access
+	SDL_mutex *sync_mutex; //for signaling a new frame ready to draw
+	SDL_cond  *sync_cond; //-''-
+
+	dWorldID world;
+	dSpaceID space;
+	dJointGroupID contactgroup;
+
+	//statistics
+	unsigned int count; //keep track of number of render/simulation steps
+	unsigned int lag_count; //mainly for simulation
+	unsigned int lag_time; //-''-
+};
+
+const Thread thread_defaults = {
+	done, //runlevel
+	true,
+	true,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	0,
+	0,
+	0 };
 
 
-//prototypes for communication/statistic variables
-//simulation:
-extern unsigned int simulation_count;
-extern unsigned int simulation_lag_count;
-extern unsigned int simulation_lag_time;
+//used for passing some finishing info
+extern Uint32 starttime;
+extern Uint32 racetime;
 
-//interface:
-extern unsigned int interface_count;
-extern bool render_models;
-extern bool render_geoms;
+//just these, explicitly, two threads for now:
+extern Thread interface_thread;
+extern Thread simulation_thread;
 
-//functions
+//functions for handling the two threads
+void Threads_Launch(void);
+
 bool Interface_Init(bool window, bool fullscreen, int xres, int yres);
 void Interface_Quit(void);
 bool Simulation_Init(void);
@@ -52,7 +95,6 @@ void Simulation_Quit (void);
 
 int Interface_Loop (void);
 int Simulation_Loop (void *d);
-
 
 
 //TMP: used for keeping track for objects spawning

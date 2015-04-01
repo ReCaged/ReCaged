@@ -26,6 +26,7 @@
 #include "common/internal.hpp"
 #include "common/log.hpp"
 #include "common/directories.hpp"
+#include "common/threads.hpp"
 #include "simulation/camera.hpp"
 #include "simulation/geom.hpp"
 #include "simulation/body.hpp"
@@ -354,7 +355,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Trimesh_3D *wheel3D, Profile 
 	new Space(car);
 
 	dMass m;
-	car->bodyid = dBodyCreate (world);
+	car->bodyid = dBodyCreate (simulation_thread.world);
 	dBodySetAutoDisableFlag (car->bodyid, 0); //never disable main body
 	
 
@@ -491,7 +492,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Trimesh_3D *wheel3D, Profile 
 
 
 		//(body)
-		wheel_body[i] = dBodyCreate (world);
+		wheel_body[i] = dBodyCreate (simulation_thread.world);
 
 		//never disable wheel body
 		dBodySetAutoDisableFlag (wheel_body[i], 0);
@@ -570,7 +571,7 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Trimesh_3D *wheel3D, Profile 
 	Joint *jointd;
 	for (int i=0; i<4; ++i)
 	{
-		car->joint[i]=dJointCreateHinge2 (world, 0);
+		car->joint[i]=dJointCreateHinge2 (simulation_thread.world, 0);
 		jointd = new Joint(car->joint[i], car);
 		jointd->carwheel = &car->gotwheel[i];
 
@@ -661,7 +662,7 @@ void Car::Respawn (dReal x, dReal y, dReal z)
 	{
 		if (!gotwheel[i])
 		{
-			joint[i]=dJointCreateHinge2 (world, 0);
+			joint[i]=dJointCreateHinge2 (simulation_thread.world, 0);
 			jointd = new Joint(joint[i], this);
 			jointd->carwheel = &gotwheel[i];
 

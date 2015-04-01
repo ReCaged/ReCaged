@@ -60,8 +60,6 @@ rcx_SOURCES =	./rcx.cpp \
 		common/internal.hpp \
 		common/log.cpp \
 		common/log.hpp \
-		common/runlevel.cpp \
-		common/runlevel.hpp \
 		common/threads.cpp \
 		common/threads.hpp \
 		interface/geom_render.cpp \

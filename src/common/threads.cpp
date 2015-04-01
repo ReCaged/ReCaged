@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,16 +19,50 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
+#include <SDL/SDL.h>
 #include "threads.hpp"
 
-SDL_mutex *render_list_mutex = NULL; //prevent threads from switching buffers at the same
-//(probability is low, but it could occur)
+//global Thread variables, will be more dynamic in future
+Thread interface_thread = thread_defaults;
+Thread simulation_thread = thread_defaults;
 
-SDL_mutex *ode_mutex = NULL; //only one thread for ode
-SDL_mutex *sdl_mutex = NULL; //only one thread for sdl
+Uint32 starttime = 0;
+Uint32 racetime = 0;
+void Threads_Launch(void)
+{
+	//start
+	Log_Add (0, "Launching Threads (and race)");
 
-SDL_mutex *sync_mutex = NULL; //for using sync_cond
-SDL_cond  *sync_cond  = NULL; //threads can sleep until synced
-//
+	//create mutex for ode locking
+	simulation_thread.ode_mutex = SDL_CreateMutex();
 
+	//and for signaling new render
+	simulation_thread.sync_mutex = SDL_CreateMutex();
+	simulation_thread.sync_cond = SDL_CreateCond();
+
+	//prevent (unlikely) update/render collision
+	simulation_thread.render_list_mutex = SDL_CreateMutex();
+
+	starttime = SDL_GetTicks(); //how long it took for race to start
+
+	//launch threads
+	SDL_Thread *simulation = SDL_CreateThread (Simulation_Loop, NULL);
+	Interface_Loop(); //we already got opengl context in main thread
+
+	//just in case, to prevent accidental locks:
+	simulation_thread.runlevel=done;
+
+	//wait for threads
+	SDL_WaitThread (simulation, NULL);
+	racetime = SDL_GetTicks() - starttime;
+
+	//cleanup
+	SDL_DestroyMutex(simulation_thread.ode_mutex);
+	SDL_DestroyMutex(simulation_thread.sync_mutex);
+	SDL_DestroyCond(simulation_thread.sync_cond);
+	SDL_DestroyMutex(simulation_thread.render_list_mutex);
+
+	//done!
+	Log_Add(0, "Threads (and race) Finished");
+}
 

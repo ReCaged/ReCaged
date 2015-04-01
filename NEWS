@@ -80,6 +80,7 @@ TODO: more stuff here!
    * Renamed directory "shared" to "common"
    * Renamed directory "loaders" to "assets"
    * Renamed "Racetime_Data" to "Assets"
+   * Created "Thread" struct for thread local data (will become important)
    * Moved most code from "common" to "assets" and "simulation"
    * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
    * Removed "../" from header inclusions (src is now in the inclusion paths)
