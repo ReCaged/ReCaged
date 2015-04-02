@@ -176,7 +176,7 @@ w32deps)
 	echo "Getting build dependencies..."
 	echo ""
 
-	if [ BUILDTYPE = "W32NATIVE" ]; then
+	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
 		if ! test -e /etc/fstab
 		then
 			echo ""
@@ -272,7 +272,7 @@ w32deps)
 
 	#lua TODO!
 
-	if [ BUILDTYPE = "W32NATIVE" ]; then
+	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
 		#nsis (always try this, best way to update I guess)
 		cd "$HOME" #otherwise browser will prevent deletion of BUILDDIR
 		echo ""
@@ -291,7 +291,7 @@ w32update)
 	echo "Getting updates..."
 	echo ""
 
-	if [ BUILDTYPE = "W32NATIVE" ]; then
+	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
 		mingw-get update
 		mingw-get upgrade
 	fi
