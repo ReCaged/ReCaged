@@ -303,7 +303,7 @@ w32update)
 	rm -rf "$LIBDIR"
 
 	echo "Installing dependencies again"
-	"$0" dependencies
+	"$0" w32deps
 
 	;;
 
