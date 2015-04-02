@@ -50,7 +50,6 @@ esac
 case $HOME in
 	*\ *) #space
 		echo '(detected space in $HOME, using /opt/rcx instead of ~/.rcxdev)'
-		echo ""
 		BASEDIR="/opt/rcxdev"
 		;;
 	*)
@@ -58,6 +57,8 @@ case $HOME in
 		;;
 esac
 
+#just to separate from text above
+echo ""
 
 #the actual dirs, based on the one above:
 BUILDDIR="$BASEDIR/BUILD"
@@ -174,26 +175,29 @@ w32deps)
 	echo ""
 	echo "Getting build dependencies..."
 	echo ""
-	if ! test -e /etc/fstab
-	then
-		echo ""
-		echo "WARNING: no fstab, /mingw probably not set up! creating!"
-		echo ""
-		echo "$HOMEDRIVE/mingw /mingw" > /etc/fstab
-	fi
 
-	echo "Installing packages using msys-get..."
+	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
+		if ! test -e /etc/fstab
+		then
+			echo ""
+			echo "WARNING: no fstab, /mingw probably not set up! creating!"
+			echo ""
+			echo "$HOMEDRIVE/mingw /mingw" > /etc/fstab
+		fi
 
-	#using mingw pre-built packages:
-	mingw-get install msys-wget mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-bzip2 mingw32-libz mingw32-autoconf mingw32-automake msys-vim
+		echo "Installing packages using msys-get..."
 
-	echo "NOTE: WARNINGS ABOVE CAN BE IGNORED! MOST LIKELY THE PACKAGES ARE ALREADY INSTALLED!"
+		#using mingw pre-built packages:
+		mingw-get install msys-wget mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-bzip2 mingw32-libz mingw32-autoconf mingw32-automake msys-vim
 
-	#yes, I like vim...
-	if ! test -e "$HOME/.vimrc"
-	then
-		echo "...vim text editor not configured. using example config"
-		cp /usr/share/vim/vim*/vimrc_example.vim "$HOME/.vimrc"
+		echo "NOTE: WARNINGS ABOVE CAN BE IGNORED! MOST LIKELY THE PACKAGES ARE ALREADY INSTALLED!"
+
+		#yes, I like vim...
+		if ! test -e "$HOME/.vimrc"
+		then
+			echo "...vim text editor not configured. using example config"
+			cp /usr/share/vim/vim*/vimrc_example.vim "$HOME/.vimrc"
+		fi
 	fi
 
 	echo "Compiling and installing libraries..."
@@ -268,13 +272,15 @@ w32deps)
 
 	#lua TODO!
 
-	#nsis (always try this, best way to update I guess)
-	cd "$HOME" #otherwise browser will prevent deletion of BUILDDIR
-	echo ""
-	echo "Almost done! Now just install NSIS..."
-	echo ""
-	echo "NOTE: Keep installation path and options/plug-ins at default!"
-	cmd //c start "" 'http://sourceforge.net/projects/nsis/files/latest/download?source=files'
+	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
+		#nsis (always try this, best way to update I guess)
+		cd "$HOME" #otherwise browser will prevent deletion of BUILDDIR
+		echo ""
+		echo "Almost done! Now just install NSIS..."
+		echo ""
+		echo "NOTE: Keep installation path and options/plug-ins at default!"
+		cmd //c start "" 'http://sourceforge.net/projects/nsis/files/latest/download?source=files'
+	fi
 
 	;;
 
@@ -285,8 +291,10 @@ w32update)
 	echo "Getting updates..."
 	echo ""
 
-	mingw-get update
-	mingw-get upgrade
+	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
+		mingw-get update
+		mingw-get upgrade
+	fi
 
 	echo ""
 	echo "Deleting \"$LIBDIR\" to perform reinstallation"
@@ -295,7 +303,7 @@ w32update)
 	rm -rf "$LIBDIR"
 
 	echo "Installing dependencies again"
-	"$0" dependencies
+	"$0" w32deps
 
 	;;
 
@@ -314,7 +322,6 @@ w32quick)
 
 	echo ""
 	echo "Okay! Now just type \"make\" to compile! (and \"src/rcx\" to run)"
-	echo ""
 	;;
 
 
