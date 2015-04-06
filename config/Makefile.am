@@ -19,6 +19,7 @@
 # along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+#default config files placed according to xdg convention
 configdir = $(sysconfdir)/xdg/rcx/
 nobase_dist_config_DATA = \
 	internal.conf \

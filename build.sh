@@ -137,9 +137,9 @@ case $1 in
 	cp w32/version.nsh "$BUILDDIR"
 
 	#move to place
-	mv "$BUILDDIR"/bin/rcx "$BUILDDIR"/RCX.exe
+	mv "$BUILDDIR"/games/rcx "$BUILDDIR"/RCX.exe
 	mv "$BUILDDIR"/etc/xdg/rcx "$BUILDDIR"/config
-	mv "$BUILDDIR"/share/rcx "$BUILDDIR"/data
+	mv "$BUILDDIR"/share/games/rcx "$BUILDDIR"/data
 
 	#find nsis the stupid way
 	MAKENSIS="$PROGRAMFILES/NSIS/makensis"
