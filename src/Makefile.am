@@ -25,10 +25,14 @@ ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
 #compiler flags
 AM_CPPFLAGS =	$(RCX_FLAGS) -Wall \
-		-DDATADIR='"$(datadir)/rcx/"' \
+		-DDATADIR='"$(datadir)/games/rcx/"' \
 		-DCONFDIR='"$(sysconfdir)/xdg/rcx/"'
+
 #AM_LDFLAGS not used right now
 LDADD = $(RCX_LIBS)
+
+#place in subdir "games" instead of "bin"
+bindir=$(exec_prefix)/games
 
 bin_PROGRAMS = rcx
 

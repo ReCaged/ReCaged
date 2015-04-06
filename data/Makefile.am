@@ -19,9 +19,9 @@
 # along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#TODO: in future "teams" and "worlds" will be part of "objects" and a new dir
-#"shared" will be added. Then: one Makefile.am for each dir.
-objectsdir = $(datadir)/rcx
+#TODO: in future "teams" and "worlds" will be in "objects" and a new dir
+#("shared"?) will be added for shared assets.
+objectsdir = $(datadir)/games/rcx
 nobase_dist_objects_DATA = \
 	objects/misc/beachball/README \
 	objects/misc/beachball/sphere.mtl \
@@ -58,7 +58,7 @@ nobase_dist_objects_DATA = \
 	objects/misc/tetrahedron/README
 
 #TODO: remove in future (everything will be objects)
-teamsdir = $(datadir)/rcx/
+teamsdir = $(datadir)/games/rcx/
 nobase_dist_teams_DATA = \
 	teams/Nemesis/cars/Venom/car.conf \
 	teams/Nemesis/cars/Venom/camera.conf \
@@ -67,7 +67,7 @@ nobase_dist_teams_DATA = \
 	teams/Nemesis/cars/Venom/Venom.mtl \
 	teams/Nemesis/cars/Venom/Venom.obj
 
-worldsdir = $(datadir)/rcx/
+worldsdir = $(datadir)/games/rcx/
 nobase_dist_worlds_DATA = \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
@@ -92,8 +92,4 @@ nobase_dist_worlds_DATA = \
 	worlds/Sandbox/wheels/Slipstream/wheel.conf \
 	worlds/Sandbox/wheels/Slipstream/wheel.obj \
 	worlds/Sandbox/wheels/Slipstream/README
-
-#TODO: add in future (shared media)
-#objectsdir = $(datadir)/rcx/data
-#nobase_dist_objects_DATA = 
 
