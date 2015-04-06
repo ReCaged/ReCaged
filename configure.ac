@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 #
-# RCX - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2013, 2014, 2015 Mats Wahlberg
 #

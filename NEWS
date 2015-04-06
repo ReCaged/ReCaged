@@ -17,7 +17,8 @@ TODO: more stuff here!
  * Added simple script ("build.sh") for automating tedious builds (w32 for now)
 
  * Detect if running in "installed" or "portable" mode
-   * Uses xdg or platform-specific paths when installed
+   * Uses xdg or platform-specific paths when running in installed mode
+   * Only uses local directories when running in portable mode
    * Automatic detection and paths can be overridden by invocation arguments
 
  * New set of invocation flags and arguments (includes long arguments)
@@ -63,6 +64,7 @@ TODO: more stuff here!
 
  * Car improvements:
    * New, more powerful, downforce
+   * Dynamic suspension elevation/compensation of downforce and gravity
    * Major reconfiguration of "Venom" car
    * New tyre friction simulation model (more stable, easier to configure)
    * New tyre combined slip/grip model
@@ -74,7 +76,6 @@ TODO: more stuff here!
    * Smarter transition between brakes and throttle, more reliable at low speed
    * New rolling resistance code (more reliable at low speed/uneven terrain)
    * Less bending of wheel axles at high speeds (finite rotation for axles)
-   *..... TODO!
 
  * Major code reorganizations:
    * Renamed directory "shared" to "common"
