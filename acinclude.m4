@@ -21,7 +21,7 @@
 
 
 #
-#Custom macros for checking some common (but not OS level) libraries.
+#Custom macros for checking some libraries, config flags, and set up.
 #
 
 
@@ -59,21 +59,32 @@ esac
 #make this result available for automake (certain code alterations)
 AM_CONDITIONAL([ON_W32], [test "$RCX_TARGET" = "w32"])
 
+#(note: the two "if/else" checks below prevents STATIC and CONSOLE from staying
+#empty, to avoid using (IMHO) ugly looking "x$STATIC" = "xyes" tests later on)
+
 #if w32, probably wanting static linking?
 AC_ARG_ENABLE(
 	[w32static],
 	[AS_HELP_STRING([--enable-w32static],
-			[Link libraries statically on W32 @<:@default=no@:>@])],
-	[STATIC="$enableval"],
-	[STATIC="no"] )
+			[Link libraries statically on W32 @<:@default=no@:>@])], [
+		if test "x$enableval" != "xno"; then
+			STATIC="yes"
+		else
+			STATIC="no"
+		fi
+		], [STATIC="no"] )
 
 #and console output?
 AC_ARG_ENABLE(
 	[w32console],
 	[AS_HELP_STRING([--enable-w32console],
-			[Enable console output on W32 @<:@default=no@:>@])],
-	[CONSOLE="$enableval"],
-	[CONSOLE="no"] )
+			[Enable console output on W32 @<:@default=no@:>@])], [
+		if test "x$enableval" != "xno"; then
+			CONSOLE="yes"
+		else
+			CONSOLE="no"
+		fi
+		], [CONSOLE="no"] )
 
 #need windres if on w32
 if test "$RCX_TARGET" = "w32"; then
@@ -99,11 +110,12 @@ AC_DEFUN([RCX_CHECK_PROG],
 
 FAILED="yes"
 
-if test "$1"; then
+if test -n "$1"; then
 
 	#try running program for flags
 	AC_MSG_CHECKING([for flags using $1 $2])
 
+	#(these if statements check the return status, not returned string)
 	if tmp_flags=$($1 $2 2>/dev/null); then
 		#ok
 		AC_MSG_RESULT([$tmp_flags])
@@ -151,7 +163,7 @@ if test "$RCX_TARGET" = "w32"; then
 
 	#console flag
 	AC_MSG_CHECKING([if building with w32 console enabled])
-	if test "$CONSOLE" != "no"; then
+	if test "$CONSOLE" = "yes"; then
 		AC_MSG_RESULT([yes])
 
 		RCX_LIBS="$RCX_LIBS -mconsole"
@@ -161,7 +173,7 @@ if test "$RCX_TARGET" = "w32"; then
 
 	#static flag
 	AC_MSG_CHECKING([if building static w32 binary])
-	if test "$STATIC" != "no"; then
+	if test "$STATIC" = "yes"; then
 		AC_MSG_RESULT([yes])
 
 		RCX_FLAGS="$RCX_FLAGS -DGLEW_STATIC"
@@ -203,7 +215,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags sdl], [$pkg_static --libs sdl],
 	AC_PATH_TOOL([SDL_CONFIG], [sdl-config])
 
 	#normally "--libs", but might change in certain situation (w32+static)
-	if test "$RCX_TARGET" = "w32" && test "$STATIC" != "no"; then
+	if test "$RCX_TARGET" = "w32" && test "$STATIC" = "yes"; then
 		sdl_libs="--static-libs"
 	else
 		sdl_libs="--libs"
@@ -239,7 +251,7 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 ])
 
 #static stop (if enabled and on w32)
-if test "$RCX_TARGET" = "w32" && test "$STATIC" != "no"; then
+if test "$RCX_TARGET" = "w32" && test "$STATIC" = "yes"; then
 	RCX_LIBS="$RCX_LIBS -Wl,-Bdynamic"
 fi
 
