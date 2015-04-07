@@ -95,6 +95,9 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/wheel.cpp \
 		simulation/wheel.hpp
 
+#a trick to make all objects recompile if Makefile gets updated (reconfigure)
+$(rcx_OBJECTS): Makefile
+
 #remove w32 files on all platforms (just in case)
 CLEANFILES = resources.rc resources.o
 
