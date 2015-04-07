@@ -19,8 +19,6 @@
 # along with RCX.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#TODO: in future "teams" and "worlds" will be in "objects" and a new dir
-#("shared"?) will be added for shared assets.
 objectsdir = $(datadir)/games/rcx
 nobase_dist_objects_DATA = \
 	objects/misc/beachball/README \
@@ -55,20 +53,13 @@ nobase_dist_objects_DATA = \
 	objects/misc/pillar/README \
 	objects/misc/tetrahedron/model.mtl \
 	objects/misc/tetrahedron/model.obj \
-	objects/misc/tetrahedron/README
-
-#TODO: remove in future (everything will be objects)
-teamsdir = $(datadir)/games/rcx/
-nobase_dist_teams_DATA = \
+	objects/misc/tetrahedron/README \
 	teams/Nemesis/cars/Venom/car.conf \
 	teams/Nemesis/cars/Venom/camera.conf \
 	teams/Nemesis/cars/Venom/geoms.lst \
 	teams/Nemesis/cars/Venom/README \
 	teams/Nemesis/cars/Venom/Venom.mtl \
-	teams/Nemesis/cars/Venom/Venom.obj
-
-worldsdir = $(datadir)/games/rcx/
-nobase_dist_worlds_DATA = \
+	teams/Nemesis/cars/Venom/Venom.obj \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
 	worlds/Sandbox/tracks/Box/Box3.mtl \
