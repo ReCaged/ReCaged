@@ -1,5 +1,5 @@
 #
-# RCX - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2015 Mats Wahlberg
 #
@@ -23,15 +23,18 @@
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
-#TODO!
-SUBDIRS                 = config data icons man src w32
+SUBDIRS                 = config data man src w32
 
-#TODO!
-EXTRA_DIST		= AUTHORS COPYING INSTALL NEWS README ChangeLog \
-			  build.sh \
-			  licenses/CC0 \
-			  licenses/CC-BY-SA-4.0 \
-			  licenses/GPL-3
+#documentation installed
+dist_doc_DATA		= AUTHORS COPYING INSTALL NEWS README ChangeLog
+
+#TODO: when icon...
+#pixmapsdir = $(datadir)/pixmaps
+#dist_pixmaps_DATA = #data/icon...
+
+#helper script for obscure builds, and license directory
+EXTRA_DIST		= build.sh licenses
+
 
 #create ChangeLog from git log
 dist-hook:

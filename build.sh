@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# RCX - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2014, 2015 Mats Wahlberg
 #
