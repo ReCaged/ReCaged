@@ -276,7 +276,7 @@ w32deps)
 		echo "Getting LUA..."
 		echo ""
 		echo "Figuring out latest version..."
-		LUAV=$(wget 'http://www.lua.org/download.html' -O - 2>/dev/null | grep '"ftp/lua-.*tar.gz"' |head -n 1|cut -d'"' -f 2)
+		LUAV=$(wget 'http://www.lua.org/download.html' -O - 2>/dev/null | grep -m 1 '"ftp/lua-.*tar.gz"' |cut -d'"' -f 2)
 		echo "Latest version might be: "$LUAV" - trying..."
 
 		cd "$BUILDDIR"
