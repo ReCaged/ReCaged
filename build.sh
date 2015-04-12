@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# RCX - a Free Software, Futuristic, Racing Simulator
+# RCX - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2014, 2015 Mats Wahlberg
 #
@@ -188,7 +188,7 @@ w32deps)
 		echo "Installing packages using msys-get..."
 
 		#using mingw pre-built packages:
-		mingw-get install msys-wget mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-bzip2 mingw32-libz mingw32-autotools msys-vim
+		mingw-get install msys-wget mingw32-libz mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-autotools msys-vim
 
 		echo "NOTE: WARNINGS ABOVE CAN BE IGNORED! MOST LIKELY THE PACKAGES ARE ALREADY INSTALLED!"
 

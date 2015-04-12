@@ -1,6 +1,6 @@
-; RCX - a Free Software, Futuristic, Racing Simulator
+; RCX - a Free Software, Futuristic, Racing Game
 ;
-; Copyright (C) 2012, 2013 Mats Wahlberg
+; Copyright (C) 2012, 2013, 2015 Mats Wahlberg
 ;
 ; This file is part of RCX.
 ;
@@ -106,8 +106,8 @@ VIProductVersion "${W32VERSION}"
 VIAddVersionKey "ProductName" "RCX"
 VIAddVersionKey "FileVersion" "${VERSION}"
 VIAddVersionKey "ProductVersion" "${VERSION}"
-VIAddVersionKey "Comments" "A Free Software, Futuristic, Racing Simulator"
-VIAddVersionKey "FileDescription" "A Free Software, Futuristic, Racing Simulator"
+VIAddVersionKey "Comments" "A Free Software, Futuristic, Racing Game"
+VIAddVersionKey "FileDescription" "A Free Software, Futuristic, Racing Game"
 VIAddVersionKey "LegalCopyright" "Copyright (C) Mats Wahlberg"
 
 
