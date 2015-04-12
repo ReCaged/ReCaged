@@ -248,6 +248,34 @@ w32deps)
 		fi
 	fi
 
+	#z(lib)
+	if [ ! -e "$LIBDIR/include/zlib.h" ]
+	then
+		echo "Getting Z..."
+		echo ""
+
+		echo "Figuring out latest version..."
+		ZV=$(wget 'http://www.zlib.net/' -O - 2>/dev/null|grep -m 1 "http://zlib.net/zlib-.*.tar.gz"|cut -d'"' -f2)
+		echo "Latest version might be: "$ZV" - trying..."
+
+		cd "$BUILDDIR"
+		wget "$ZV"
+		tar xf zlib*
+
+		export BINARY_PATH="$LIBDIR/bin"
+		export INCLUDE_PATH="$LIBDIR/include"
+		export LIBRARY_PATH="$LIBDIR/lib"
+
+		if ! (cd zlib-*&& \
+			make -f win32/Makefile.gcc install)
+		then
+			echo ""
+			echo "ERROR!"
+			echo ""
+			exit 1
+		fi
+	fi
+
 	#png
 	if [ ! -e "$LIBDIR/include/png.h" ]
 	then
