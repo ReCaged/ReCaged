@@ -59,6 +59,18 @@ esac
 #make this result available for automake (certain code alterations)
 AM_CONDITIONAL([ON_W32], [test "$RCX_TARGET" = "w32"])
 
+#force a certain lua package name (disables autodetection)?
+AC_ARG_WITH(
+	[lua],
+	[AS_HELP_STRING([--with-lua=LUAPACKAGE],
+		[Override detection of which lua package to use])], [
+		if test "x$with_lua" = "xno"; then
+			AC_MSG_ERROR([You can not disable lua])
+		elif test "x$with_lua" != "xyes"; then
+			LUAPKG="$with_lua"
+		fi
+            ])
+
 #(note: the two "if/else" checks below prevents STATIC and CONSOLE from staying
 #empty, to avoid using (IMHO) ugly looking "x$STATIC" = "xyes" tests later on)
 
@@ -251,8 +263,82 @@ RCX_CHECK_PROG([$PKG_CONFIG], [--cflags glew], [$pkg_static --libs glew],
 ])
 
 #LUA:
-RCX_FLAGS="$RCX_FLAGS -I/usr/include/lua5.2"
-RCX_LIBS="$RCX_LIBS -llua5.2"
+
+#Note: some distros append the version number of the library to its name, which
+#is smart since new lua versions often breaks backwards compatibility. But some
+#distros doesn't (or use a different suffix). Unless the user specifies which
+#version to use, try to automatically find the highest version around...
+
+#first, did user not specify a version?
+if test -z "$LUAPKG"; then
+
+	#begin with a fallback/dummy name of "lua" (will be tested if nothing else is found)
+	LUAPKG="lua"
+
+	#if got pkg-config, find the most likely highest lua version
+	if test -n "$PKG_CONFIG"; then
+		AC_PROG_AWK
+		AC_MSG_CHECKING([for likely highest version of lua known by pkg-config])
+
+		#find package names beginning with lua and (at most) any version suffix
+		#note: extra square brackets to counter expansions
+		LUA_LIST=$($PKG_CONFIG --list-all|$AWK '/^lua[[0-9.-]]* / { print $[]1 }')
+
+		#loop through all candidates and find the highest-versioned one
+		#(LUAVER will be empty at first check, but that's ok)
+		for LUA_CANDIDATE in $LUA_LIST; do
+			LUA_CANDIDATE_VER=$($PKG_CONFIG --modversion $LUA_CANDIDATE)
+			AS_VERSION_COMPARE([$LUAVER], [$LUA_CANDIDATE_VER], [
+				LUAVER=$LUA_CANDIDATE_VER
+				LUAPKG=$LUA_CANDIDATE
+				])
+		done
+
+		AC_MSG_RESULT([$LUAPKG])
+	fi
+
+fi
+
+		
+#whatever we got above (should be at least "lua"), try to use it
+RCX_CHECK_PROG([$PKG_CONFIG], [--cflags $LUAPKG], [$pkg_static --libs $LUAPKG],
+[
+	AC_MSG_WARN([Attempting to guess configuration for LUA using ac_check_* macros])
+
+	#check all three headers
+	FAILED="no"
+	AC_CHECK_HEADER([$LUAPKG/lua.h],, [FAILED="yes"])
+	AC_CHECK_HEADER([$LUAPKG/lualib.h],, [FAILED="yes"])
+	AC_CHECK_HEADER([$LUAPKG/lauxlib.h],, [FAILED="yes"])
+
+	#if any one failed
+	if test "$FAILED" = "no"; then
+		#export the special paths as defines
+		AC_DEFINE([OVERRIDE_LUA_HEADERS])
+		AC_DEFINE_UNQUOTED([OVERRIDE_LUA_H], [<$LUAPKG/lua.h>])
+		AC_DEFINE_UNQUOTED([OVERRIDE_LUALIB_H], [<$LUAPKG/lualib.h>])
+		AC_DEFINE_UNQUOTED([OVERRIDE_LAUXLIB_H], [<$LUAPKG/lauxlib.h>])
+	#if failed, there might still be another possibility...
+	#"lua"=default string (user/pkg-config detection has not specified anything different)
+	elif test "$LUAPKG" = "lua"; then
+		#okay, check again, but this time directly in include path
+		FAILED="no"
+		AC_CHECK_HEADER([lua.h],, [FAILED="yes"])
+		AC_CHECK_HEADER([lualib.h],, [FAILED="yes"])
+		AC_CHECK_HEADER([lauxlib.h],, [FAILED="yes"])
+	fi
+
+	#if nothing succeeded...
+	if test "$FAILED" = "yes"; then
+		AC_MSG_ERROR([Headers for LUA appear to be missing, install liblua-dev or similar])
+	fi
+
+	#check library as usual - I assume lua_close exists in all versions
+	AC_CHECK_LIB([$LUAPKG], [lua_close],
+		[RCX_LIBS="$RCX_LIBS -l$LUAPKG"],
+		[AC_MSG_ERROR([LUA library appears to be missing, install liblua or similar])])
+])
+
 
 
 #static stop (if enabled and on w32)

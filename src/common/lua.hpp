@@ -23,9 +23,15 @@
 #define _RCX_LUA_H
 
 extern "C" {
+#if OVERRIDE_LUA_HEADERS
+#include OVERRIDE_LUA_H
+#include OVERRIDE_LUALIB_H
+#include OVERRIDE_LAUXLIB_H
+#else
 #include <lua.h>
 #include <lualib.h>
 #include <lauxlib.h>
+#endif
 }
 
 #endif

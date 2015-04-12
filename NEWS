@@ -7,6 +7,14 @@
 
 TODO: more info in header!
 
+
+TODO: 0.9.0 "?" (?/?/?)
+---------------------------
+ * Added initial lua scripting support!
+   * It automatically finds and builds against the highest installed version
+   * User can override automatic detection (using ./configure --with-lua=NAME)
+
+
 RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
 ---------------------------------------------------------------
 TODO: more stuff here!

@@ -125,6 +125,23 @@ src directory). If you're building from the git repository (development),
 first run "autoreconf -vfi" to generate the configure script and other
 required files. Remember to set "CPPFLAGS" and "LDFLAGS" if necessary.
 
+
+TODO!
+On some distributions several versions of lua can be installed at the same
+time, so by default the configure script will try to find the highest lua
+version available. You can override this using the "--with-lua=" option to
+force a certain package name (it will be used when testing both pkg-config and
+direct header/library existence):
+
+Forcing build against lua 5.2 on debian: "./configure --with-lua=lua5.2"
+And similar on freebsd: "./configure --with-lua=lua-5.2"
+
+This can be useful if the game doesn't build against the highest version of
+lua installed, or if you are a package maintainer and want to make sure it
+always builds against a certain version (which you have listed as a dependency)
+/TODO!
+
+
 If you are building on OS X (you crazy person!), you can use MacPorts to get
 all necessary dependencies (libsdl, ode, glew, etc. you can also get automake,
 autoconf and git for development versions). The rest or the build process is
@@ -164,7 +181,7 @@ and ... TODO!
 
 Alternatively you can compile and install the SDL, ODE and GLEW libraries
 manually, and install NSIS. This process will not be covered in detail here.
-Then cd into the src directory of rcx and run "./configure && make" to compile.
+Then cd into the src directory of rcx and run "./configure && make" to compile
 But if you want to create a complete installer, instead run "./configure
 --enable-w32static --enable-w32console && make" to compile and then build the
 NSIS installer. Or just use "./build.sh w32inst". The "--enable-w32static"
