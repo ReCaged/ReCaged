@@ -188,7 +188,7 @@ w32deps)
 		echo "Installing packages using msys-get..."
 
 		#using mingw pre-built packages:
-		mingw-get install msys-wget mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-bzip2 mingw32-libz mingw32-autotools msys-vim
+		mingw-get install msys-wget mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-autotools msys-vim
 
 		echo "NOTE: WARNINGS ABOVE CAN BE IGNORED! MOST LIKELY THE PACKAGES ARE ALREADY INSTALLED!"
 
