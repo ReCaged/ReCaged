@@ -105,6 +105,10 @@ libraries (the compiled windows binary includes these):
    4.4) [ODE]
    RCX uses the library "Open Dynamics Engine" for most physics simulations.
 
+   4.5) [LUA]
+   RCX uses the lua library for scripting, requiring version 5.0 or
+   (preferably) later.
+
 
 
 5) [COMPILING]
@@ -112,8 +116,8 @@ libraries (the compiled windows binary includes these):
 If you have installed a pre-compiled package or used the windows installer,
 you can skip this section. Otherwise read on...
 
-First of all, you will need the libraries mentioned above (gl, glew, sdl and
-ode). Also check if your distro provides development libraries in separate
+First of all, you will need the libraries mentioned above (gl, glew, sdl, ode
+and lua). Also check if your distro provides development libraries in separate
 packages and if so, install them too (look for packages named like
 lib<name>-dev). Also make sure you got the usual development tools (Make, C++
 compiler, Autotools, libraries etc).

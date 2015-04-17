@@ -294,7 +294,13 @@ if test -z "$LUAPKG"; then
 				])
 		done
 
-		AC_MSG_RESULT([$LUAPKG])
+		if test -n "$LUAVER"; then
+			AC_MSG_RESULT([$LUAPKG (version $LUAVER)])
+			AS_VERSION_COMPARE([$LUAVER], ["5.0"], [
+				AC_MSG_ERROR([You need at least version 5.0 of lua])])
+		else
+			AC_MSG_RESULT([nothing found, trying $LUAPKG])
+		fi
 	fi
 
 fi
