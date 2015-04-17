@@ -116,7 +116,7 @@ First of all, you will need the libraries mentioned above (gl, glew, sdl and
 ode). Also check if your distro provides development libraries in separate
 packages and if so, install them too (look for packages named like
 lib<name>-dev). Also make sure you got the usual development tools (Make, C++
-compiler, Autotools, libraries etc).
+compiler, libraries etc). Autotools are needed when building from git.
 
 The build process is the standard autoconf routine (see the file "INSTALL" for
 more information): run "./configure" followed by "make". "make install" will
