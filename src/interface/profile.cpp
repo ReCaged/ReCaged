@@ -85,18 +85,107 @@ void Profile_Input_Collect(SDL_Event *event)
 	}
 }
 
+//
 //act based on inputs
+//
+
+//helper function: increases/decreases value of target variable to approach the
+//wanted value using speed of change determined by speedbase (minimum speed)
+//and speedincrease (speed increases by distance between target and wanted)
+void Approach(dReal *target, dReal wanted,
+		dReal speedbase, dReal speedincrease,
+		dReal steptime)
+{
+	//how much the actual throttle is of from the wanted
+	dReal difference=*target-wanted;
+
+	//and if the difference is positive of negative (0 is no problem)
+	bool positive=difference>0.0?true: false;
+
+	//increased speed of change by distance from wanted position
+	if (speedincrease > 0.0)
+	{
+		dReal quotient=speedbase/speedincrease;
+
+		if (positive)
+			difference=(difference+quotient)*exp(-speedincrease*steptime)-quotient;
+		else
+			difference=(difference-quotient)*exp(-speedincrease*steptime)+quotient;
+	}
+	//constant speed of change...
+	else
+	{
+		if (positive)
+			difference-=speedbase*steptime;
+		else
+			difference+=speedbase*steptime;
+	}
+
+	if (positive)
+	{
+		//there is distance left to push throttle
+		if (difference > 0.0)
+			*target=wanted+difference;
+		else //overshoot, or at zero
+			*target=wanted;
+	}
+	else
+	{
+		if (difference < 0.0)
+			*target=wanted+difference;
+		else
+			*target=wanted;
+	}
+}
+
+//helper function 2 (for digital/keyboard input): if input is in other
+//direction of current steering/throttle, first use centering speeds to return
+//to neutral (0) and (if reached) use normal speeds for one more step.
+void Approach_Over_Zero(dReal *target, dReal wanted,
+		dReal speedbase, dReal speedincrease,
+		dReal centerspeedbase, dReal centerspeedincrease,
+		dReal steptime)
+{
+	//target 
+	if (*target * wanted < 0.0)
+	{
+		//note: "wanted" instead of 0.0, to get any extra speed from
+		//the larger difference (if got distance-based speed)
+		Approach(target, wanted,
+			centerspeedbase, centerspeedincrease,
+			steptime);
+		//but it might overshoot...
+
+		//was it enough? (yes, this floating equality test _is_ ok)
+		if (*target * wanted >= 0.0)
+		{
+			//reset to zero (remove any overshoot)
+			*target=0.0;
+
+			//and allow second call to Approach() below
+		}
+		//not enough, need to keep centering at next step
+		else
+			return; //stop here
+	}
+
+	//just the normal steering (if not different direction, or centered above)
+	Approach(target, wanted,
+		speedbase, speedincrease,
+		steptime);
+}
+
+
 //LUA note: will be performed by remote control for specific vehicle-type
 void Profile_Input_Step(Uint32 step)
 {
+	dReal steptime=(dReal) step;
 	bool digital[9];
-	dReal wanted, change_speed; //wanted "analog"+speed of change
-	int i;
 
 	for (Profile *prof=profile_head; prof; prof=prof->next)
 	{
 		//combine all digital inputs ("OR" them together):
-		for (i=0; i<9; ++i)
+		for (int i=0; i<9; ++i)
 			digital[i] = prof->input[i].key_state||prof->input[i].button_state||prof->input[i].hat_state;
 
 		//set camera settings if got a car(input fallback to analog)
@@ -134,71 +223,82 @@ void Profile_Input_Step(Uint32 step)
 				carp->drift_brakes = false;
 
 			//check for explicit digital throttle, fallback to analog
-			//if all zeroed, keep centering with last speed
-			if (digital[0] && !digital[1])
+			//if all zeroed, keep centering with last input (default digital)
+			if (digital[0] && !digital[1]) //digital forward
 			{
-				wanted = 1.0*carp->dir;
-				prof->last_throttle_speed = prof->digital_throttle_speed;
+				Approach_Over_Zero(&carp->throttle, 1.0*carp->dir,
+						prof->digital_throttle_speed[0], prof->digital_throttle_speed[1],
+						prof->digital_throttle_center_speed[0], prof->digital_throttle_center_speed[1],
+						steptime);
+
+				//for later
+				prof->analog_throttle=false;
 			}
-			else if (!digital[0] && digital[1])
+			else if (!digital[0] && digital[1]) //digital left
 			{
-				wanted = -1.0*carp->dir;
-				prof->last_throttle_speed = prof->digital_throttle_speed;
+				Approach_Over_Zero(&carp->throttle, -1.0*carp->dir,
+						prof->digital_throttle_speed[0], prof->digital_throttle_speed[1],
+						prof->digital_throttle_center_speed[0], prof->digital_throttle_center_speed[1],
+						steptime);
+
+				//store for later
+				prof->analog_throttle=false;
 			}
-			else if (prof->input[0].axis_state || prof->input[1].axis_state)
+			else if (prof->input[0].axis_state || prof->input[1].axis_state) //analog throttle
 			{
 				//combine both analog inputs into wanted
-				wanted = (prof->input[0].axis_state - prof->input[1].axis_state)*carp->dir;
-				prof->last_throttle_speed = prof->analog_throttle_speed;
+				Approach(&carp->throttle, (prof->input[0].axis_state - prof->input[1].axis_state)*carp->dir,
+						prof->analog_throttle_speed, 0.0, steptime);
+
+				prof->analog_throttle=true;
 			}
-			else
-				wanted = 0.0;
-
-			change_speed = prof->last_throttle_speed*(dReal)step;
-
-			if (carp->throttle > wanted)
+			else //digital/analog neutral
 			{
-				if ((carp->throttle-=change_speed) <wanted)
-					carp->throttle=wanted;
+				//check last input method, center using it:
+				if (prof->analog_throttle)
+					Approach(&carp->throttle, 0.0,
+						prof->analog_throttle_speed, 0.0, steptime);
+				else
+					Approach(&carp->throttle, 0.0,
+						prof->digital_throttle_center_speed[0], prof->digital_throttle_center_speed[1],
+						steptime);
 			}
-			else if (carp->throttle < wanted)
-			{
-				if ((carp->throttle+=change_speed) >wanted)
-					carp->throttle=wanted;
-			}
-
 
 			//steering, same as throttle...
 			if (digital[2] && !digital[3])
 			{
-				wanted = 1.0*carp->dir;
-				prof->last_steer_speed = prof->digital_steer_speed;
+				Approach_Over_Zero(&carp->steering, 1.0*carp->dir,
+						prof->digital_steer_speed[0], prof->digital_steer_speed[1],
+						prof->digital_steer_center_speed[0], prof->digital_steer_center_speed[1],
+						steptime);
+
+				prof->analog_steer=false;
 			}
 			else if (!digital[2] && digital[3])
 			{
-				wanted = -1.0*carp->dir;
-				prof->last_steer_speed = prof->digital_steer_speed;
+				Approach_Over_Zero(&carp->steering, -1.0*carp->dir,
+						prof->digital_steer_speed[0], prof->digital_steer_speed[1],
+						prof->digital_steer_center_speed[0], prof->digital_steer_center_speed[1],
+						steptime);
+
+				prof->analog_steer=false;
 			}
 			else if (prof->input[2].axis_state || prof->input[3].axis_state)
 			{
-				//combine both analog inputs into wanted
-				wanted = (prof->input[2].axis_state - prof->input[3].axis_state)*carp->dir;
-				prof->last_steer_speed = prof->analog_steer_speed;
+				Approach(&carp->steering, (prof->input[2].axis_state - prof->input[3].axis_state)*carp->dir,
+						prof->analog_steer_speed, 0.0, steptime);
+
+				prof->analog_steer=true;
 			}
 			else
-				wanted = 0.0;
-
-			change_speed = prof->last_steer_speed*(dReal)step;
-
-			if (carp->steering > wanted)
 			{
-				if ((carp->steering-=change_speed) <wanted)
-					carp->steering=wanted;
-			}
-			else if (carp->steering < wanted)
-			{
-				if ((carp->steering+=change_speed) >wanted)
-					carp->steering=wanted;
+				if (prof->analog_steer)
+					Approach(&carp->steering, 0.0,
+						prof->analog_steer_speed, 0.0, steptime);
+				else
+					Approach(&carp->steering, 0.0,
+						prof->digital_steer_center_speed[0], prof->digital_steer_center_speed[1],
+						steptime);
 			}
 		}
 	}
