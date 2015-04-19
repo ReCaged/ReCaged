@@ -67,7 +67,6 @@ struct Profile {
 
 extern Profile *profile_head;
 
-#pragma message "configure defaults!"
 const Profile profile_defaults = {
 	NULL, //car
 	//steering throttling speed
