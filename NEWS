@@ -29,6 +29,8 @@ TODO: more stuff here!
 
  * Fixed various insufficient memory allocations
 
+ * Clipping and fog are now track-specific, and more fog options are available
+
  * Separate tyre and rim models replaced by single wheel models (by world/track)
 
  * New models and tracks:

@@ -23,6 +23,7 @@
 #include "render_list.hpp"
 
 #include "assets/model.hpp"
+#include "assets/track.hpp"
 #include "common/threads.hpp"
 #include "common/internal.hpp"
 #include "common/log.hpp"
@@ -32,10 +33,6 @@
 
 #include <stdlib.h>
 #include <ode/ode.h>
-
-//options
-bool culling=false;
-bool fog=false;
 
 //offset for vbo
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -352,14 +349,27 @@ void Render_List_Render()
 	//options:
 	//
 
-	//culling of backs
-	if (culling)
+	//culling of back faces
+	if (internal.culling)
 		glEnable(GL_CULL_FACE);
 
-	//fog
-	if (fog)
+	//enable fog?
+	if (track.fog_mode)
+	{
 		glEnable(GL_FOG);
 
+		if (track.fog_mode == 1)
+		{
+			glFogi(GL_FOG_MODE, GL_LINEAR);
+			glFogf(GL_FOG_START, track.fog_range[0]);
+			glFogf(GL_FOG_END, track.fog_range[1]);
+		}
+		else
+		{
+			glFogi(GL_FOG_MODE, track.fog_mode==2? GL_EXP: GL_EXP2);
+			glFogf(GL_FOG_DENSITY, track.fog_density);
+		}
+	}
 
 
 	//enable rendering of vertices and normals
@@ -395,8 +405,8 @@ void Render_List_Render()
 		up_proj = pos[0]*camera_rot[2]+pos[1]*camera_rot[5]+pos[2]*camera_rot[8];
 
 		//limit of what range is rendered (compensates for "radius" of model that might still be seen)
-		dir_min = internal.clipping[0] - radius; //behind close clipping
-		dir_max = internal.clipping[1] + radius; //beyound far clipping
+		dir_min = track.clipping[0] - radius; //behind close clipping
+		dir_max = track.clipping[1] + radius; //beyound far clipping
 		right_max = view_angle_rate_x*(dir_proj+radius) + radius; //right/left
 		up_max = view_angle_rate_y*(dir_proj+radius) + radius; //above/below
 

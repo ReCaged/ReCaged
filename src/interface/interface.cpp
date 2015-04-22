@@ -93,13 +93,12 @@ void Resize (int new_w, int new_h)
 	//
 
 	//x position at close clipping
-	GLfloat x = internal.clipping[0] * view_angle_rate_x;
-	//y -''- 
-	GLfloat y = internal.clipping[0] * view_angle_rate_y;
-
+	GLfloat x = track.clipping[0] * view_angle_rate_x;
+	//y -''-
+	GLfloat y = track.clipping[0] * view_angle_rate_y;
 
 	//set values
-	glFrustum(-x, x, -y, y, internal.clipping[0], internal.clipping[1]);
+	glFrustum(-x, x, -y, y, track.clipping[0], track.clipping[1]);
 
 	//switch back to usual matrix
 	glMatrixMode (GL_MODELVIEW);
@@ -232,17 +231,6 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 	//
 	//options
 	//
-	if (internal.culling)
-		culling=true;
-
-	//if positive and closer than far clipping
-	if (internal.fog > 0.0 && internal.fog < internal.clipping[1])
-	{
-		glFogi(GL_FOG_MODE, GL_LINEAR);
-		glFogf(GL_FOG_START, internal.fog);
-		glFogf(GL_FOG_END, internal.clipping[1]);
-		fog=true;
-	}
 
 	//make sure everything is rendered with highest possible quality
 	glHint(GL_FOG_HINT, GL_NICEST);
@@ -456,7 +444,7 @@ int Interface_Loop ()
 		else if (!background && geom_render_level != 5)
 		{
 			//restore track specified background
-			glClearColor (track.sky[0],track.sky[1],track.sky[2],1.0);
+			glClearColor (track.background[0],track.background[1],track.background[2],1.0);
 			background = true;
 		}
 
