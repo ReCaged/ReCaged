@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -26,10 +26,6 @@
 #define INITIAL_RENDER_LIST_SIZE 150
 
 #include <SDL/SDL_mutex.h>
-
-//options
-extern bool culling;
-extern bool fog;
 
 //functions
 void Render_List_Update(); //create pos/rot list

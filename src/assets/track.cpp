@@ -100,9 +100,17 @@ bool load_track (const char *path)
 	default_camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
 			track.focus_start[0], track.focus_start[1], track.focus_start[2]);
 
+	if (track.fog_mode < 0 || track.fog_mode > 3)
+	{
+		Log_Add(-1, "Incorrect fog mode for track, disabling");
+		track.fog_mode=0;
+
+	}
 	//all data loaded, start building
-	glClearColor (track.sky[0],track.sky[1],track.sky[2],track.sky[3]); //background
-	glFogfv(GL_FOG_COLOR, track.sky); //"fog"
+	//background (for now)
+	glClearColor (track.background[0],track.background[1],track.background[2],track.background[3]);
+	//fog
+	glFogfv(GL_FOG_COLOR, track.fog_colour);
 	
 	//sun position and colour
 	glLightfv (GL_LIGHT0, GL_AMBIENT, track.ambient);

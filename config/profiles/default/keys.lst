@@ -60,7 +60,7 @@ left hat 0 left
 #note: if you got analog shoulder buttons, they are probably
 #mapped as two axis resting at -32768 (fully pressed at 32767)
 #they can be mapped as (assuming the axes are 5 and 2):
-#(just uncomment the follwing lines. it's really good!)
+#(just uncomment the following lines. It's really good!)
 #forward axis 5 -3200 32000
 #reverse axis 2 -3200 32000
 #drift_brake button 0

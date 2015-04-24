@@ -125,6 +125,7 @@ int Simulation_Loop (void *d)
 				Wheel::Physics_Step(); //create contacts and rolling resistance
 				Car::Physics_Step(divided_stepsize); //control, antigrav...
 				Geom::Physics_Step(); //sensor/radar handling
+				Track_Physics_Step(); //respawn/destruction
 
 				//simulate
 				dWorldQuickStep (simulation_thread.world, divided_stepsize);

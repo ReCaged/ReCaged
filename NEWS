@@ -37,6 +37,10 @@ TODO: more stuff here!
 
  * Fixed various insufficient memory allocations
 
+ * Prevent rare occurrences of random joint damage
+
+ * Clipping and fog are now track-specific, and more fog options are available
+
  * Separate tyre and rim models replaced by single wheel models (by world/track)
 
  * New models and tracks:
@@ -71,9 +75,10 @@ TODO: more stuff here!
    * Modified camera (position) can now be reset without restarting the game
 
  * Car improvements:
+   * Major reconfiguration of "Venom" car
+   * Much better steer&throttle control for keyboard/digital input
    * New, more powerful, downforce
    * Dynamic suspension elevation/compensation of downforce and gravity
-   * Major reconfiguration of "Venom" car
    * New tyre friction simulation model (more stable, easier to configure)
    * New tyre combined slip/grip model
    * New tyre/rim contact point evaluation

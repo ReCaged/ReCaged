@@ -78,6 +78,13 @@ void Joint::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
 		feedback=new dJointFeedback;
 		dJointSetFeedback (joint_id, feedback);
 
+		//set feedback values to zero. note: normally not necessary
+		//(since ode overwrites them at the next step), but there's a
+		//slight chance it might get read before the next step, causing
+		//unexpected weakening/breakage of joints (random values
+		//instead of zero)
+		memset(feedback, 0, sizeof(dJointFeedback));
+
 		threshold=thres;
 		buffer=buff;
 		buffer_script=scr;
