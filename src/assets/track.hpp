@@ -31,7 +31,13 @@
 //TODO: all this will be moved to Thread and new rendering System (with lua)
 extern struct Track_Struct {
 	//placeholder for stuff like if it's raining/snowing and lightsources
-	float sky[4]; //background/fog colour
+	float background[4];
+
+	float clipping[2];
+	int fog_mode;
+	float fog_range[2];
+	float fog_density;
+	float fog_colour[4];
 
 	float position[4]; //light position
 	float ambient[4];
@@ -55,7 +61,12 @@ extern struct Track_Struct {
 //index:
 
 const struct Track_Struct track_defaults = {
-	{0.5,0.7,0.8 ,1.0},
+	{0.53,0.81,0.92 ,1.0},
+	{1.0, 1500.0},
+	3,
+	{1000.0, 1500.0},
+	0.0015,
+	{0.53,0.81,0.92 ,1.0},
 	{-1.0,0.5,1.0,0.0},
 	{0.0,0.0,0.0 ,1.0},
 	{1.0,1.0,1.0 ,1.0},
@@ -69,7 +80,12 @@ const struct Track_Struct track_defaults = {
 	-20.0};
 
 const struct Conf_Index track_index[] = {
-	{"sky",		'f',3,	offsetof(Track_Struct, sky[0])},
+	{"background",	'f',3,	offsetof(Track_Struct, background)},
+	{"clipping",	'f',2,	offsetof(Track_Struct, clipping)},
+	{"fog:mode",	'i',1,	offsetof(Track_Struct, fog_mode)},
+	{"fog:range",	'f',2,	offsetof(Track_Struct, fog_range)},
+	{"fog:density",	'f',1,	offsetof(Track_Struct, fog_density)},
+	{"fog:colour",	'f',3,	offsetof(Track_Struct, fog_colour)},
 	{"ambient",	'f',3,	offsetof(Track_Struct, ambient[0])},
 	{"diffuse",	'f',3,	offsetof(Track_Struct, diffuse[0])},
 	{"specular",	'f',3,	offsetof(Track_Struct, specular[0])},
@@ -84,5 +100,6 @@ const struct Conf_Index track_index[] = {
 	{"",0,0}};//end
 
 bool load_track (const char *path);
+void Track_Physics_Step();
 
 #endif

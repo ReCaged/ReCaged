@@ -71,6 +71,7 @@ class Body: public Component
 		Body *prev, *next;
 		static Body *head;
 		friend void Render_List_Update(); //to allow loop through bodies
+		friend void Track_Physics_Step();
 
 		//data for drag (air+water friction)
 		//instead of the simple spherical drag model, use a

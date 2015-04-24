@@ -139,6 +139,7 @@ class Geom: public Component
 		friend void Render_List_Update(); //to allow loop through geoms
 		friend void Event_Buffers_Process(dReal); //to allow looping
 		friend void Body::Physics_Step (dReal step); //dito
+		friend void Track_Physics_Step();
 		friend void Geom_Render(); //same as above, for debug collision render
 		friend class Wheel; //to set collision feedbacks
 };

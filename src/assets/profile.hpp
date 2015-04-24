@@ -33,8 +33,12 @@ struct Profile {
 	class Car *car;
 
 	//settings (loaded from conf)
-	dReal digital_steer_speed, analog_steer_speed, last_steer_speed;
-	dReal digital_throttle_speed, analog_throttle_speed, last_throttle_speed;
+	dReal digital_steer_speed[2], digital_throttle_speed[2];
+	dReal digital_steer_center_speed[2], digital_throttle_center_speed[2];
+	dReal analog_steer_speed, analog_throttle_speed;
+
+	//keep track of last input type (to decide centering speed on no input)
+	bool analog_steer, analog_throttle;
 
 	//default camera number
 	int camera_default;
@@ -66,27 +70,31 @@ extern Profile *profile_head;
 const Profile profile_defaults = {
 	NULL, //car
 	//steering throttling speed
-	0.0075, 0.0075, 0.0,
-	0.02, 0.02, 0.0,
+	{0.0001, 0.004}, {0.0001, 0.004},
+	{0.0040, 0.008}, {0.0040, 0.008},
+	0.02, 0.02,
+	false, false,
 	//default camera setting
 	3,
 	//control+camera selection keys
 	{ //set states to false/0, set default inputs. 255 are unmapped (override in keys.lst)
-	{false, false, false, 0.0,	SDLK_UP,	1, -500, -32000, 0, 0, SDL_HAT_UP},
-	{false, false, false, 0.0,	SDLK_DOWN,	1, 500, 32000, 1, 0, SDL_HAT_DOWN},
-	{false, false, false, 0.0,	SDLK_RIGHT,	0, 500, 32000, 255, 0, SDL_HAT_RIGHT},
-	{false, false, false, 0.0,	SDLK_LEFT,	0, -500, -32000, 255, 0, SDL_HAT_LEFT},
-	{false, false, false, 0.0,	SDLK_SPACE,	255, -200, -32768, 2, 255, SDL_HAT_CENTERED},
-	{false, false, false, 0.0,	SDLK_F1,	255, -200, -32768, 3, 255, SDL_HAT_CENTERED},
-	{false, false, false, 0.0,	SDLK_F2,	255, -200, -32768, 4, 255, SDL_HAT_CENTERED},
-	{false, false, false, 0.0,	SDLK_F3,	255, -200, -32768, 5, 255, SDL_HAT_CENTERED},
-	{false, false, false, 0.0,	SDLK_F4,	255, -200, -32768, 6, 255, SDL_HAT_CENTERED}
+	{false, false, false, 0.0,	SDLK_UP,	1, -500, -32000, 0, 0, SDL_HAT_UP}, //accelerate
+	{false, false, false, 0.0,	SDLK_DOWN,	1, 500, 32000, 1, 0, SDL_HAT_DOWN}, //reverse
+	{false, false, false, 0.0,	SDLK_RIGHT,	0, 500, 32000, 255, 0, SDL_HAT_RIGHT}, //right
+	{false, false, false, 0.0,	SDLK_LEFT,	0, -500, -32000, 255, 0, SDL_HAT_LEFT}, //left
+	{false, false, false, 0.0,	SDLK_SPACE,	255, -200, -32768, 2, 255, SDL_HAT_CENTERED}, //drift brakes
+	{false, false, false, 0.0,	SDLK_F1,	255, -200, -32768, 3, 255, SDL_HAT_CENTERED}, //cam1
+	{false, false, false, 0.0,	SDLK_F2,	255, -200, -32768, 4, 255, SDL_HAT_CENTERED}, //cam2
+	{false, false, false, 0.0,	SDLK_F3,	255, -200, -32768, 5, 255, SDL_HAT_CENTERED}, //cam3
+	{false, false, false, 0.0,	SDLK_F4,	255, -200, -32768, 6, 255, SDL_HAT_CENTERED}  //cam4
 	}};
 
 
 const struct Conf_Index profile_index[] = {
-	{"digital:steer_speed",		'R' ,1 ,offsetof(Profile, digital_steer_speed)},
-	{"digital:throttle_speed",	'R' ,1 ,offsetof(Profile, digital_throttle_speed)},
+	{"digital:steer_speed",		'R' ,2 ,offsetof(Profile, digital_steer_speed)},
+	{"digital:throttle_speed",	'R' ,2 ,offsetof(Profile, digital_throttle_speed)},
+	{"digital:steer_center_speed",	'R' ,2 ,offsetof(Profile, digital_steer_center_speed)},
+	{"digital:throttle_center_speed",'R',2 ,offsetof(Profile, digital_throttle_center_speed)},
 	{"analog:steer_speed",		'R' ,1 ,offsetof(Profile, analog_steer_speed)},
 	{"analog:throttle_speed",	'R' ,1 ,offsetof(Profile, analog_throttle_speed)},
 

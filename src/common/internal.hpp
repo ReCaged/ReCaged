@@ -56,10 +56,8 @@ extern struct internal_struct {
 	bool culling;
 	bool fullscreen;
 	int msaa;
-	float clipping[2];
 	int filter;
 	bool separate_specular;
-	float fog;
 	float fov;
 	float dist;
 } internal;
@@ -85,10 +83,8 @@ const struct internal_struct internal_defaults = {
 	true,
 	false,
 	4,
-	{1.0, 1500.0},
 	1,
 	true,
-	1000.0,
 	45.0,
 	2500.0};
 
@@ -122,10 +118,8 @@ const struct Conf_Index internal_index[] = {
 	{"backface_culling",	'b',1, offsetof(struct internal_struct, culling)},
 	{"fullscreen",		'b',1, offsetof(struct internal_struct, fullscreen)},
 	{"multisample",		'i',1, offsetof(struct internal_struct, msaa)},
-	{"clipping",		'f',2, offsetof(struct internal_struct, clipping)},
 	{"texture:filter",	'i',1, offsetof(struct internal_struct, filter)},
 	{"texture:separate_specular",'b',1, offsetof(struct internal_struct, separate_specular)},
-	{"fog",			'f',1, offsetof(struct internal_struct, fog)},
 	{"FOV",			'f',1, offsetof(struct internal_struct, fov)},
 	{"eye_distance",	'f',1, offsetof(struct internal_struct, dist)},
 
