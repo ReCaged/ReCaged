@@ -90,6 +90,7 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/simulation.cpp \
 		simulation/space.cpp \
 		simulation/space.hpp \
+		simulation/track.cpp \
 		simulation/timers.cpp \
 		simulation/timers.hpp \
 		simulation/wheel.cpp \

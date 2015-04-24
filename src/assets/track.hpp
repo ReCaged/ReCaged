@@ -100,5 +100,6 @@ const struct Conf_Index track_index[] = {
 	{"",0,0}};//end
 
 bool load_track (const char *path);
+void Track_Physics_Step();
 
 #endif
