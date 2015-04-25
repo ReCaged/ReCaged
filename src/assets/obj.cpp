@@ -26,23 +26,6 @@
 #include "text_file.hpp"
 
 
-char *FindRelPath(const char *start, const char *file)
-{
-	char *filename = new char[strlen(start)+strlen(file)+1]; //enough to hold both obj and mtl path+filename
-	strcpy(filename, start); //copy obj path+filename
-	char *last = strrchr(filename, '/'); //last slash in obj filename
-
-	if (last) //if obj file had a path before filename (most likely):
-	{
-		last[1]='\0'; //indicate end at end of path (after /)
-		strcat(filename, file); //add mtl filename/path to obj path
-	}
-	else //just what's requested
-		strcpy(filename, file); //overwrite with mtl filename
-
-	return filename;
-}
-
 bool Model::Load_OBJ(const char *f)
 {
 	Log_Add(2, "Loading model from OBJ file %s", f);
@@ -62,6 +45,7 @@ bool Model::Load_OBJ(const char *f)
 	Vector_Float vector;
 	Vector2_Float vector2;
 	Triangle_Uint triangle; //for building a triangle
+	std::string matpath; //for storing material file name+path
 	unsigned int matnr = INDEX_ERROR; //keep track of current material (none right now)
 	unsigned int tmpmatnr;
 	unsigned int vi, ti, ni; //vertex, uv, normal index
@@ -178,11 +162,8 @@ bool Model::Load_OBJ(const char *f)
 		}
 		else if (!strcmp(file.words[0], "mtllib") && file.word_count==2)
 		{
-			//rewrite path to be relative to this file
-			char *filename=FindRelPath(f, file.words[1]);
-
-			Load_Material(filename); //if not succesfull, continue - might not need any materials anyway?
-			delete[] filename;
+			matpath=Relative_Path(file.words[1]);
+			Load_Material(matpath.c_str()); //don't care if fails, continue anyway
 		}
 	}
 
@@ -339,9 +320,7 @@ bool Model::Load_MTL(const char *f)
 			}
 			else if (!strcmp(file.words[0], "map_Kd") &&file.word_count == 2) //textures (K=colours?)
 			{
-				char *name = FindRelPath(f, file.words[1]);
-				materials[mat_nr].diffusetex = name;
-				delete[] name;
+				materials[mat_nr].diffusetex = Relative_Path(file.words[1]);
 				//TODO: Ka, Ks, Ke, Ns, bump mapping...
 			}
 

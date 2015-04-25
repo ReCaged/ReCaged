@@ -357,9 +357,7 @@ bool Interface_Init(bool window, bool fullscreen, int xres, int yres)
 		glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
 
 	//and render splash screen, if found (not fatal if fails)
-	Directories dirs;
-	if (dirs.Find("recaged.png", DATA, READ))
-		Interface_Splash(dirs.Path(), screen->w, screen->h);
+	Interface_Splash("recaged.png", screen->w, screen->h);
 
 	//things possibly used in future:
 	/*

@@ -29,6 +29,7 @@
 #include <setjmp.h> //for insanity of jpeg/png libraries
 #include "common/internal.hpp"
 #include "common/log.hpp"
+#include "common/directories.hpp"
 #include "image.hpp"
 
 
@@ -67,13 +68,18 @@ bool Image::Load (const char *file)
 		return false;
 	}
 
+	//find
+	Directories dirs;
+	if (!dirs.Find(file, DATA, READ))
+		return false;
+
 	//see if match:
 	if (!strcasecmp(suffix, ".bmp"))
-		return Load_BMP(file);
+		return Load_BMP(dirs.Path());
 	else if (!strcasecmp(suffix, ".png"))
-		return Load_PNG(file);
+		return Load_PNG(dirs.Path());
 	else if (!strcasecmp(suffix, ".jpg") || !strcasecmp(suffix, ".jpeg"))
-		return Load_JPG(file);
+		return Load_JPG(dirs.Path());
 
 	//else, no match
 	Log_Add(-1, "unknown image file suffix for \"%s\"", file);
@@ -532,7 +538,7 @@ GLuint Image_Texture::GetID()
 //remove texture
 Image_Texture::~Image_Texture()
 {
-	Log_Add(2, "Removing texture image");
+	Log_Add(2, "Removing texture from gpu");
 	glDeleteTextures(1, &id);
 }
 

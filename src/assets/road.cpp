@@ -445,6 +445,7 @@ bool Model::Load_Road(const char *f)
 	triangle_count=0; //for info output
 	int last_xres=0; //to prevent getting fooled (guaranteed to be accurate)
 	bool last_dpt=false; //the same, set correctly after each road block
+	std::string matpath; //for material file path
 
 	while  (file.Read_Line())
 	{
@@ -668,21 +669,8 @@ bool Model::Load_Road(const char *f)
 		}
 		else if (!strcmp(file.words[0], "material_file") && file.word_count == 2)
 		{
-			//directly copied from obj.cpp
-			char filename[strlen(f)+strlen(file.words[1])+1];
-			strcpy(filename, f);
-			char *last = strrchr(filename, '/');
-
-			if (last)
-			{
-				last[1]='\0';
-				strcat(filename, file.words[1]);
-			}
-			else
-			{
-				strcpy(filename, file.words[1]);
-			}
-			Load_Material(filename);
+			matpath=Relative_Path(file.words[1]);
+			Load_Material(matpath.c_str());
 		}
 		else if (!strcmp(file.words[0], "cubic"))
 			cubic=true;

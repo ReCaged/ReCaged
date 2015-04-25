@@ -213,6 +213,9 @@ class Model
 		unsigned int Find_Material(const char *); //find first matching material by name
 		float Find_Longest_Distance(); //find vertex furthest from center, and return its length
 
+		//other tools:
+		std::string Relative_Path(const char *); //builds paths to files relative to opened model
+
 		//functions for loading 3d files:
 		//obj files (obj.cpp)
 		bool Load_OBJ(const char *);
