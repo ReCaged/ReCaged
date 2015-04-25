@@ -57,8 +57,7 @@ bool Simulation_Init(void)
 	}
 
 	//create lua state for this thread
-	simulation_thread.lua_state = luaL_newstate();
-	luaL_openlibs(simulation_thread.lua_state);
+	RCLua_Init(&simulation_thread); //init
 
 	//more ode stuff
 	simulation_thread.world = dWorldCreate();

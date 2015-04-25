@@ -343,9 +343,18 @@ bool load_track (const char *path)
 	Log_Add(2, "Loading track object list: %s", olist);
 
 	//don't fail if can't find file, maybe there is no need for it anyway
-	if (dirs.Find(olist, DATA, READ) && !luaL_dofile(simulation_thread.lua_state, dirs.Path()))
+	if (dirs.Find(olist, DATA, READ))
 	{
-		Log_Add(1, "Ran lua script: %s", dirs.Path());
+		Log_Add(1, "Running lua script: %s", dirs.Path());
+		lua_State *L=simulation_thread.lua_state;
+		int status = luaL_dofile(L, dirs.Path());
+
+		if (status != LUA_OK)
+		{
+			const char *m=lua_tostring(L, -1);
+			Log_Add(-1, "Lua error: %s", m);
+			lua_pop(L, -1);
+		}
 	}
 	else
 		Log_Add(1, "WARNING: no object list for track, no default objects spawned");

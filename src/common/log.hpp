@@ -46,4 +46,10 @@ void Log_Add (int, const char*, ...);
 void Log_printf (int, const char*, ...);
 void Log_puts (int, const char*);
 
+//
+//lua library
+//
+#include "lua.hpp"
+int Lua_Log_Init(lua_State *L);
+
 #endif

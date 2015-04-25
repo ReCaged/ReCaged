@@ -23,6 +23,7 @@
 #include <SDL/SDL_mutex.h>
 #include "internal.hpp"
 #include "log.hpp"
+#include "lua.hpp"
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -287,3 +288,136 @@ void Log_puts (int level, const char *text)
 	SDL_mutexV(logmutex);
 }
 
+
+//
+//lua methods
+//
+
+static int log_add(lua_State *L)
+{
+	//
+	//check lua args:
+	//
+	//number of arguments
+	int n = lua_gettop(L);
+
+	//not enough/wrong arguments
+	luaL_argcheck(L, n >= 1 && lua_isnumber(L, 1),
+			1, "expected verbosity number");
+
+	//verbosity level
+	int level = lua_tonumber(L, 1);
+	luaL_argcheck(L, level >= -1 && level <= 2,
+			1, "expected verbosity range from -1 to 2");
+
+	//
+	//continue like Log_Add
+	//
+
+	//check if not needed
+	if (!logram && !logfile && level > stdout_verbosity)
+		return 0;
+
+	//like _Add above:
+	SDL_mutexP(logmutex);
+
+	 //reset buffer position if not logging to ram
+	if (!logram)
+		bufferpos=0;
+
+	//index to current line added to log
+	int entry=bufferpos;
+
+	//at least enough size to put indicator
+	IncreaseBuffer(9); //9=enough for 8 chars and 1 \0
+
+	//begin with verbosity indicator (+update position)
+	strcpy(logbuffer+bufferpos, indicator[level+1]);
+	UPDATEPOS();
+
+
+	//
+	//now for the lua specific: parse the arguments:
+	//(note: heavily inspired by luaB_print)
+
+	//to transform as much as possible to strings, run "tostring" _in_ lua
+	lua_getglobal(L, "tostring");
+
+	const char *string;
+	size_t length;
+	for (int i=2; i<=n; ++i) {
+		lua_pushvalue(L, -1); //function to call (tostring)
+		lua_pushvalue(L, i); //with argument (position i after n)
+		lua_call(L, 1, 1); //call unprotected, 1 arg, 1 return
+
+		string = lua_tolstring(L, -1, &length); //get return from top
+
+		//check if ok
+		luaL_argcheck(L, string, i, 
+				"'tostring' could not convert argument to string");
+
+		//insert tabs between (and if) multiple arguments
+		if (i>2)
+		{
+			IncreaseBuffer(2);
+			strcpy(logbuffer+bufferpos, "\t");
+			UPDATEPOS();
+		}
+
+		//copy actual string to buffer
+		IncreaseBuffer(length+1);
+		strcpy(logbuffer+bufferpos, string);
+		UPDATEPOS();
+
+		lua_pop(L, 1); //pop string from stack
+	}
+	//
+	//continue like Log_Add
+	//
+
+
+	//similar to earlier, add newline
+	IncreaseBuffer(2); //enough for \n and \0
+	strcpy(logbuffer+bufferpos, "\n");
+	UPDATEPOS();
+
+	//write to targets (+add newling)
+	if (logfile)
+		fputs(logbuffer+entry, logfile);
+
+	//special case
+	if (level == -1)
+	{
+		//write to stderr instead of stdout (+some newlines to
+		//make it visible)
+		fputs(logbuffer+entry, stderr);
+#ifdef _WIN32
+		//and annoy the user on windoze
+		//don't want the newlines in beginning and end...
+		logbuffer[bufferpos]='\0'; //replace \n with \0
+		MessageBoxA(NULL, logbuffer+entry+1, "Error!", MB_ICONERROR | MB_OK);
+		logbuffer[bufferpos]='\n'; //and put back
+#endif
+	}
+	else if (level <=stdout_verbosity) //normal case, if high enough verbosity
+		fputs(logbuffer+entry, stdout);
+
+	SDL_mutexV(logmutex); //ok
+
+	return 0;
+}
+
+//
+//for registering to thread/lua state:
+//
+static const luaL_Reg log_lib[] = {
+	{"add",	log_add},
+	{NULL,	NULL}
+};
+
+//simple init: just expose log.add() method:
+int Lua_Log_Init(lua_State *L)
+{
+	luaL_newlib(L, log_lib);
+	return 1;
+}

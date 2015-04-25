@@ -4,13 +4,14 @@
 -- are permitted in any medium without royalty provided the copyright
 -- notice and this notice are preserved. This file is offered as-is,
 -- without any warranty.
+log=require "log"
 
-print "loading box module"
+log.add(1, "loading box module")
 
 local module={}
 
-function module.spawn(x, y, z)
-	print("spawning at ("..x..","..y..","..z..")")
+function module.create(x, y, z)
+	log.add(1, "creating box at ("..x..","..y..","..z..")")
 end
 
 return module

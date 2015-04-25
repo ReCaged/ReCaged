@@ -7,10 +7,10 @@
 
 --insanely modify the package paths... TODO: do this in C! And proper paths!
 package.path="data/?.lua;data/?/module.lua;../data/?.lua;../data/?/module.lua"
-package.cpath=nil --disable!
+package.cpath="" --disable!
 
 local obj = require "objects/misc/box"
-obj.spawn(10, 20, 0.5)
+obj.create(10, 20, 0.5)
 
 --[[
 > misc/box
