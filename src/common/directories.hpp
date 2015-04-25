@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2012 Mats Wahlberg
+ * Copyright (C) 2012, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -69,6 +69,9 @@ class Directories
 				const char *path1, const char *path2);
 		static char *user_conf, *user_data, *user_cache;
 		static char *inst_conf, *inst_data;
+
+		//needs to set up lua package paths based on strings above
+		friend bool RCLua_Init(struct Thread *thread);
 
 		bool Try_Set_File(dir_operation op,
 				const char *path1, const char *path2);

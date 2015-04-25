@@ -22,6 +22,7 @@
 #include "lua.hpp"
 #include "threads.hpp"
 #include "directories.hpp"
+#include <string>
 
 bool RCLua_Init(Thread *thread)
 {
@@ -38,22 +39,41 @@ bool RCLua_Init(Thread *thread)
 	//open standard libs:
 	luaL_openlibs(thread->lua_state);
 
-	//overwrite package paths according to what "directories" has found:
-	lua_State *L=thread->lua_state; //just for shorter code
-
-	//set package.path=lpath
-	lua_getglobal(L, "package"); //find package
-	const char *lpath=Directories::BuildLuaPath(); //get string
-	lua_pushstring(L, lpath); //put/copy to top of stack
-	delete[] lpath; //this string can be deleted immediately 
-	lua_setfield(L, -2, "path"); //overwrite index by string
-
-	//set package.cpath="" (empty, no c libs!)
-	lua_pushstring(L, "");
-	lua_setfield(L, -2, "cpath");
-
 	//open common custom libraries:
 	RCLua_Add(thread, common_lua_libs);
+
+
+	//
+	//overwrite package paths according to what "directories" has found:
+	//
+	std::string path;
+
+	//assemble 4 (potential) permutations to include:
+	// * module is in user's data dir or installed data dir
+	// * module is a plain file ("name.lua") or a dir ("name/init.lua")
+	const char *base[2]={Directories::user_data, Directories::inst_data};
+	const char *pattern[2]={"/?/init.lua", "/?.lua"};
+	//loop with priority: user > installed, and: directory > file
+	for (int b=0; b<2; ++b)
+	for (int p=0; p<2; ++p)
+		if (base[b]) //if path exists (found by directory)
+		{
+			//only add separator between paths
+			if (!path.empty()) //already got
+				path+=";";
+
+			path+=base[b];
+			path+=pattern[p];
+		}
+
+	//set package.path=path
+	lua_getglobal(thread->lua_state, "package"); //find package
+	lua_pushstring(thread->lua_state, path.c_str()); //put/copy to top of stack
+	lua_setfield(thread->lua_state, -2, "path"); //overwrite index by string
+
+	//set package.cpath="" (empty, to prevent c libs!)
+	lua_pushstring(thread->lua_state, "");
+	lua_setfield(thread->lua_state, -2, "cpath");
 
 	return true;
 }
