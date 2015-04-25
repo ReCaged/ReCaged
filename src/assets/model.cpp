@@ -255,6 +255,23 @@ float Model::Find_Longest_Distance()
 	return biggest;
 }
 
+std::string Model::Relative_Path(const char *file)
+{
+	std::string path;
+	path=name; //name of this model (from class variables)
+
+	//position of last slash in model filename (or npos)
+	size_t last=path.rfind('/');
+
+	//remove everything from last slash, or whole string
+	path.erase((last==std::string::npos? 0: last));
+
+	//append file to it
+	path+="/";
+	path+=file;
+
+	return path;
+}
 //
 //for trimesh file loading
 //
@@ -262,7 +279,7 @@ float Model::Find_Longest_Distance()
 //wrapper for loading
 bool Model::Load(const char *file)
 {
-	Log_Add(2, "Loading trimesh from file \"%s\" (identifying suffix)", file);
+	Log_Add(2, "Loading model from file \"%s\" (identifying suffix)", file);
 
 	if (file == NULL)
 	{
@@ -320,9 +337,14 @@ bool Model::Load_Material(const char *file)
 		return false;
 	}
 
+	//find
+	Directories dirs;
+	if (!dirs.Find(file, DATA, READ))
+		return false;
+
 	//see if match:
 	if (!strcasecmp(suffix, ".mtl"))
-		return Load_MTL(file);
+		return Load_MTL(dirs.Path());
 
 	//else, no match
 	Log_Add(-1, "Unknown material file suffix for \"%s\"", file);

@@ -45,6 +45,7 @@ bool Model::Load_OBJ(const char *f)
 	//
 	Vector_Float vector;
 	Triangle_Uint triangle; //for building a triangle
+	std::string matpath; //for storing material file name+path
 	unsigned int matnr = INDEX_ERROR; //keep track of current material (none right now)
 	unsigned int tmpmatnr;
 	unsigned int vi, ni;
@@ -148,21 +149,8 @@ bool Model::Load_OBJ(const char *f)
 		}
 		else if (!strcmp(file.words[0], "mtllib") && file.word_count==2)
 		{
-			char filename[strlen(f)+strlen(file.words[1])+1]; //enough to hold both obj and mtl path+filename
-			strcpy(filename, f); //copy obj path+filename
-			char *last = strrchr(filename, '/'); //last slash in obj filename
-
-			if (last) //if obj file had a path before filename (most likely):
-			{
-				last[1]='\0'; //indicate end at end of path (after /)
-				strcat(filename, file.words[1]); //add mtl filename/path to obj path
-			}
-			else //just what's requested
-			{
-				strcpy(filename, file.words[1]); //overwrite with mtl filename
-			}
-				
-			Load_Material(filename); //if not succesfull, continue - might not need any materials anyway?
+			matpath=Relative_Path(file.words[1]);
+			Load_Material(matpath.c_str()); //don't care if fails, continue anyway
 		}
 	}
 
