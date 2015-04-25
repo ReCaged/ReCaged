@@ -37,7 +37,7 @@ extern "C" {
 //helper functions (compatibility with different lua versions)
 //TODO: should probably move whole Thread to class, this as (private) methods
 bool RCLua_Init(class Thread *); //initiates and loads std libraries
-bool RCLua_Add(class Thread *, const luaL_Reg *newlibs); //add custom libs
+void RCLua_Add(class Thread *, const luaL_Reg *newlibs); //add custom libs
 
 //"common" custom lua libraries:
 int (Lua_Log_Init) (lua_State *L);

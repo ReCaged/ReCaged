@@ -57,7 +57,11 @@ bool Simulation_Init(void)
 	}
 
 	//create lua state for this thread
-	RCLua_Init(&simulation_thread); //init
+	if (!RCLua_Init(&simulation_thread))
+	{
+		dCloseODE(); //TODO: support multithreading...
+		return false;
+	}
 
 	//more ode stuff
 	simulation_thread.world = dWorldCreate();
@@ -201,6 +205,6 @@ void Simulation_Quit (void)
 	dJointGroupDestroy (simulation_thread.contactgroup);
 	dSpaceDestroy (simulation_thread.space);
 	dWorldDestroy (simulation_thread.world);
-	dCloseODE();
+	dCloseODE(); //TODO: support multithreading...
 }
 
