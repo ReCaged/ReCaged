@@ -6,7 +6,7 @@
 -- without any warranty.
 
 --insanely modify the package paths... TODO: do this in C! And proper paths!
-package.path="data/?.lua;data/?/module.lua;../data/?.lua;../data/?/module.lua"
+package.path="data/?.lua;data/?/init.lua;../data/?.lua;../data/?/init.lua"
 package.cpath="" --disable!
 
 local obj = require "objects/misc/box"
