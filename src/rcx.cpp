@@ -432,16 +432,16 @@ Log_puts(1, "\
 \n\n\
 				-=[ Credits ]=-\n\n\
   * Mats Wahlberg (\"Slinger\")		-	Creator/developer + development 3D models\n\
-  * \"K.Mac\"				-	Extensive testing, hacks and new ideas\n\
-  * \"MeAkaJon\"				-	Creating the original project homepage\n\
-  * \"Spontificus\"			-	Hacks, fixes, move to C++, git and new website\n\
-  * \"MoruganKodi\"/\"コディ[KODI]\"	-	Many High Detail 3D models for cars and tracks\n\
-  * \"orgyia\"				-	Testing, scramble-like test track\n\
+  * K.Mac				-	Extensive testing, hacks and new ideas\n\
+  * MeAkaJon				-	Creating the original project homepage\n\
+  * Spontificus				-	Hacks, fixes, move to C++, git and new website\n\
+  * MoruganKodi/コディ[KODI]		-	Many High Detail 3D models for cars and tracks\n\
+  * orgyia				-	Testing, scramble-like test track\n\
   * You (yes, you)			-	For being interested and trying RCX!\n\
 \n		-=[ Other Projects that made RCX possible ]=-\n\n\
-  * \"Free Software Foundation\"		-	\"Free Software, Free Society\"\n\
-  * \"The GNU Project\"			-	Developing a Free OS\n\
-  * \"TuxFamily\"				-	Amazingly generous hosting for the project!\n\n\n\
+  * Free Software Foundation		-	\"Free Software, Free Society\"\n\
+  * The GNU Project			-	Developing a Free OS\n\
+  * TuxFamily				-	Amazingly generous hosting for the project!\n\n\n\
  Default track and cars can be changed in \"config/tmp_menu_selections\"\n\
  Default key bindings can be found (and changed) in \"data/profiles/default/keys.lst\"\n\
  More keys exists for debug/testing/demo, see README if you are interested.\n\n\
