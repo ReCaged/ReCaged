@@ -51,8 +51,8 @@ bool tmp_menus()
 	std::string sprofile, sworld, strack, steam, scar, swheel; //easy text manipulation...
 	Directories dirs; //for finding
 	Text_File file; //for parsing
-	dirs.Find("tmp_menu_selections", CONFIG, READ);
-	file.Open(dirs.Path()); //just assume it opens (no harm if not)...
+	if (!(dirs.Find("tmp_menu_selections", CONFIG, READ) && file.Open(dirs.Path())))
+		Log_Add(0, "WARNING: could not find tmp_menu_selections, loading defaults (there will be warnings)");
 
 	//MENU: welcome to rcx, please select profile or create a new profile
 	sprofile = "profiles/";
@@ -96,10 +96,10 @@ bool tmp_menus()
 		return false; //GOTO: track selection menu
 
 	//TMP: load some objects for online spawning
-	if (	!(box = Module::Load("objects/misc/box"))		||
-		!(sphere = Module::Load("objects/misc/beachball"))||
-		!(funbox = Module::Load("objects/misc/funbox"))	||
-		!(molecule = Module::Load("objects/misc/NH4"))	)
+	if (	!(box = Module::Load("misc/box"))		||
+		!(sphere = Module::Load("misc/beachball"))	||
+		!(funbox = Module::Load("misc/funbox"))		||
+		!(molecule = Module::Load("misc/NH4"))		)
 		return false;
 	//
 
@@ -127,7 +127,7 @@ bool tmp_menus()
 
 				//try to load tyre and rim (if possible)
 				if (!wheel)
-					wheel = Model_Draw::Quick_Load_Conf("worlds/Sandbox/wheels/Reckon", "wheel.conf");
+					wheel = Model_Draw::Quick_Load_Conf("wheels/Reckon", "wheel.conf");
 				//good, spawn
 				car = car_template->Spawn(
 					track.start[0], //x
@@ -161,21 +161,36 @@ bool tmp_menus()
 		//wheel selected in menu
 		else if (file.word_count == 2 && !strcmp(file.words[0], "wheel"))
 		{
-			//try loading from world wheels
-			swheel = sworld;
+			//try loading from track wheels
+			swheel = strack;
 			swheel += "/wheels/";
 			swheel += file.words[1];
 
+			wheel = Model_Draw::Quick_Load_Conf(swheel.c_str(), "wheel.conf");
+
 			//if failure...
-			if (! (wheel = Model_Draw::Quick_Load_Conf(swheel.c_str(), "wheel.conf")) )
+			if (!wheel)
 			{
-				//try seing if its track specific tyre
-				swheel = strack;
+				//try world specific
+				swheel = sworld;
 				swheel += "/wheels/";
 				swheel += file.words[1];
 
 				wheel = Model_Draw::Quick_Load_Conf(swheel.c_str(), "wheel.conf");
 			}
+
+			//still nothing?
+			if (!wheel)
+			{
+				//try global wheels
+				swheel = "wheels/";
+				swheel += file.words[1];
+
+				wheel = Model_Draw::Quick_Load_Conf(swheel.c_str(), "wheel.conf");
+			}
+
+			//if wheel is still NULL, just don't rendering anything
+
 		}
 		//manual position required for spawning
 		else if (file.word_count == 3 && !strcmp(file.words[0], "spawn"))
@@ -394,6 +409,8 @@ Options for overriding normal (automatic) directory detection:\n\
 		Load_Conf (conf_overr, (char*)&internal, internal_index);
 	else if (dirs.Find("internal.conf", CONFIG, READ)) //try find by default
 		Load_Conf (dirs.Path(), (char *)&internal, internal_index);
+	else
+		Log_Add(0, "internal.conf file not found, falling back to defaults");
 
 	//only enable file logging if requested
 	if (internal.logfile)

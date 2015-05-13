@@ -114,7 +114,8 @@ Profile *Profile_Load (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/profile.conf");
 
-	if (dirs.Find(conf, CONFIG, READ)) Load_Conf(dirs.Path(), (char *)prof, profile_index); //try to load conf
+	if (!(dirs.Find(conf, CONFIG, READ)) && Load_Conf(dirs.Path(), (char *)prof, profile_index))
+		Log_Add(0, "WARNING: no conf file for profile, falling back to defaults");
 
 	//set camera
 	if (!(prof->camera_default >0 && prof->camera_default <5))
@@ -184,6 +185,8 @@ Profile *Profile_Load (const char *path)
 			}
 		}
 	}
+	else
+		Log_Add(0, "WARNING: no key mapping list for profile, falling back to defaults");
 
 	return prof;
 }
