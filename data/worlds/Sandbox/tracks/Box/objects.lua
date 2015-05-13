@@ -5,7 +5,7 @@
 -- notice and this notice are preserved. This file is offered as-is,
 -- without any warranty.
 
-local obj = require "objects/misc/box"
+local obj = require "misc/box"
 
 obj.create(10, 20, 0.5)
 
