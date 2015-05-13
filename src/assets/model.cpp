@@ -311,7 +311,10 @@ bool Model::Load(const char *file)
 	//find
 	Directories dirs;
 	if (!dirs.Find(file, DATA, READ))
+	{
+		Log_Add(-1, "could not find 3D file \"%s\" for model", file);
 		return false;
+	}
 
 	//see if match:
 	if (!strcasecmp(suffix, ".obj"))
@@ -349,7 +352,10 @@ bool Model::Load_Material(const char *file)
 	//find
 	Directories dirs;
 	if (!dirs.Find(file, DATA, READ))
+	{
+		Log_Add(-1, "could not find material file \"%s\" for model", file);
 		return false;
+	}
 
 	//see if match:
 	if (!strcasecmp(suffix, ".mtl"))

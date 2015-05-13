@@ -23,47 +23,51 @@ objectsdir = $(datadir)/games/rcx
 nobase_dist_objects_DATA = \
 	README \
 	recaged.png \
-	objects/misc/beachball/README \
-	objects/misc/beachball/sphere.mtl \
-	objects/misc/beachball/sphere.obj \
-	objects/misc/box/box.mtl \
-	objects/misc/box/box.obj \
-	objects/misc/box/carbon.png \
-	objects/misc/box/object.script \
-	objects/misc/box/rcx.png \
-	objects/misc/box/README \
-	objects/misc/building/pillar.mtl \
-	objects/misc/building/pillar.obj \
-	objects/misc/building/README \
-	objects/misc/building/roof.mtl \
-	objects/misc/building/roof.obj \
-	objects/misc/building/wall.mtl \
-	objects/misc/building/wall.obj \
-	objects/misc/flipper/Flipper.mtl \
-	objects/misc/flipper/Flipper.obj \
-	objects/misc/flipper/README \
-	objects/misc/funbox/box.mtl \
-	objects/misc/funbox/box.obj \
-	objects/misc/funbox/README \
-	objects/misc/NH4/Atom1.mtl \
-	objects/misc/NH4/Atom1.obj \
-	objects/misc/NH4/Atom2.mtl \
-	objects/misc/NH4/Atom2.obj \
-	objects/misc/NH4/README \
-	objects/misc/pillar/Broken.mtl \
-	objects/misc/pillar/Broken.obj \
-	objects/misc/pillar/Pillar.mtl \
-	objects/misc/pillar/Pillar.obj \
-	objects/misc/pillar/README \
-	objects/misc/tetrahedron/model.mtl \
-	objects/misc/tetrahedron/model.obj \
-	objects/misc/tetrahedron/README \
+	misc/beachball/README \
+	misc/beachball/sphere.mtl \
+	misc/beachball/sphere.obj \
+	misc/box/box.mtl \
+	misc/box/box.obj \
+	misc/box/carbon.png \
+	misc/box/object.script \
+	misc/box/rcx.png \
+	misc/box/README \
+	misc/building/pillar.mtl \
+	misc/building/pillar.obj \
+	misc/building/README \
+	misc/building/roof.mtl \
+	misc/building/roof.obj \
+	misc/building/wall.mtl \
+	misc/building/wall.obj \
+	misc/flipper/Flipper.mtl \
+	misc/flipper/Flipper.obj \
+	misc/flipper/README \
+	misc/funbox/box.mtl \
+	misc/funbox/box.obj \
+	misc/funbox/README \
+	misc/NH4/Atom1.mtl \
+	misc/NH4/Atom1.obj \
+	misc/NH4/Atom2.mtl \
+	misc/NH4/Atom2.obj \
+	misc/NH4/README \
+	misc/pillar/Broken.mtl \
+	misc/pillar/Broken.obj \
+	misc/pillar/Pillar.mtl \
+	misc/pillar/Pillar.obj \
+	misc/pillar/README \
+	misc/tetrahedron/model.mtl \
+	misc/tetrahedron/model.obj \
+	misc/tetrahedron/README \
 	teams/Nemesis/cars/Venom/car.conf \
 	teams/Nemesis/cars/Venom/camera.conf \
 	teams/Nemesis/cars/Venom/geoms.lst \
 	teams/Nemesis/cars/Venom/README \
 	teams/Nemesis/cars/Venom/Venom.mtl \
 	teams/Nemesis/cars/Venom/Venom.obj \
+	wheels/Reckon/wheel.mtl \
+	wheels/Reckon/wheel.conf \
+	wheels/Reckon/wheel.obj \
+	wheels/Reckon/README \
 	worlds/Sandbox/tracks/Box/Box.mtl \
 	worlds/Sandbox/tracks/Box/Box.obj \
 	worlds/Sandbox/tracks/Box/Box3.mtl \
@@ -79,10 +83,6 @@ nobase_dist_objects_DATA = \
 	worlds/Sandbox/tracks/Box/surfaces.mtl \
 	worlds/Sandbox/tracks/Box/track.conf \
 	worlds/Sandbox/tracks/Box/vertigo.road \
-	worlds/Sandbox/wheels/Reckon/wheel.mtl \
-	worlds/Sandbox/wheels/Reckon/wheel.conf \
-	worlds/Sandbox/wheels/Reckon/wheel.obj \
-	worlds/Sandbox/wheels/Reckon/README \
 	worlds/Sandbox/wheels/Slipstream/wheel.mtl \
 	worlds/Sandbox/wheels/Slipstream/wheel.conf \
 	worlds/Sandbox/wheels/Slipstream/wheel.obj \

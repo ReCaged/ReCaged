@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2012, 2013, 2014 Mats Wahlberg
+ * Copyright (C) 2012, 2013, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -713,21 +713,21 @@ const char *Directories::Find(const char *path,
 			else if ( Try_Set_File(op, inst, path) )
 				Log_Add(2, "Readable in installation directory: \"%s\"", file_path);
 			else
-				Log_Add(0, "Unable to find file \"%s\" for reading!", path);
+				Log_Add(2, "Unable to find file \"%s\" for reading", path);
 			break;
 
 		case WRITE: //try user
 			if ( Try_Set_File(op, user, path) )
 				Log_Add(2, "Writeable in user directory: \"%s\"", file_path);
 			else
-				Log_Add(0, "Unable to resolve/create file \"%s\" for writing!", path);
+				Log_Add(2, "Unable to resolve/create file \"%s\" for writing", path);
 			break;
 
 		case APPEND: //user, but copy from installed if needed/possible
 			if ( Try_Set_File_Append(user, inst, path) )
 				Log_Add(2, "Appendable in user directory: \"%s\"", file_path);
 			else
-				Log_Add(0, "Unable to resolve/create file \"%s\" for appending!", path);
+				Log_Add(2, "Unable to resolve/create file \"%s\" for appending", path);
 			break;
 	}
 

@@ -71,7 +71,10 @@ bool Image::Load (const char *file)
 	//find
 	Directories dirs;
 	if (!dirs.Find(file, DATA, READ))
+	{
+		Log_Add(-1, "could not find image file \"%s\"", file);
 		return false;
+	}
 
 	//see if match:
 	if (!strcasecmp(suffix, ".bmp"))

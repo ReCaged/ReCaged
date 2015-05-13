@@ -131,7 +131,7 @@ Module *Module::Load(const char *path)
 	Module *obj;
 	
 	//currently no scripting, only hard-coded solutions
-	if (!strcmp(path,"objects/misc/box"))
+	if (!strcmp(path,"misc/box"))
 	{
 		//"load" 3d box
 		Log_Add(2, "(hard-coded box)");
@@ -140,12 +140,12 @@ Module *Module::Load(const char *path)
 		obj->box = true;
 
 		//the debug box will only spawn one component - one "3D file"
-		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/box/box.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("misc/box/box.obj")))
 			return NULL;
 
 	//end of test
 	}
-	else if (!strcmp(path, "objects/misc/funbox"))
+	else if (!strcmp(path, "misc/funbox"))
 	{
 		Log_Add(2, "(Mac's hard-coded funbox");
 
@@ -153,11 +153,11 @@ Module *Module::Load(const char *path)
 		obj->funbox = true; //id
 
 		//graphics
-		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/funbox/box.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("misc/funbox/box.obj")))
 			return NULL;
 
 	}
-	else if (!strcmp(path, "objects/misc/flipper"))
+	else if (!strcmp(path, "misc/flipper"))
 	{
 		Log_Add(2, "(hard-coded flipper)");
 
@@ -165,11 +165,11 @@ Module *Module::Load(const char *path)
 		obj->flipper = true; //id
 
 		//graphics
-		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/flipper/Flipper.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("misc/flipper/Flipper.obj")))
 			return NULL;
 
 	}
-	else if (!strcmp(path, "objects/misc/NH4"))
+	else if (!strcmp(path, "misc/NH4"))
 	{
 		Log_Add(2, "(hard-coded \"molecule\")");
 
@@ -177,21 +177,21 @@ Module *Module::Load(const char *path)
 		obj->NH4 = true;
 
 		//graphics
-		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/NH4/Atom1.obj")) ||
-			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/NH4/Atom2.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("misc/NH4/Atom1.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("misc/NH4/Atom2.obj"))	)
 			return NULL;
 
 	}
-	else if (!strcmp(path, "objects/misc/beachball"))
+	else if (!strcmp(path, "misc/beachball"))
 	{
 		Log_Add(2, "(hard-coded beachball)");
 
 		obj = new Module(path);
 		obj->sphere = true;
-		if (!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/beachball/sphere.obj")))
+		if (!(obj->model[0] = Model_Draw::Quick_Load("misc/beachball/sphere.obj")))
 			return NULL;
 	}
-	else if (!strcmp(path, "objects/misc/building"))
+	else if (!strcmp(path, "misc/building"))
 	{
 		Log_Add(2, "(hard-coded building)");
 
@@ -199,13 +199,13 @@ Module *Module::Load(const char *path)
 		obj->building = true;
 
 		//graphics
-		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/building/pillar.obj")) ||
-			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/building/roof.obj")) ||
-			!(obj->model[2] = Model_Draw::Quick_Load("objects/misc/building/wall.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("misc/building/pillar.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("misc/building/roof.obj")) ||
+			!(obj->model[2] = Model_Draw::Quick_Load("misc/building/wall.obj"))	)
 			return NULL;
 
 	}
-	else if (!strcmp(path,"objects/misc/pillar"))
+	else if (!strcmp(path,"misc/pillar"))
 	{
 		//"load" 3d box
 		Log_Add(2, "(hard-coded pillar)");
@@ -214,12 +214,12 @@ Module *Module::Load(const char *path)
 		obj->pillar = true;
 
 		//graphics
-		if (	!(obj->model[0] = Model_Draw::Quick_Load("objects/misc/pillar/Pillar.obj")) ||
-			!(obj->model[1] = Model_Draw::Quick_Load("objects/misc/pillar/Broken.obj"))	)
+		if (	!(obj->model[0] = Model_Draw::Quick_Load("misc/pillar/Pillar.obj")) ||
+			!(obj->model[1] = Model_Draw::Quick_Load("misc/pillar/Broken.obj"))	)
 			return NULL;
 
 	}
-	else if (!strcmp(path,"objects/misc/tetrahedron"))
+	else if (!strcmp(path,"misc/tetrahedron"))
 	{
 		//"load" 3d box
 		Log_Add(2, "(hard-coded tetrahedron)");
@@ -229,7 +229,7 @@ Module *Module::Load(const char *path)
 
 		//try to load and generate needed vertices (render+collision)
 		Model mesh;
-		if (	!(mesh.Load("objects/misc/tetrahedron/model.obj")) ||
+		if (	!(mesh.Load("misc/tetrahedron/model.obj")) ||
 			!(obj->model[0] = mesh.Create_Draw()) ||
 			!(obj->geom[0] = mesh.Create_Mesh())	)
 			return NULL;

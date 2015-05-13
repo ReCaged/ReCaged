@@ -93,7 +93,8 @@ bool load_track (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/track.conf");
 
-	if (dirs.Find(conf, DATA, READ)) Load_Conf(dirs.Path(), (char *)&track, track_index);
+	if (!(dirs.Find(conf, DATA, READ)) && Load_Conf(dirs.Path(), (char *)&track, track_index))
+		Log_Add(0, "WARNING: no config file for track, falling back to defaults");
 
 	//set camera default values, some from track specs
 	default_camera.Set_Pos(track.cam_start[0], track.cam_start[1], track.cam_start[2],
@@ -353,13 +354,10 @@ bool load_track (const char *path)
 			if (file.word_count==2 && !strcmp(file.words[0], ">"))
 			{
 				Log_Add(2, "object load request: %s", file.words[1]);
-				char obj_name[8+strlen(file.words[1])+1];
-				strcpy (obj_name, "objects/");
-				strcat (obj_name, file.words[1]);
 
-				if (!(obj = Module::Load(obj_name))) //NULL if failure
+				if (!(obj = Module::Load(file.words[1]))) //NULL if failure
 				{
-					Log_Add(-1, "Could not load object \"%s\" (requested by track)", obj_name);
+					Log_Add(-1, "Could not load object \"%s\" (requested by track)", file.words[1]);
 					delete track.object;
 					return false;
 				}
@@ -393,7 +391,7 @@ bool load_track (const char *path)
 		}
 	}
 	else
-		Log_Add(1, "WARNING: no object list for track, no default objects spawned");
+		Log_Add(0, "WARNING: no object list for track, no default objects spawned");
 
 	//that's it!
 	return true;
