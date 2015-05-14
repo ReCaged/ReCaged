@@ -12,7 +12,7 @@ section -	-12 0	12 0
 
 
 #since symmetric shape, only describe half road
-#(will be spawned twice in geoms.lst)
+#(will be places twice in geoms.lst)
 
 select -
 resolution 1 30

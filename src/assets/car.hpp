@@ -370,10 +370,10 @@ class Car_Module:public Assets
 {
 	public:
 		static Car_Module *Load(const char *path);
-		class Car *Spawn(dReal x, dReal y, dReal z, Model_Draw *wheel, class Profile *profile);
+		class Car *Create(dReal x, dReal y, dReal z, Model_Draw *wheel, class Profile *profile);
 
 	private:
-		Car_Module(const char *name); //only allocate through spawn function
+		Car_Module(const char *name); //only allocate through creation function
 
 		//conf:
 		Car_Conf conf; //loads from car.conf
@@ -402,7 +402,7 @@ class Car:public Object
 		~Car();
 
 		//change car position (and reset rotation and velocity)
-		void Respawn(dReal x, dReal y, dReal z);
+		void Recreate(dReal x, dReal y, dReal z);
 
 		static void Physics_Step(dReal step);
 
@@ -452,7 +452,7 @@ class Car:public Object
 		//tmp: wheel+hinge position...
 		dReal jx, wx, wy;
 
-		//used when/if recreating suspensions (on respawn)
+		//used when/if recreating suspensions (on recreation)
 		dReal sCFM, sERP;
 		dReal sthreshold, sbuffer;
 

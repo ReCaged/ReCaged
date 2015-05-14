@@ -23,7 +23,7 @@
 #
 #
 #surface options:
-#affects latest spawned geom (used after spawned geom)
+#affects latest created geom (used after creating geom)
 # > surface TYPE [OPTION VALUE]...
 #
 #where type can be just "global" or "material" followed by a name of a
@@ -55,7 +55,7 @@
 #specify the default global mu for all future geoms
 > surface global mu 1
 
-#spawning of trimesh geom (with override-able rendering model):
+#creating trimesh geom (with override-able rendering model):
 # POSITION ROTATION GEOM_MODEL [RENDER_MODEL]
   0 0 0    0 0 0    "Box.obj"  #"Box.obj"
 

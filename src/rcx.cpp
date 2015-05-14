@@ -95,7 +95,7 @@ bool tmp_menus()
 	if (!load_track(strack.c_str()))
 		return false; //GOTO: track selection menu
 
-	//TMP: load some objects for online spawning
+	//TMP: load some objects for creation during race
 	if (	!(box = Module::Load("misc/box"))		||
 		!(sphere = Module::Load("misc/beachball"))	||
 		!(funbox = Module::Load("misc/funbox"))		||
@@ -128,8 +128,8 @@ bool tmp_menus()
 				//try to load tyre and rim (if possible)
 				if (!wheel)
 					wheel = Model_Draw::Quick_Load_Conf("wheels/Reckon", "wheel.conf");
-				//good, spawn
-				car = car_template->Spawn(
+				//good, create
+				car = car_template->Create(
 					track.start[0], //x
 					track.start[1], //y
 					track.start[2], //z
@@ -192,8 +192,8 @@ bool tmp_menus()
 			//if wheel is still NULL, just don't rendering anything
 
 		}
-		//manual position required for spawning
-		else if (file.word_count == 3 && !strcmp(file.words[0], "spawn"))
+		//manual position required for creating
+		else if (file.word_count == 3 && !strcmp(file.words[0], "start"))
 		{
 			if (!car_template)
 			{
@@ -201,7 +201,7 @@ bool tmp_menus()
 				return false;
 			}
 
-			car = car_template->Spawn(
+			car = car_template->Create(
 					(track.start[0]+atof(file.words[1])), //x
 					(track.start[1]+atof(file.words[2])), //y
 					(track.start[2]), //z

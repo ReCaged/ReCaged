@@ -29,24 +29,24 @@
 #include "simulation/space.hpp"
 #include "simulation/component.hpp"
 
-//object: one "thing" on the track, from a complex building to a tree, spawning
+//object: one "thing" on the track, from a complex building to a tree, created
 //from "modules" using lua (in future versions). the most important role of
 //"object" is to store the components, ode space and joint group for the
-//spawned object
+//created object
 
-//template for spawning
+//template for creating
 class Module:public Assets
 {
 	public:
 		static Module *Load(const char *path);
-		void Spawn(dReal x, dReal y, dReal z);
+		void Create(dReal x, dReal y, dReal z);
 
 	private:
 		Module(const char*); //just set some default values
 		//placeholder for script data, now just variables
 
-		//script to be run when spawning object
-		Script *spawn;
+		//script to be run when creating object
+		Script *create;
 
 		//tmp vbo test graphics
 		Model_Draw *model[10];
