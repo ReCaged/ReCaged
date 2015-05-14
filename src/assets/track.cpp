@@ -140,7 +140,7 @@ bool load_track (const char *path)
 	{
 		//store default global surface properties for all geoms
 		Surface global;
-		//keep track of latest geom spawned
+		//keep track of latest geom create
 		Geom *latestgeom=NULL;
 
 		while (file.Read_Line())
@@ -362,26 +362,26 @@ bool load_track (const char *path)
 					return false;
 				}
 			}
-			//three words (x, y and z coord for spawning): spawning
+			//three words (x, y and z coord for creating) => create
 			else if (file.word_count == 3)
 			{
-				Log_Add(2, "object spawn request");
+				Log_Add(2, "object creation request");
 				//in case no object has been loaded yet
 				if (!obj)
 				{
-					Log_Add(-1, "Track is trying to spawn object without specifying what object!");
+					Log_Add(-1, "Track is trying to create object without specifying what object!");
 					continue; //go to next
 				}
 
 				//translate words to values
 				float x,y,z;
 
-				//assume conversion is succesfully (not reliable, but it shouldn't be a problem)
+				//assume conversion is successfully (not reliable, but it shouldn't be a problem)
 				x = atof(file.words[0]);
 				y = atof(file.words[1]);
 				z = atof(file.words[2]);
 
-				obj->Spawn(x, y, z);
+				obj->Create(x, y, z);
 			}
 			else
 			{
@@ -391,7 +391,7 @@ bool load_track (const char *path)
 		}
 	}
 	else
-		Log_Add(0, "WARNING: no object list for track, no default objects spawned");
+		Log_Add(0, "WARNING: no object list for track, no default objects created");
 
 	//that's it!
 	return true;

@@ -90,5 +90,6 @@ TODO: more stuff here!
    * Created "Thread" struct for thread local data (will become important)
    * Renamed "Object_Template" and "Car_Template" to "Module" and "Car_Module"
    * Renamed "Trimesh" and "..._Geom/_3D" to "Model" and "..._Mesh/_Draw"
+   * Changed terminology: "spawn" and "respawn" are now "create" and "recreate"
    * Removed "../" from header inclusions (src is now in the inclusion paths)
 

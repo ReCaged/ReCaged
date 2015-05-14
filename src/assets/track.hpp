@@ -53,7 +53,7 @@ extern struct Track_Struct {
 	float cam_start[3];
 	float focus_start[3];
 
-	dReal respawn;
+	dReal restart;
 
 	Object *object;
 	Space *space;
@@ -96,7 +96,7 @@ const struct Conf_Index track_index[] = {
 	{"start",	'R',3,	offsetof(Track_Struct, start)},
 	{"cam_start",	'f',3,	offsetof(Track_Struct, cam_start)},
 	{"focus_start",	'f',3,	offsetof(Track_Struct, focus_start)},
-	{"respawn",	'R',1,	offsetof(Track_Struct, respawn)},
+	{"restart",	'R',1,	offsetof(Track_Struct, restart)},
 	{"",0,0}};//end
 
 bool load_track (const char *path);

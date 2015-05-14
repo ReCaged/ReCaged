@@ -25,7 +25,7 @@
 #include "assets.hpp"
 
 //script: human readable (read: not _programming_) langue which will
-//describe what should be done when spawning an object (components, joints...),
+//describe what should be done when creating an object (components, joints...),
 //and when an component is colliding ("sensor triggering", destroying and so on)
 //function arguments can point at 3d files and other scripts and so on...
 //

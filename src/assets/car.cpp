@@ -79,7 +79,7 @@ Car::~Car()
 		next->prev = prev;
 }
 
-//loading/spawning:
+//loading/creating:
 Car_Module *Car_Module::Load (const char *path)
 {
 	Log_Add(1, "Loading car: %s", path);
@@ -156,7 +156,7 @@ Car_Module *Car_Module::Load (const char *path)
 					pos+=1;
 				}
 			}
-			//geom to spawn
+			//geom to create
 			else
 			{
 				if (!strcmp(file.words[0], "sphere") && file.word_count >= 2)
@@ -294,9 +294,9 @@ Car_Module *Car_Module::Load (const char *path)
 }
 
 
-Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile *profile)
+Car *Car_Module::Create (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile *profile)
 {
-	Log_Add(1, "spawning car at: %f %f %f", x,y,z);
+	Log_Add(1, "creating car at: %f %f %f", x,y,z);
 
 	//begin copying of needed configuration data
 	Car *car = new Car();
@@ -610,9 +610,9 @@ Car *Car_Module::Spawn (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile 
 	return car;
 }
 
-void Car::Respawn (dReal x, dReal y, dReal z)
+void Car::Recreate (dReal x, dReal y, dReal z)
 {
-	Log_Add(1, "respawning car at: %f %f %f", x,y,z);
+	Log_Add(1, "recreating car at: %f %f %f", x,y,z);
 
 	//remember old car position
 	const dReal *pos = dBodyGetPosition(bodyid);

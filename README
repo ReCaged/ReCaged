@@ -201,14 +201,14 @@ Camera movement/tweaking:
 * A/D, W/S and Q/E - movement along X, Y and Z axes.
   Note that these buttons will be used for weapon control in future versions.
 
-Spawning:
-* F5-F8 - spawn some objects:
+Creation:
+* F5-F8 - create some objects:
   box, beachball, funbox, molecule.
   Note that this function will also be removed in future versions
 
 Debugging:
 * F9  - switch car (if more than one)
-* F10 - respawn car at track starting point
+* F10 - recreate car at track starting point
 * F11 - simulation pause (camera can still be moved)
 * F12 - wireframe geom/collision rendering toggle, the following is provided:
    + models (normal rendering, only the 3D models)

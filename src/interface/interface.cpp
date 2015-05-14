@@ -38,7 +38,7 @@ int bpp;
 int joysticks=0;
 SDL_Joystick **joystick;
 
-//TMP: keep track of demo spawn stuff
+//TMP: keep track of demo object creation stuff
 Module *box = NULL;
 Module *sphere = NULL;
 Module *funbox = NULL;
@@ -316,31 +316,31 @@ int Interface_Loop ()
 							simulation_thread.runlevel = done;
 						break;
 
-						//box spawning
+						//box creation
 						case SDLK_F5:
 							SDL_mutexP(simulation_thread.ode_mutex);
-							box->Spawn (0,0,10);
+							box->Create (0,0,10);
 							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
-						//sphere spawning
+						//sphere creation
 						case SDLK_F6:
 							SDL_mutexP(simulation_thread.ode_mutex);
-							sphere->Spawn (0,0,10);
+							sphere->Create (0,0,10);
 							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
-						//spawn funbox
+						//create funbox
 						case SDLK_F7:
 							SDL_mutexP(simulation_thread.ode_mutex);
-							funbox->Spawn (0,0,10);
+							funbox->Create (0,0,10);
 							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
 						//molecule
 						case SDLK_F8:
 							SDL_mutexP(simulation_thread.ode_mutex);
-							molecule->Spawn (0,0,10);
+							molecule->Create (0,0,10);
 							SDL_mutexV(simulation_thread.ode_mutex);
 						break;
 
@@ -361,12 +361,12 @@ int Interface_Loop ()
 							}
 						break;
 
-						//respawn car
+						//recreate car
 						case SDLK_F10:
 							if (car)
 							{
 								SDL_mutexP(simulation_thread.ode_mutex);
-								car->Respawn(track.start[0], track.start[1], track.start[2]);
+								car->Recreate(track.start[0], track.start[1], track.start[2]);
 								SDL_mutexV(simulation_thread.ode_mutex);
 							}
 						break;
