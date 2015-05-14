@@ -103,7 +103,7 @@ int Interface_Loop (void);
 int Simulation_Loop (void *d);
 
 
-//TMP: used for keeping track for objects spawning
+//TMP: used for keeping track for objects creation
 #include "assets/object.hpp"
 extern Module *box;
 extern Module *sphere;

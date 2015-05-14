@@ -116,7 +116,7 @@ void Object::Destroy_All()
 	while (head)
 		delete (head);
 }
-//load data for spawning object (object data), hard-coded debug version
+//load data for creating object (object data), hard-coded debug version
 Module *Module::Load(const char *path)
 {
 	Log_Add(1, "Loading module: %s", path);
@@ -139,7 +139,7 @@ Module *Module::Load(const char *path)
 		obj = new Module(path);
 		obj->box = true;
 
-		//the debug box will only spawn one component - one "3D file"
+		//the debug box will only need one "3D file"
 		if (!(obj->model[0] = Model_Draw::Quick_Load("misc/box/box.obj")))
 			return NULL;
 
@@ -258,11 +258,11 @@ void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 	jd->Set_Buffer_Event(20000, 5000, (Script*)1337);
 }
 
-//spawn a "loaded" (actually hard-coded) object
+//create a "loaded" (actually hard-coded) object
 //TODO: rotation
-void Module::Spawn (dReal x, dReal y, dReal z)
+void Module::Create (dReal x, dReal y, dReal z)
 {
-	Log_Add(1, "Spawning object at: %f %f %f", x,y,z);
+	Log_Add(1, "Creating object at: %f %f %f", x,y,z);
 	//pretend to be executing the script... just load debug values
 	//
 
@@ -794,7 +794,7 @@ void Module::Spawn (dReal x, dReal y, dReal z)
 	//
 	//
 	else
-		Log_Add(-1, "trying to spawn unidentified object?!");
+		Log_Add(-1, "trying to create unidentified object?!");
 
 }
 

@@ -26,7 +26,7 @@
 #include "geom.hpp"
 #include "body.hpp"
 
-//check for bodies below "respawn depth"
+//check for bodies below "restart height"
 //TODO: can use arbitrary geoms and collisions instead, but better when lua
 void Track_Physics_Step()
 {
@@ -40,13 +40,13 @@ void Track_Physics_Step()
 		bnext = body->next;
 
 		const dReal *pos = dBodyGetPosition(body->body_id); //get position
-		if (pos[2] < track.respawn) //under respawn height
+		if (pos[2] < track.restart) //under restart height
 		{
 			Car *car = dynamic_cast<Car*>(body->object_parent);
 
-			//this is part of a car, it can be respawned
+			//this is part of a car, it can be recreated
 			if (car)
-				car->Respawn(track.start[0], track.start[1], track.start[2]);
+				car->Recreate(track.start[0], track.start[1], track.start[2]);
 			//else, this is part of an object, destroy it (and any attached geom)
 			else
 			{

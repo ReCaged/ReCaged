@@ -141,7 +141,7 @@ bool load_track (const char *path)
 	{
 		//store default global surface properties for all geoms
 		Surface global;
-		//keep track of latest geom spawned
+		//keep track of latest geom create
 		Geom *latestgeom=NULL;
 
 		while (file.Read_Line())
@@ -358,7 +358,7 @@ bool load_track (const char *path)
 		}
 	}
 	else
-		Log_Add(0, "WARNING: no object list for track, no default objects spawned");
+		Log_Add(0, "WARNING: no object list for track, no default objects created");
 
 	//that's it!
 	return true;
