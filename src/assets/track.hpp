@@ -77,7 +77,7 @@ const struct Track_Struct track_defaults = {
 	{0,-50,1.5},
 	{50,-100,5},
 	{0,0,0},
-	-20.0};
+	-80.0};
 
 const struct Conf_Index track_index[] = {
 	{"background",	'f',3,	offsetof(Track_Struct, background)},

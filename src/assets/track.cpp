@@ -93,7 +93,7 @@ bool load_track (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/track.conf");
 
-	if (!(dirs.Find(conf, DATA, READ)) && Load_Conf(dirs.Path(), (char *)&track, track_index))
+	if (!((dirs.Find(conf, DATA, READ)) && Load_Conf(dirs.Path(), (char *)&track, track_index)))
 		Log_Add(0, "WARNING: no config file for track, falling back to defaults");
 
 	//set camera default values, some from track specs
