@@ -49,7 +49,8 @@ const luaL_Reg common_lua_libs[] = {
 	{"object",	Lua_Object_Init},
 	{NULL,		NULL}};
 
-//simulation libraries:
+//extension libraries:
 extern const luaL_Reg simulation_lua_libs[];
+extern const luaL_Reg assets_lua_libs[];
 
 #endif

@@ -43,6 +43,7 @@ rcx_SOURCES =	./rcx.cpp \
 		assets/car.hpp \
 		assets/conf.cpp \
 		assets/conf.hpp \
+		assets/lua.cpp \
 		assets/model.cpp \
 		assets/model_draw.cpp \
 		assets/model.hpp \

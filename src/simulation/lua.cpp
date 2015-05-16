@@ -1,4 +1,3 @@
-
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
@@ -56,6 +55,16 @@ static int body_mass(lua_State *L)
 	return 0;
 }
 
+static int body_model(lua_State *L)
+{
+	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
+	Model_Draw **m=(Model_Draw**)luaL_checkudata(L, 2, "rcmodeldraw");
+
+	(**body).model=*m;
+
+	return 0;
+}
+
 static int body_position(lua_State *L)
 {
 	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
@@ -91,6 +100,7 @@ static const luaL_Reg body_lib[] = {
 
 static const luaL_Reg body_methods[] = {
 	{"mass",	body_mass},
+	{"model",	body_model},
 	{"position",	body_position},
 	{"rotation",	body_rotation},
 	{"delete",	body_delete},

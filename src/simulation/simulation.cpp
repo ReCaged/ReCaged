@@ -66,6 +66,9 @@ bool Simulation_Init(void)
 	//load simulation libraries
 	RCLua_Add(&simulation_thread, simulation_lua_libs);
 
+	//load assets libraries
+	RCLua_Add(&simulation_thread, assets_lua_libs);
+
 	//more ode stuff
 	simulation_thread.world = dWorldCreate();
 
