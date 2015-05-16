@@ -26,10 +26,10 @@
 //bellonging to the player during the race
 //Allocated at start
 #include "assets.hpp"
-#include "object.hpp"
 #include "model.hpp"
 #include "conf.hpp"
 #include "profile.hpp"
+#include "common/object.hpp"
 #include "simulation/camera.hpp"
 #include "simulation/body.hpp"
 #include "simulation/geom.hpp"

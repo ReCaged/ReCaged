@@ -22,7 +22,7 @@
 #include "body.hpp"
 #include "common/log.hpp"
 #include "common/internal.hpp"
-#include "assets/object.hpp"
+#include "common/object.hpp"
 #include "assets/car.hpp"
 #include "assets/track.hpp"
 #include "event_buffers.hpp"
@@ -223,7 +223,7 @@ void Body::Axis_Angular_Drag (dReal step)
 		rot[8]*rel[0]+rot[9]*rel[1]+rot[10]*rel[2] );
 }
 
-void Body::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
+void Body::Set_Buffer_Event(dReal thres, dReal buff, int *scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{

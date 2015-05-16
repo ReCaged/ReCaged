@@ -39,10 +39,21 @@ extern "C" {
 bool RCLua_Init(class Thread *); //initiates and loads std libraries
 void RCLua_Add(class Thread *, const luaL_Reg *newlibs); //add custom libs
 
-//"common" custom lua libraries:
+//lists used to add custom libraries:
+
+//common lua libraries:
 int (Lua_Log_Init) (lua_State *L);
+int (Lua_Object_Init) (lua_State *L);
 const luaL_Reg common_lua_libs[] = {
-	{"log",	Lua_Log_Init},
-	{NULL,	NULL}};
+	{"log",		Lua_Log_Init},
+	{"object",	Lua_Object_Init},
+	{NULL,		NULL}};
+
+//simulation libraries:
+int (Lua_Geom_Init) (lua_State *L);
+const luaL_Reg simulation_lua_libs[] = {
+	{"geom",	Lua_Geom_Init},
+	{NULL,		NULL}};
+
 
 #endif

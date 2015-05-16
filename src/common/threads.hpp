@@ -104,7 +104,7 @@ int Simulation_Loop (void *d);
 
 
 //TMP: used for keeping track for objects creation
-#include "assets/object.hpp"
+#include "object.hpp"
 extern Module *box;
 extern Module *sphere;
 extern Module *funbox;

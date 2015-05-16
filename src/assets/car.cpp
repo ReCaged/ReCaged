@@ -583,7 +583,7 @@ Car *Car_Module::Create (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile
 		{
 			Log_Add(2, "enabling damageable wheel suspension");
 			jointd->Set_Buffer_Event(conf.suspension_threshold, conf.suspension_buffer,
-					(Script *)1337);
+					(int*)1337);
 		}
 
 		//body is still body of car main body
@@ -671,7 +671,7 @@ void Car::Recreate (dReal x, dReal y, dReal z)
 			{
 				Log_Add(2, "enabling damageable wheel suspension");
 				jointd->Set_Buffer_Event(sthreshold, sbuffer,
-						(Script *)1337);
+						(int *)1337);
 			}
 
 			//body is still body of car main body

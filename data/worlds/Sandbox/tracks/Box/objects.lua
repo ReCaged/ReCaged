@@ -4,43 +4,46 @@
 -- are permitted in any medium without royalty provided the copyright
 -- notice and this notice are preserved. This file is offered as-is,
 -- without any warranty.
+local object=require "object"
 
-local obj = require "misc/box"
+local track=object.create()
 
-obj.create(10, 20, 0.5)
+local box=require "misc/box"
+box.create(track, 6, 20, 0.5)
 
---[[
-> misc/box
-10 20 0.5
-11 20 0.5
-12 20 0.5
-13 20 0.5
-14 20 0.5
+--try deletion method:
+local tmp=box.create(track, 7, 20, 0.5)
+tmp:delete()
 
-10.5 20 1.5
-11.5 20 1.5
-12.5 20 1.5
-13.5 20 1.5
+--2d pyramid, yes can automate with loops, but this is demo:
+box.create(track, 10, 20, 0.5)
+box.create(track, 11, 20, 0.5)
+box.create(track, 12, 20, 0.5)
+box.create(track, 13, 20, 0.5)
+box.create(track, 14, 20, 0.5)
 
-11 20 2.5
-12 20 2.5
-13 20 2.5
+box.create(track, 10.5, 20, 1.5)
+box.create(track, 11.5, 20, 1.5)
+box.create(track, 12.5, 20, 1.5)
+box.create(track, 13.5, 20, 1.5)
 
-11.5 20 3.5
-12.5 20 3.5
+box.create(track, 11, 20, 2.5)
+box.create(track, 12, 20, 2.5)
+box.create(track, 13, 20, 2.5)
 
-12 20 4.5
+box.create(track, 11.5, 20, 3.5)
+box.create(track, 12.5, 20, 3.5)
 
--15 20 0.5
--15 20 1.5
--15 20 2.5
--15 20 3.5
--15 20 4.5
--15 20 5.5
--15 20 6.5
--15 20 7.5
+box.create(track, 12, 20, 4.5)
 
-> misc/flipper
+--local rot=quaternion.new() --or: matrix.new()
+for i=0,7 do
+	--rot.fromaxisandangle(0, 0, 1, 0.1*i)
+	box.create(track, -15, 20, 0.5+i, rot)
+end
+
+
+--[[> misc/flipper
 12 0 0.25
 -12 0 0.25
 

@@ -48,16 +48,15 @@ rcx_SOURCES =	./rcx.cpp \
 		assets/model.hpp \
 		assets/model_mesh.cpp \
 		assets/obj.cpp \
-		assets/object.cpp \
-		assets/object.hpp \
 		assets/profile.cpp \
 		assets/profile.hpp \
 		assets/road.cpp \
-		assets/script.hpp \
 		assets/text_file.cpp \
 		assets/text_file.hpp \
 		assets/track.cpp \
 		assets/track.hpp \
+		common/component.cpp \
+		common/component.hpp \
 		common/directories.cpp \
 		common/directories.hpp \
 		common/internal.cpp \
@@ -66,6 +65,8 @@ rcx_SOURCES =	./rcx.cpp \
 		common/log.hpp \
 		common/lua.cpp \
 		common/lua.hpp \
+		common/object.cpp \
+		common/object.hpp \
 		common/threads.cpp \
 		common/threads.hpp \
 		interface/geom_render.cpp \
@@ -81,8 +82,6 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/car.cpp \
 		simulation/collision_feedback.cpp \
 		simulation/collision_feedback.hpp \
-		simulation/component.cpp \
-		simulation/component.hpp \
 		simulation/event_buffers.cpp \
 		simulation/event_buffers.hpp \
 		simulation/geom.cpp \
@@ -92,9 +91,9 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/simulation.cpp \
 		simulation/space.cpp \
 		simulation/space.hpp \
-		simulation/track.cpp \
 		simulation/timers.cpp \
 		simulation/timers.hpp \
+		simulation/track.cpp \
 		simulation/wheel.cpp \
 		simulation/wheel.hpp
 

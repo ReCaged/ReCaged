@@ -23,9 +23,10 @@
 #include <stdlib.h>
 
 #include "object.hpp"
-#include "assets.hpp"
-#include "model.hpp"
-#include "track.hpp"
+
+#include "assets/assets.hpp"
+#include "assets/model.hpp"
+#include "assets/track.hpp"
 
 #include "common/log.hpp"
 #include "common/threads.hpp"
@@ -255,7 +256,7 @@ void debug_joint_fixed(dBodyID body1, dBodyID body2, Object *obj)
 
 	//use feedback
 	//set threshold, buffer and dummy script
-	jd->Set_Buffer_Event(20000, 5000, (Script*)1337);
+	jd->Set_Buffer_Event(20000, 5000, (int*)1337);
 }
 
 //create a "loaded" (actually hard-coded) object
@@ -278,7 +279,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomID geom  = dCreateBox (0, 1,1,1); //geom
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
+	data->Set_Buffer_Event(100000, 10000, (int*)1337);
 	dBodyID body = dBodyCreate (simulation_thread.world);
 
 	dMass m;
@@ -319,7 +320,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	Body *bd = new Body (body1, obj);
 
 	//set buffer for body (when destroyed, so are all other geoms)
-	bd->Set_Buffer_Event(150000, 10000, (Script*)1337);
+	bd->Set_Buffer_Event(150000, 10000, (int*)1337);
 
 
 	//
@@ -419,7 +420,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 
 	data->flipper_geom = geom; //tmp debug solution
 	//enable script execution on sensor triggering (but not when untriggered)
-	data->Set_Sensor_Event ( ((Script*)1337) , NULL); //(triggered,untriggered)
+	data->Set_Sensor_Event ( ((int*)1337) , NULL); //(triggered,untriggered)
 
 	//
 	}
@@ -438,7 +439,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomID geom  = dCreateSphere (0, 1); //geom
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
+	data->Set_Buffer_Event(100000, 10000, (int*)1337);
 
 	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
@@ -471,7 +472,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	geom  = dCreateSphere (0, 0.8); //geom
 	data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(100000, 10000, (Script*)1337);
+	data->Set_Buffer_Event(100000, 10000, (int*)1337);
 	body = dBodyCreate (simulation_thread.world);
 
 	dMassSetSphereTotal (&m,30,0.5); //mass and radius
@@ -491,7 +492,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	joint = dJointCreateBall (simulation_thread.world, 0);
 
 	Joint *jd = new Joint(joint, obj);
-	jd->Set_Buffer_Event(1000, 50000, (Script*)1337);
+	jd->Set_Buffer_Event(1000, 50000, (int*)1337);
 
 	dJointAttach (joint, body1, body);
 	dJointSetBallAnchor (joint, x+pos[i][0], y+pos[i][1], z+pos[i][2]);
@@ -513,7 +514,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomID geom  = dCreateSphere (0, 1); //geom
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(1000, 1500, (Script*)1337);
+	data->Set_Buffer_Event(1000, 1500, (int*)1337);
 	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	dMass m;
@@ -561,7 +562,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 			dGeomID geom  = dCreateBox (0, 4,0.4,2.4); //geom
 			Geom *data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
-			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
+			data->Set_Buffer_Event(100000, 100000, (int*)1337);
 
 			body1[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body1[i]);
@@ -619,7 +620,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 			dGeomID geom  = dCreateBox (0, 4,4,0.2); //geom
 			Geom *data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
-			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
+			data->Set_Buffer_Event(100000, 100000, (int*)1337);
 
 			body2[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body2[i]);
@@ -683,7 +684,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 			geom  = dCreateCapsule (0, 0.3,1.4); //geom
 			data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
-			data->Set_Buffer_Event(100000, 100000, (Script*)1337);
+			data->Set_Buffer_Event(100000, 100000, (int*)1337);
 			body[i] = dBodyCreate (simulation_thread.world);
 	
 			dMass m;
@@ -753,7 +754,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 		g->TMP_pillar_geom = true;
 
 		//destruction
-		g->Set_Buffer_Event(200000, 100000, (Script*)1337);
+		g->Set_Buffer_Event(200000, 100000, (int*)1337);
 		g->TMP_pillar_graphics = model[1];
 	}
 	//
@@ -769,7 +770,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 
 		//properties:
 		g->surface.mu = 1.0;
-		g->Set_Buffer_Event(100000, 50000, (Script*)1337);
+		g->Set_Buffer_Event(100000, 50000, (int*)1337);
 
 		dBodyID body = dBodyCreate (simulation_thread.world);
 		dMass m;
@@ -798,3 +799,47 @@ void Module::Create (dReal x, dReal y, dReal z)
 
 }
 
+
+//
+//lua methods:
+//
+
+static int object_create(lua_State *L)
+{
+	Object **obj=(Object**)lua_newuserdata(L, sizeof(Object*));
+	*obj=new Object();
+	luaL_getmetatable(L, "rcobject");
+	lua_setmetatable(L, -2);
+	return 1;
+}
+
+static int object_delete(lua_State *L)
+{
+	Object **obj=(Object**)luaL_checkudata(L, 1, "rcobject");
+	//TODO: need to put int lua__ref to Object, set udata pointer to NULL if already deleted...
+	delete *obj;
+	return 0;
+}
+//
+//for registering to thread/lua state:
+//
+static const luaL_Reg object_lib[] = {
+	{"create",	object_create},
+	{NULL,	NULL}
+};
+
+static const luaL_Reg object_methods[] = {
+	{"delete",	object_delete},
+	{NULL,		NULL}
+};
+
+int Lua_Object_Init(lua_State *L)
+{
+	luaL_newmetatable(L, "rcobject");
+	lua_pushvalue(L, -1);  /* push metatable */
+	lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
+	luaL_setfuncs(L, object_methods, 0);  /* add file methods to new metatable */
+	lua_pop(L, 1);  /* pop new metatable */
+	luaL_newlib(L, object_lib);
+	return 1;
+}

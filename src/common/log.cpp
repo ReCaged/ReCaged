@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -406,6 +406,10 @@ static int log_add(lua_State *L)
 
 	return 0;
 }
+
+//
+//lua methods:
+//
 
 //
 //for registering to thread/lua state:

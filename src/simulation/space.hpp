@@ -21,8 +21,8 @@
 
 #ifndef _RCX_SPACE_H
 #define _RCX_SPACE_H
-#include "component.hpp"
-#include "assets/object.hpp"
+#include "common/component.hpp"
+#include "common/object.hpp"
 
 //Space: (meta)data for spaces (collects geoms that should not collide)
 //(in contrary to other components, this can't be rendered or cause events)

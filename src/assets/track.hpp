@@ -22,7 +22,7 @@
 #ifndef _RCX_TRACK_H
 #define _RCX_TRACK_H
 #include "assets/conf.hpp"
-#include "object.hpp"
+#include "common/object.hpp"
 #include <GL/glew.h>
 #include <ode/ode.h>
 

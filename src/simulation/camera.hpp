@@ -41,7 +41,7 @@ struct Camera_Settings {
 };
 
 #include <assets/car.hpp>
-#include <assets/object.hpp>
+#include <common/object.hpp>
 
 //safety values for struct above
 const struct Camera_Settings camera_settings_default = {

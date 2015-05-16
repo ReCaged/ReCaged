@@ -24,11 +24,8 @@
 #include <ode/ode.h>
 #include <SDL/SDL.h>
 
-#include "joint.hpp"
-#include "component.hpp"
-
-#include "assets/object.hpp"
-#include "assets/script.hpp"
+#include "common/component.hpp"
+#include "common/object.hpp"
 
 //Joint: (meta)data for joint (connects bodies), is used for:
 //currently only for triggering event script (force threshold)
@@ -46,7 +43,7 @@ class Joint: public Component
 		dJointID joint_id;
 
 		//buffer event
-		void Set_Buffer_Event(dReal thresh, dReal buff, Script *scr);
+		void Set_Buffer_Event(dReal thresh, dReal buff, int *scr);
 		void Increase_Buffer(dReal add);
 
 	private:
@@ -64,7 +61,7 @@ class Joint: public Component
 		dJointFeedback *feedback; //used if checking forces
 		dReal threshold; //if force on body exceeds threshold, eat buffer
 		dReal buffer; //if buffer reaches zero, trigger event
-		Script *buffer_script; //the script to run
+		int *buffer_script; //the script to run
 
 		friend class Car_Module;
 		friend class Car;

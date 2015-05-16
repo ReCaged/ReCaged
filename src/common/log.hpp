@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011, 2012, 2014 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -45,11 +45,5 @@ void Log_Add (int, const char*, ...);
 //wrappers for popular text output functions
 void Log_printf (int, const char*, ...);
 void Log_puts (int, const char*);
-
-//
-//lua library
-//
-#include "lua.hpp"
-int Lua_Log_Init(lua_State *L);
 
 #endif

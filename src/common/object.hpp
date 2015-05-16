@@ -23,11 +23,10 @@
 #define _RCX_OBJECT_H
 #include <ode/common.h>
 
-#include "assets.hpp"
-#include "model.hpp"
-#include "script.hpp"
+#include "assets/assets.hpp"
+#include "assets/model.hpp"
 #include "simulation/space.hpp"
-#include "simulation/component.hpp"
+#include "component.hpp"
 
 //object: one "thing" on the track, from a complex building to a tree, created
 //from "modules" using lua (in future versions). the most important role of
@@ -44,9 +43,6 @@ class Module:public Assets
 	private:
 		Module(const char*); //just set some default values
 		//placeholder for script data, now just variables
-
-		//script to be run when creating object
-		Script *create;
 
 		//tmp vbo test graphics
 		Model_Draw *model[10];
@@ -74,8 +70,8 @@ class Object
 		//for increasing/decreasing activity counter
 		void Increase_Activity();
 		void Decrease_Activity();
-	private:
 		Object();
+	private:
 		//the following are either using or inherited from this class
 		friend class Module; //needs access to constructor
 		friend bool load_track (const char *);

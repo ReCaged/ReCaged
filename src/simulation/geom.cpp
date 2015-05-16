@@ -384,7 +384,7 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 //
 
 //buffer
-void Geom::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
+void Geom::Set_Buffer_Event(dReal thres, dReal buff, int *scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{
@@ -443,7 +443,7 @@ void Geom::Increase_Buffer(dReal buff)
 }
 
 //sensor
-void Geom::Set_Sensor_Event(Script *s1, Script *s2)
+void Geom::Set_Sensor_Event(int *s1, int *s2)
 {
 	if (s1 || s2) //enable
 	{
@@ -475,3 +475,107 @@ void Geom::Physics_Step()
 		//if (geom->radar_event)... - TODO
 	}
 }
+
+//
+//lua methods:
+//
+
+static int geom_box(lua_State *L)
+{
+	/*
+	//check lua args:
+	//
+	//number of arguments
+	int n = lua_gettop(L);
+
+kanske: n == 4 => object, n == 3 => orphan?
+
+	//not enough/wrong arguments
+	luaL_argcheck(L, n == 3 &&
+			lua_isnumber(L, 1) &&
+			lua_isnumber(L, 2) &&
+			lua_isnumber(L, 3),
+			1, "expected verbosity number");
+			*/
+
+	Object **obj = (Object**)luaL_checkudata(L, 1, "rcobject");
+
+	dGeomID geom  = dCreateBox (0,
+			lua_tonumber(L, 2),
+			lua_tonumber(L, 3),
+			lua_tonumber(L, 4));
+
+	Geom **p=(Geom**)lua_newuserdata(L, sizeof(Geom*));
+	*p=new Geom(geom, *obj);
+	luaL_getmetatable(L, "rcgeom");
+	lua_setmetatable(L, -2);
+	//pushval //TODO: when completed move to lua
+	//luaL_ref
+	//~Geom
+	//udata->p=NULL;
+	//luaL_unref
+
+	//data->Push_Ref(L); //TODO: always push ref and duplicate in constructor!
+		//lua_newuserdata(L, sizeof(char));
+		//luaL_setmetatable(L, "foobar");
+	return 1;
+}
+
+/*
+static int geom_id(lua_State *L)
+{
+	if (luaL_checkudata(L, 1, "foobar"))
+		printf("yes\n");
+	else
+		printf("no\n");
+	return 0;
+}
+*/
+
+static int geom_position(lua_State *L)
+{
+	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
+
+	dGeomSetPosition(	(**geom).geom_id, 
+			lua_tonumber(L, 2),
+			lua_tonumber(L, 3),
+			lua_tonumber(L, 4));
+
+	return 0;
+}
+
+static int geom_delete(lua_State *L)
+{
+	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
+	delete *geom;
+	return 0;
+}
+//
+//for registering to thread/lua state:
+//
+static const luaL_Reg geom_lib[] = {
+	{"box",		geom_box},
+	//{"id",	geom_id},
+	{NULL,		NULL}
+};
+
+static const luaL_Reg geom_methods[] = {
+	{"position",	geom_position},
+	{"delete",	geom_delete},
+	{NULL,		NULL}
+};
+
+//simple init: just expose log.add() method:
+int Lua_Geom_Init(lua_State *L)
+{
+	luaL_newmetatable(L, "rcgeom");
+
+	lua_pushvalue(L, -1);  /* push metatable */
+	lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
+	luaL_setfuncs(L, geom_methods, 0);  /* add file methods to new metatable */
+	lua_pop(L, 1);  /* pop new metatable */
+	luaL_newlib(L, geom_lib);
+	return 1;
+}
+
+//TODO: destroy base metatable at close!

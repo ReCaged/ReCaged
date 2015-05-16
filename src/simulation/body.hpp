@@ -23,10 +23,8 @@
 #define _RCX_BODY_H
 #include <ode/ode.h>
 #include <SDL/SDL.h>
-#include "component.hpp"
-#include "assets/script.hpp"
-#include "assets/object.hpp"
-#include "assets/script.hpp"
+#include "common/component.hpp"
+#include "common/object.hpp"
 
 //body_data: data for body (describes mass and mass positioning), used for:
 //currently only for triggering event script (force threshold and event variables)
@@ -40,7 +38,7 @@ class Body: public Component
 		Body (dBodyID body, Object *obj);
 		~Body();
 
-		void Set_Event(dReal thresh, dReal buff, Script *scr);
+		void Set_Event(dReal thresh, dReal buff, int *scr);
 		void Update_Mass(); //must be called if change of mass
 
 		//set linear/angular air/liquid drag coefficients
@@ -60,7 +58,7 @@ class Body: public Component
 		Model_Draw *model;
 
 		//buffer events (sent from geoms)
-		void Set_Buffer_Event(dReal thresh, dReal buff, Script *scr);
+		void Set_Buffer_Event(dReal thresh, dReal buff, int *scr);
 		void Increase_Buffer(dReal add);
 		void Damage_Buffer(dReal force, dReal step);
 		bool Buffer_Event_Configured(); //check if configured (by geom)
@@ -88,7 +86,7 @@ class Body: public Component
 		bool buffer_event; //buffer has just been depleted
 		dReal threshold; //if allocated forces exceeds, eat buffer
 		dReal buffer; //if buffer reaches zero, trigger event
-		Script *buffer_script; //execute on event
+		int *buffer_script; //execute on event
 
 		//private methods for drag
 		void Linear_Drag(dReal step);

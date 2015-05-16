@@ -21,7 +21,7 @@
 
 #include "joint.hpp"
 #include "event_buffers.hpp"
-#include "component.hpp"
+#include "common/component.hpp"
 #include "common/internal.hpp"
 
 //creation/destruction:
@@ -71,7 +71,7 @@ Joint::~Joint ()
 }
 
 //set event
-void Joint::Set_Buffer_Event(dReal thres, dReal buff, Script *scr)
+void Joint::Set_Buffer_Event(dReal thres, dReal buff, int *scr)
 {
 	if (thres > 0 && buff > 0 && scr)
 	{

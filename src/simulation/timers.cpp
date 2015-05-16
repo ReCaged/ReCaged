@@ -21,11 +21,11 @@
 
 #include "timers.hpp"
 #include "geom.hpp"
-#include "assets/object.hpp"
+#include "common/object.hpp"
 
 Animation_Timer *Animation_Timer::head = NULL;
 
-Animation_Timer::Animation_Timer (Object *obj, Script *scr, dReal start, dReal stop,
+Animation_Timer::Animation_Timer (Object *obj, int *scr, dReal start, dReal stop,
 		dReal duration):object(obj), script(scr), counter(start), goal(stop)
 {
 	speed = (stop-start)/duration;
@@ -94,7 +94,7 @@ void Animation_Timer::Events_Step(dReal  step)
 			//now that we're done elevating flipper (positive movement), start new timer for lowering it back:
 			//goas from old timer's goal to goal-2, during 2 seconds (slower - looks nice)
 			if (timer->speed > 0)
-				new Animation_Timer(timer->object,(Script*)geom,timer->goal,(timer->goal-2.0), 2.0);
+				new Animation_Timer(timer->object,(int*)geom,timer->goal,(timer->goal-2.0), 2.0);
 			//end of TMP
 
 			//delete

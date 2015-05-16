@@ -23,7 +23,7 @@
 
 #include "track.hpp"
 #include "text_file.hpp"
-#include "object.hpp"
+#include "common/object.hpp"
 
 #include "common/internal.hpp"
 #include "common/log.hpp"

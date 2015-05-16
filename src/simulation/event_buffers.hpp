@@ -22,7 +22,7 @@
 #ifndef _RCX_EVENT_BUFFERS_H
 #define _RCX_EVENT_BUFFERS_H
 
-#include "simulation/component.hpp"
+#include "common/component.hpp"
 #include "simulation/geom.hpp"
 #include "simulation/body.hpp"
 #include "simulation/joint.hpp"

@@ -1,7 +1,7 @@
 /*
  * RCX - a Free Software, Futuristic, Racing Game
  *
- * Copyright (C) 2009, 2010, 2011 Mats Wahlberg
+ * Copyright (C) 2009, 2010, 2011, 2015 Mats Wahlberg
  *
  * This file is part of RCX.
  *
@@ -19,24 +19,29 @@
  * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
-#ifndef _RCX_SCRIPT_H
-#define _RCX_SCRIPT_H
+#include "component.hpp"
+#include "object.hpp"
+#include "log.hpp"
 
-#include "assets.hpp"
-
-//script: human readable (read: not _programming_) langue which will
-//describe what should be done when creating an object (components, joints...),
-//and when an component is colliding ("sensor triggering", destroying and so on)
-//function arguments can point at 3d files and other scripts and so on...
-//
-//(currently not used)
-//
-//>Allocated at start
-class Script: public Assets
+Component::Component(Object *obj)
 {
-	public:
-		Script(const char*);
-		~Script();
-};
+	//rather simple: just add it to the top of obj list of components
+	next = obj->components;
+	prev = NULL;
+	obj->components = this;
 
-#endif
+	if (next) next->prev = this;
+
+	//keep track of owning object
+	object_parent = obj;
+}
+
+Component::~Component()
+{
+	//just unlink...
+	if (prev) prev->next = next;
+	else object_parent->components = next;
+
+	if (next) next->prev = prev;
+}
+
