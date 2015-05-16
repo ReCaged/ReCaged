@@ -50,12 +50,6 @@ const luaL_Reg common_lua_libs[] = {
 	{NULL,		NULL}};
 
 //simulation libraries:
-int (Lua_Geom_Init) (lua_State *L);
-int (Lua_Rotation_Init) (lua_State *L);
-const luaL_Reg simulation_lua_libs[] = {
-	{"geom",	Lua_Geom_Init},
-	{"rotation",	Lua_Rotation_Init},
-	{NULL,		NULL}};
-
+extern const luaL_Reg simulation_lua_libs[];
 
 #endif

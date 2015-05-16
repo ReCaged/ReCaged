@@ -13,10 +13,6 @@ local track=object.create()
 local box=require "misc/box"
 box.create(track, 6, 20, 0.5)
 
---try deletion method:
-local tmp=box.create(track, 7, 20, 0.5)
-tmp:delete()
-
 --2d pyramid, yes can automate with loops, but this is demo:
 box.create(track, 10, 20, 0.5)
 box.create(track, 11, 20, 0.5)
