@@ -88,6 +88,7 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/geom.hpp \
 		simulation/joint.cpp \
 		simulation/joint.hpp \
+		simulation/lua.cpp \
 		simulation/simulation.cpp \
 		simulation/space.cpp \
 		simulation/space.hpp \

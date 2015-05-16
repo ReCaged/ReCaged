@@ -4,7 +4,9 @@
 -- are permitted in any medium without royalty provided the copyright
 -- notice and this notice are preserved. This file is offered as-is,
 -- without any warranty.
+local math=require "math"
 local object=require "object"
+local rotation=require "rotation"
 
 local track=object.create()
 
@@ -36,9 +38,10 @@ box.create(track, 12.5, 20, 3.5)
 
 box.create(track, 12, 20, 4.5)
 
---local rot=quaternion.new() --or: matrix.new()
+local rot=rotation.matrix()
+local turn=math.pi/(2*7)
 for i=0,7 do
-	--rot.fromaxisandangle(0, 0, 1, 0.1*i)
+	rot:fromaxisandangle(0, 0, 1, turn*i)
 	box.create(track, -15, 20, 0.5+i, rot)
 end
 

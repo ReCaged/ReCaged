@@ -12,14 +12,14 @@ log.add(1, "loading box module")
 
 local module={}
 
-function module.create(parent, x, y, z, m)
-	local x, y, z, m = x or 1, y or 1, z or 1 --, m or matrix.identity()
-
-	log.add(1, "creating box at ("..x..","..y..","..z..")") --todo: remove this
-
+function module.create(parent, x, y, z, r)
 	o=object.create(parent)
 	local g=geom.box(o, 1, 1, 1)
 	g:position(x, y, z)
+
+	if r then
+		g:rotation(r)
+	end
 
 	--todo: body
 

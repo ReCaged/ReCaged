@@ -544,6 +544,16 @@ static int geom_position(lua_State *L)
 	return 0;
 }
 
+static int geom_rotation(lua_State *L)
+{
+	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
+	dMatrix3 *m=(dMatrix3*)luaL_checkudata(L, 2, "rcmatrix");
+
+	dGeomSetRotation((**geom).geom_id, *m);
+
+	return 0;
+}
+
 static int geom_delete(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
@@ -561,6 +571,7 @@ static const luaL_Reg geom_lib[] = {
 
 static const luaL_Reg geom_methods[] = {
 	{"position",	geom_position},
+	{"rotation",	geom_rotation},
 	{"delete",	geom_delete},
 	{NULL,		NULL}
 };
@@ -570,10 +581,16 @@ int Lua_Geom_Init(lua_State *L)
 {
 	luaL_newmetatable(L, "rcgeom");
 
-	lua_pushvalue(L, -1);  /* push metatable */
-	lua_setfield(L, -2, "__index");  /* metatable.__index = metatable */
-	luaL_setfuncs(L, geom_methods, 0);  /* add file methods to new metatable */
-	lua_pop(L, 1);  /* pop new metatable */
+	//use metatable for __index: compact and common solution:
+	lua_pushvalue(L, -1); //copy
+	lua_setfield(L, -2, "__index"); //set index to itself (via copy)
+
+	//write functions to table
+	luaL_setfuncs(L, geom_methods, 0);
+
+	//remove metatable from stack
+	lua_pop(L, 1);
+
 	luaL_newlib(L, geom_lib);
 	return 1;
 }
