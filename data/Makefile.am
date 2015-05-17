@@ -21,6 +21,7 @@
 
 objectsdir = $(datadir)/games/rcx
 nobase_dist_objects_DATA = \
+	misc/beachball/init.lua \
 	misc/beachball/README \
 	misc/beachball/sphere.mtl \
 	misc/beachball/sphere.obj \

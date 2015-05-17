@@ -8,8 +8,8 @@
 --libraries:
 local log=require "log"
 local object=require "object"
-local geom=require "body"
-local geom=require "mass"
+local body=require "body"
+local mass=require "mass"
 local geom=require "geom"
 local model=require "model"
 
@@ -54,7 +54,6 @@ function module.create(parent, x, y, z, r)
 	--configure callback for damage
 	--threshold N, damage buffer Ns, function when buffer reach 0
 	Geom:damage(100000, 10000, function()
-		log.add(1, "box destroyed!")
 		Body:delete()
 		Geom:delete()
 	end)

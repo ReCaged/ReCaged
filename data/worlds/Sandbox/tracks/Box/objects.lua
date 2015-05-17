@@ -43,12 +43,12 @@ end
 
 --[[> misc/flipper
 12 0 0.25
--12 0 0.25
+-12 0 0.25]]
 
-> misc/beachball
-2 0 20
+local ball=require "misc/beachball"
+ball.create(track, 2, 0, 20)
 
-> misc/funbox
+--[[> misc/funbox
 -8 -5 9
 
 > misc/NH4

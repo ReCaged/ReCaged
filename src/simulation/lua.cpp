@@ -59,9 +59,21 @@ static int body_model(lua_State *L)
 {
 	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
 	Model_Draw **m=(Model_Draw**)luaL_checkudata(L, 2, "rcmodeldraw");
-
 	(**body).model=*m;
+	return 0;
+}
 
+static int body_linear_drag(lua_State *L)
+{
+	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
+	(**body).Set_Linear_Drag(lua_tonumber(L, 2));
+	return 0;
+}
+
+static int body_angular_drag(lua_State *L)
+{
+	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
+	(**body).Set_Angular_Drag(lua_tonumber(L, 2));
 	return 0;
 }
 
@@ -101,6 +113,8 @@ static const luaL_Reg body_lib[] = {
 static const luaL_Reg body_methods[] = {
 	{"mass",	body_mass},
 	{"model",	body_model},
+	{"linear_drag",	body_linear_drag},
+	{"angular_drag",body_angular_drag},
 	{"position",	body_position},
 	{"rotation",	body_rotation},
 	{"delete",	body_delete},
@@ -145,8 +159,18 @@ static int mass_boxtotal(lua_State *L)
 	return 0;
 }
 
+static int mass_spheretotal(lua_State *L)
+{
+	dMass *m=(dMass*)luaL_checkudata(L, 1, "rcmass");
+	dMassSetSphereTotal(m, 
+			lua_tonumber(L, 2),
+			lua_tonumber(L, 3));
+	return 0;
+}
+
 static const luaL_Reg mass_methods[] = {
 	{"boxtotal",	mass_boxtotal},
+	{"spheretotal",	mass_spheretotal},
 	{NULL,		NULL}
 };
 int Lua_Mass_Init(lua_State *L)
@@ -251,6 +275,20 @@ kanske: n == 4 => object, n == 3 => orphan?
 	return 1;
 }
 
+static int geom_sphere(lua_State *L)
+{
+	Object **obj = (Object**)luaL_checkudata(L, 1, "rcobject");
+
+	dGeomID geom  = dCreateSphere (0,
+			lua_tonumber(L, 2));
+
+	Geom **p=(Geom**)lua_newuserdata(L, sizeof(Geom*));
+	*p=new Geom(geom, *obj);
+	luaL_getmetatable(L, "rcgeom");
+	lua_setmetatable(L, -2);
+	return 1;
+}
+
 /*
 static int geom_id(lua_State *L)
 {
@@ -287,9 +325,21 @@ static int geom_damage(lua_State *L)
 static int geom_mu(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
-
 	(**geom).surface.mu=lua_tonumber(L, 2);
+	return 0;
+}
 
+static int geom_stiffness(lua_State *L)
+{
+	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
+	(**geom).surface.spring=lua_tonumber(L, 2);
+	return 0;
+}
+
+static int geom_damping(lua_State *L)
+{
+	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
+	(**geom).surface.damping=lua_tonumber(L, 2);
 	return 0;
 }
 
@@ -324,6 +374,7 @@ static int geom_delete(lua_State *L)
 //
 static const luaL_Reg geom_lib[] = {
 	{"box",		geom_box},
+	{"sphere",	geom_sphere},
 	//{"id",	geom_id},
 	{NULL,		NULL}
 };
@@ -334,6 +385,8 @@ static const luaL_Reg geom_methods[] = {
 	{"body",	geom_body},
 	{"damage",	geom_damage},
 	{"mu",		geom_mu},
+	{"stiffness",	geom_stiffness},
+	{"damping",	geom_damping},
 	{"delete",	geom_delete},
 	{NULL,		NULL}
 };
