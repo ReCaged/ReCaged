@@ -114,7 +114,7 @@ Profile *Profile_Load (const char *path)
 	strcpy (conf,path);
 	strcat (conf,"/profile.conf");
 
-	if (!(dirs.Find(conf, CONFIG, READ)) && Load_Conf(dirs.Path(), (char *)prof, profile_index))
+	if (!(dirs.Find(conf, CONFIG, READ) && Load_Conf(dirs.Path(), (char *)prof, profile_index)))
 		Log_Add(0, "WARNING: no conf file for profile, falling back to defaults");
 
 	//set camera
@@ -132,7 +132,7 @@ Profile *Profile_Load (const char *path)
 	Log_Add(2, "Loading key list: %s", list);
 	Text_File file;
 
-	if (dirs.Find(list, CONFIG, READ), file.Open(dirs.Path()))
+	if (dirs.Find(list, CONFIG, READ) && file.Open(dirs.Path()))
 	{
 		while (file.Read_Line())
 		{
