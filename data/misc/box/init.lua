@@ -51,6 +51,14 @@ function module.create(parent, x, y, z, r)
 	Geom:body(Body)
 	Geom:mu(1) --friction 1N/N
 
+	--configure callback for damage
+	--threshold N, damage buffer Ns, function when buffer reach 0
+	Geom:damage(100000, 10000, function()
+		log.add(1, "box destroyed!")
+		Body:delete()
+		Geom:delete()
+	end)
+
 	--provide access to this box object
 	return Obj
 end

@@ -274,6 +274,16 @@ static int geom_position(lua_State *L)
 	return 0;
 }
 
+static int geom_damage(lua_State *L)
+{
+	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
+	(**geom).Set_Buffer_Event(
+			lua_tonumber(L, 2),
+			lua_tonumber(L, 3),
+			luaL_ref(L, LUA_REGISTRYINDEX));
+	return 0;
+}
+
 static int geom_mu(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
@@ -322,6 +332,7 @@ static const luaL_Reg geom_methods[] = {
 	{"position",	geom_position},
 	{"rotation",	geom_rotation},
 	{"body",	geom_body},
+	{"damage",	geom_damage},
 	{"mu",		geom_mu},
 	{"delete",	geom_delete},
 	{NULL,		NULL}

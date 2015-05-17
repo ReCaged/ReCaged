@@ -94,7 +94,7 @@ class Geom: public Component
 		Model_Draw *TMP_pillar_graphics; //TMP
 
 		//for buffer events
-		void Set_Buffer_Event(dReal thresh, dReal buff, int *scr);
+		void Set_Buffer_Event(dReal thresh, dReal buff, int function);
 		void Increase_Buffer(dReal add);
 		void Set_Buffer_Body(Body*); //send damage to body instead
 		void Damage_Buffer(dReal force, dReal step); //"damage" geom with specified force
@@ -122,7 +122,7 @@ class Geom: public Component
 		//normal buffer handling
 		dReal threshold;
 		dReal buffer;
-		int *buffer_script; //script to execute when colliding (NULL if not used)
+		int buffer_function; //lua function to execute when colliding (LUA_NOREF if not used)
 
 		//for special kind of geoms:
 		//trimesh: how many triangles (0 if not trimesh/disabled) and which colliding:

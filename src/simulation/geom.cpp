@@ -77,6 +77,7 @@ Geom::Geom (dGeomID geom, Object *obj): Component(obj) //pass object argument to
 	//events:
 	//for force handling (disable)
 	buffer_event=false;
+	buffer_function=LUA_NOREF;
 	force_to_body=NULL; //when true, points at wanted body
 	sensor_event=false;
 
@@ -89,6 +90,13 @@ Geom::~Geom ()
 {
 	//remove all events
 	Event_Buffer_Remove_All(this);
+
+	if (buffer_function != LUA_NOREF)
+	{
+		luaL_unref(simulation_thread.lua_state,
+				LUA_REGISTRYINDEX, buffer_function);
+		buffer_function=LUA_NOREF;
+	}
 
 	//1: remove it from the list
 	if (!prev) //head in list, change head pointer
@@ -384,13 +392,13 @@ void Geom::Collision_Callback (void *data, dGeomID o1, dGeomID o2)
 //
 
 //buffer
-void Geom::Set_Buffer_Event(dReal thres, dReal buff, int *scr)
+void Geom::Set_Buffer_Event(dReal thres, dReal buff, int func)
 {
-	if (thres > 0 && buff > 0 && scr)
+	if (thres > 0 && buff > 0 && func!=LUA_NOREF)
 	{
 		threshold=thres;
 		buffer=buff;
-		buffer_script=scr;
+		buffer_function=func;
 
 		//make sure no old event is left
 		Event_Buffer_Remove_All(this);
@@ -400,6 +408,12 @@ void Geom::Set_Buffer_Event(dReal thres, dReal buff, int *scr)
 	else
 	{
 		buffer_event=false;
+		if (buffer_function != LUA_NOREF)
+		{
+			luaL_unref(simulation_thread.lua_state,
+					LUA_REGISTRYINDEX, buffer_function);
+			buffer_function=LUA_NOREF;
+		}
 		Event_Buffer_Remove_All(this);
 	}
 }

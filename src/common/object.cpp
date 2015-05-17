@@ -279,7 +279,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomID geom  = dCreateBox (0, 1,1,1); //geom
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(100000, 10000, (int*)1337);
+	//data->Set_Buffer_Event(100000, 10000, (int*)1337);
 	dBodyID body = dBodyCreate (simulation_thread.world);
 
 	dMass m;
@@ -320,7 +320,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	Body *bd = new Body (body1, obj);
 
 	//set buffer for body (when destroyed, so are all other geoms)
-	bd->Set_Buffer_Event(150000, 10000, (int*)1337);
+	//bd->Set_Buffer_Event(150000, 10000, (int*)1337);
 
 
 	//
@@ -336,7 +336,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dBodySetPosition (body1, x, y, z);
 
 	data->model = model[0];
-	data->Set_Buffer_Body(bd); //send collision forces to body
+	//data->Set_Buffer_Body(bd); //send collision forces to body
 	data->surface.bounce = 2.0; //about twice the collision force is used to bounce up
 
 	//the outer boxes (different offsets)
@@ -346,7 +346,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomSetBody (geom, body1);
 	dGeomSetOffsetPosition(geom, 0.70,0,0); //offset
 	//data->f_3d = graphics_debug2; //graphics
-	data->Set_Buffer_Body(bd);
+	//data->Set_Buffer_Body(bd);
 
 	geom = dCreateBox(0, 1.0, 1.0, 1.0);
 	data = new Geom(geom, obj);
@@ -354,7 +354,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomSetBody (geom, body1);
 	dGeomSetOffsetPosition(geom, 0,0.70,0); //offset
 	//data->f_3d = graphics_debug2; //graphics
-	data->Set_Buffer_Body(bd);
+	//data->Set_Buffer_Body(bd);
 
 	geom = dCreateBox(0, 1.0, 1.0, 1.0);
 	data = new Geom(geom, obj);
@@ -362,7 +362,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomSetBody (geom, body1);
 	dGeomSetOffsetPosition(geom, 0,0,0.70); //offset
 	//data->f_3d = graphics_debug2; //graphics
-	data->Set_Buffer_Body(bd);
+	//data->Set_Buffer_Body(bd);
 
 	geom = dCreateBox(0, 1.0, 1.0, 1.0);
 	data = new Geom(geom, obj);
@@ -370,7 +370,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomSetBody (geom, body1);
 	dGeomSetOffsetPosition(geom, -0.70,0,0); //offset
 	//data->f_3d = graphics_debug2; //graphics
-	data->Set_Buffer_Body(bd);
+	//data->Set_Buffer_Body(bd);
 
 	geom = dCreateBox(0, 1.0, 1.0, 1.0);
 	data = new Geom(geom, obj);
@@ -378,7 +378,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomSetBody (geom, body1);
 	dGeomSetOffsetPosition(geom, 0,-0.70,0); //offset
 	//data->f_3d = graphics_debug2; //graphics
-	data->Set_Buffer_Body(bd);
+	//data->Set_Buffer_Body(bd);
 
 	geom = dCreateBox(0, 1.0, 1.0, 1.0);
 	data = new Geom(geom, obj);
@@ -386,7 +386,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomSetBody (geom, body1);
 	dGeomSetOffsetPosition(geom, 0,0,-0.70); //offset
 	//data->f_3d = graphics_debug2; //graphics
-	data->Set_Buffer_Body(bd);
+	//data->Set_Buffer_Body(bd);
 	
 	}
 	//
@@ -439,7 +439,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomID geom  = dCreateSphere (0, 1); //geom
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(100000, 10000, (int*)1337);
+	//data->Set_Buffer_Event(100000, 10000, (int*)1337);
 
 	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
@@ -472,7 +472,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	geom  = dCreateSphere (0, 0.8); //geom
 	data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(100000, 10000, (int*)1337);
+	//data->Set_Buffer_Event(100000, 10000, (int*)1337);
 	body = dBodyCreate (simulation_thread.world);
 
 	dMassSetSphereTotal (&m,30,0.5); //mass and radius
@@ -492,7 +492,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	joint = dJointCreateBall (simulation_thread.world, 0);
 
 	Joint *jd = new Joint(joint, obj);
-	jd->Set_Buffer_Event(1000, 50000, (int*)1337);
+	//jd->Set_Buffer_Event(1000, 50000, (int*)1337);
 
 	dJointAttach (joint, body1, body);
 	dJointSetBallAnchor (joint, x+pos[i][0], y+pos[i][1], z+pos[i][2]);
@@ -514,7 +514,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 	dGeomID geom  = dCreateSphere (0, 1); //geom
 	Geom *data = new Geom(geom, obj);
 	data->surface.mu = 1.0;
-	data->Set_Buffer_Event(1000, 1500, (int*)1337);
+	//data->Set_Buffer_Event(1000, 1500, (int*)1337);
 	dBodyID body1 = dBodyCreate (simulation_thread.world);
 
 	dMass m;
@@ -562,7 +562,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 			dGeomID geom  = dCreateBox (0, 4,0.4,2.4); //geom
 			Geom *data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
-			data->Set_Buffer_Event(100000, 100000, (int*)1337);
+			//data->Set_Buffer_Event(100000, 100000, (int*)1337);
 
 			body1[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body1[i]);
@@ -620,7 +620,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 			dGeomID geom  = dCreateBox (0, 4,4,0.2); //geom
 			Geom *data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
-			data->Set_Buffer_Event(100000, 100000, (int*)1337);
+			//data->Set_Buffer_Event(100000, 100000, (int*)1337);
 
 			body2[i] = dBodyCreate (simulation_thread.world);
 			dGeomSetBody (geom, body2[i]);
@@ -684,7 +684,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 			geom  = dCreateCapsule (0, 0.3,1.4); //geom
 			data = new Geom(geom, obj);
 			data->surface.mu = 1.0;
-			data->Set_Buffer_Event(100000, 100000, (int*)1337);
+			//data->Set_Buffer_Event(100000, 100000, (int*)1337);
 			body[i] = dBodyCreate (simulation_thread.world);
 	
 			dMass m;
@@ -754,7 +754,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 		g->TMP_pillar_geom = true;
 
 		//destruction
-		g->Set_Buffer_Event(200000, 100000, (int*)1337);
+		//g->Set_Buffer_Event(200000, 100000, (int*)1337);
 		g->TMP_pillar_graphics = model[1];
 	}
 	//
@@ -770,7 +770,7 @@ void Module::Create (dReal x, dReal y, dReal z)
 
 		//properties:
 		g->surface.mu = 1.0;
-		g->Set_Buffer_Event(100000, 50000, (int*)1337);
+		//g->Set_Buffer_Event(100000, 50000, (int*)1337);
 
 		dBodyID body = dBodyCreate (simulation_thread.world);
 		dMass m;

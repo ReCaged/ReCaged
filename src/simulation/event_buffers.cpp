@@ -165,6 +165,11 @@ void Event_Buffers_Process(dReal step)
 	//geom buffer:
 	while ((geom = (Geom*)Pop(&geom_depleted)))
 	{
+		//HACK
+		lua_rawgeti(simulation_thread.lua_state, LUA_REGISTRYINDEX, geom->buffer_function);
+		lua_call(simulation_thread.lua_state, 0, 0); //TODO: USE PCALL INSTEAD!
+		
+		/*
 		dBodyID bodyid = dGeomGetBody(geom->geom_id);
 
 		//if has body, remove body and this geom
@@ -243,6 +248,7 @@ void Event_Buffers_Process(dReal step)
 				geom->Increase_Buffer(8000);
 			}
 		}
+	*/
 	}
 
 	//geom sensor:

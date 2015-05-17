@@ -11,7 +11,6 @@ local rotation=require "rotation"
 local track=object.create()
 
 local box=require "misc/box"
-box.create(track, 6, 20, 0.5)
 
 --2d pyramid, yes can automate with loops, but this is demo:
 box.create(track, 10, 20, 0.5)
