@@ -153,11 +153,14 @@ Model_Mesh::~Model_Mesh()
 //method Model_Mesh from Trimesh
 Model_Mesh *Model::Create_Mesh()
 {
-	Log_Add(2, "Creating collision trimesh");
-
 	//already created?
 	if (Model_Mesh *tmp = Assets::Find<Model_Mesh>(name.c_str()))
+	{
+		Log_Add(2, "Found existing collision trimesh");
 		return tmp;
+	}
+	else
+		Log_Add(2, "Creating collision trimesh");
 
 	//check that we got any data (and how much?)
 	unsigned int tris=0, mats=0, tmp;;

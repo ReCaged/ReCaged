@@ -236,7 +236,12 @@ Model_Draw *Model::Create_Draw()
 {
 	//already uploaded?
 	if (Model_Draw *tmp = Assets::Find<Model_Draw>(name.c_str()))
+	{
+		Log_Add(2, "Found existing rendering trimesh");
 		return tmp;
+	}
+	else
+		Log_Add(2, "Creating rendering trimesh");
 
 	//check how many vertices (if any)
 	unsigned int vcount=0; //how many vertices
