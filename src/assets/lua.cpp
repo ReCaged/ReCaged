@@ -26,7 +26,7 @@ static int model_load(lua_State *L)
 {
 	Model **p=(Model**)lua_newuserdata(L, sizeof(Model*));
 	*p=new Model();
-	(**p).Load(lua_tostring(L, 1));
+	(**p).Load(luaL_checkstring(L, 1));
 	luaL_getmetatable(L, "rcmodel");
 	lua_setmetatable(L, -2);
 

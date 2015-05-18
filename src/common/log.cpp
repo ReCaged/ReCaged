@@ -306,7 +306,7 @@ static int log_add(lua_State *L)
 			1, "expected verbosity number");
 
 	//verbosity level
-	int level = lua_tonumber(L, 1);
+	int level = luaL_checkinteger(L, 1);
 	luaL_argcheck(L, level >= -1 && level <= 2,
 			1, "expected verbosity range from -1 to 2");
 

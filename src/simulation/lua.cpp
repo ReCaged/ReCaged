@@ -66,14 +66,14 @@ static int body_model(lua_State *L)
 static int body_linear_drag(lua_State *L)
 {
 	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
-	(**body).Set_Linear_Drag(lua_tonumber(L, 2));
+	(**body).Set_Linear_Drag(luaL_checknumber(L, 2));
 	return 0;
 }
 
 static int body_angular_drag(lua_State *L)
 {
 	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
-	(**body).Set_Angular_Drag(lua_tonumber(L, 2));
+	(**body).Set_Angular_Drag(luaL_checknumber(L, 2));
 	return 0;
 }
 
@@ -82,9 +82,9 @@ static int body_position(lua_State *L)
 	Body **body=(Body**)luaL_checkudata(L, 1, "rcbody");
 
 	dBodySetPosition(	(**body).body_id, 
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3),
-			lua_tonumber(L, 4));
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3),
+			luaL_checknumber(L, 4));
 
 	return 0;
 }
@@ -152,10 +152,10 @@ static int mass_boxtotal(lua_State *L)
 {
 	dMass *m=(dMass*)luaL_checkudata(L, 1, "rcmass");
 	dMassSetBoxTotal(m, 
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3),
-			lua_tonumber(L, 4),
-			lua_tonumber(L, 5));
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3),
+			luaL_checknumber(L, 4),
+			luaL_checknumber(L, 5));
 	return 0;
 }
 
@@ -163,8 +163,8 @@ static int mass_spheretotal(lua_State *L)
 {
 	dMass *m=(dMass*)luaL_checkudata(L, 1, "rcmass");
 	dMassSetSphereTotal(m, 
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3));
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3));
 	return 0;
 }
 
@@ -199,10 +199,10 @@ static int matrix_fromaxisandangle(lua_State *L)
 {
 	dMatrix3 *m=(dMatrix3*)luaL_checkudata(L, 1, "rcmatrix");
 	dRFromAxisAndAngle(*m, 
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3),
-			lua_tonumber(L, 4),
-			lua_tonumber(L, 5));
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3),
+			luaL_checknumber(L, 4),
+			luaL_checknumber(L, 5));
 	return 0;
 }
 
@@ -255,9 +255,9 @@ kanske: n == 4 => object, n == 3 => orphan?
 	Object **obj = (Object**)luaL_checkudata(L, 1, "rcobject");
 
 	dGeomID geom  = dCreateBox (0,
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3),
-			lua_tonumber(L, 4));
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3),
+			luaL_checknumber(L, 4));
 
 	Geom **p=(Geom**)lua_newuserdata(L, sizeof(Geom*));
 	*p=new Geom(geom, *obj);
@@ -280,7 +280,7 @@ static int geom_sphere(lua_State *L)
 	Object **obj = (Object**)luaL_checkudata(L, 1, "rcobject");
 
 	dGeomID geom  = dCreateSphere (0,
-			lua_tonumber(L, 2));
+			luaL_checknumber(L, 2));
 
 	Geom **p=(Geom**)lua_newuserdata(L, sizeof(Geom*));
 	*p=new Geom(geom, *obj);
@@ -305,9 +305,9 @@ static int geom_position(lua_State *L)
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
 
 	dGeomSetPosition(	(**geom).geom_id, 
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3),
-			lua_tonumber(L, 4));
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3),
+			luaL_checknumber(L, 4));
 
 	return 0;
 }
@@ -316,8 +316,8 @@ static int geom_damage(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
 	(**geom).Set_Buffer_Event(
-			lua_tonumber(L, 2),
-			lua_tonumber(L, 3),
+			luaL_checknumber(L, 2),
+			luaL_checknumber(L, 3),
 			luaL_ref(L, LUA_REGISTRYINDEX));
 	return 0;
 }
@@ -325,21 +325,21 @@ static int geom_damage(lua_State *L)
 static int geom_mu(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
-	(**geom).surface.mu=lua_tonumber(L, 2);
+	(**geom).surface.mu=luaL_checknumber(L, 2);
 	return 0;
 }
 
 static int geom_stiffness(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
-	(**geom).surface.spring=lua_tonumber(L, 2);
+	(**geom).surface.spring=luaL_checknumber(L, 2);
 	return 0;
 }
 
 static int geom_damping(lua_State *L)
 {
 	Geom **geom=(Geom**)luaL_checkudata(L, 1, "rcgeom");
-	(**geom).surface.damping=lua_tonumber(L, 2);
+	(**geom).surface.damping=luaL_checknumber(L, 2);
 	return 0;
 }
 

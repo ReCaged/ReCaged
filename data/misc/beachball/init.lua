@@ -11,6 +11,9 @@ local body=require "body"
 local mass=require "mass"
 local geom=require "geom"
 local model=require "model"
+local log=require "log"
+
+log.add(1, "loading beachball module")
 
 local Ballmass=mass.create()
 Ballmass:spheretotal(20, 1)
