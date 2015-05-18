@@ -20,8 +20,8 @@ local Balldraw=tmp:draw()
 tmp:delete()
 
 local module={}
-function module.create(parent, x, y, z, r)
-	Obj=object.create(parent)
+function module.create(x, y, z, r)
+	Obj=object.create()
 
 	local Body=body.create(Obj)
 	Body:model(Balldraw)

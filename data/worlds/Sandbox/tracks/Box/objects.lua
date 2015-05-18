@@ -5,39 +5,36 @@
 -- notice and this notice are preserved. This file is offered as-is,
 -- without any warranty.
 local math=require "math"
-local object=require "object"
 local rotation=require "rotation"
-
-local track=object.create()
 
 local box=require "misc/box"
 
 --2d pyramid, yes can automate with loops, but this is demo:
-box.create(track, 10, 20, 0.5)
-box.create(track, 11, 20, 0.5)
-box.create(track, 12, 20, 0.5)
-box.create(track, 13, 20, 0.5)
-box.create(track, 14, 20, 0.5)
+box.create(10, 20, 0.5)
+box.create(11, 20, 0.5)
+box.create(12, 20, 0.5)
+box.create(13, 20, 0.5)
+box.create(14, 20, 0.5)
 
-box.create(track, 10.5, 20, 1.5)
-box.create(track, 11.5, 20, 1.5)
-box.create(track, 12.5, 20, 1.5)
-box.create(track, 13.5, 20, 1.5)
+box.create(10.5, 20, 1.5)
+box.create(11.5, 20, 1.5)
+box.create(12.5, 20, 1.5)
+box.create(13.5, 20, 1.5)
 
-box.create(track, 11, 20, 2.5)
-box.create(track, 12, 20, 2.5)
-box.create(track, 13, 20, 2.5)
+box.create(11, 20, 2.5)
+box.create(12, 20, 2.5)
+box.create(13, 20, 2.5)
 
-box.create(track, 11.5, 20, 3.5)
-box.create(track, 12.5, 20, 3.5)
+box.create(11.5, 20, 3.5)
+box.create(12.5, 20, 3.5)
 
-box.create(track, 12, 20, 4.5)
+box.create(12, 20, 4.5)
 
 local rot=rotation.matrix()
 local turn=math.pi/(2*7)
 for i=0,7 do
 	rot:fromaxisandangle(0, 0, 1, turn*i)
-	box.create(track, -15, 20, 0.5+i, rot)
+	box.create(-15, 20, 0.5+i, rot)
 end
 
 
@@ -46,7 +43,7 @@ end
 -12 0 0.25]]
 
 local ball=require "misc/beachball"
-ball.create(track, 2, 0, 20)
+ball.create(2, 0, 20)
 
 --[[> misc/funbox
 -8 -5 9

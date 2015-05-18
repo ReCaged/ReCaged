@@ -29,10 +29,10 @@ tmp:delete()
 local module={}
 
 --main feature of this module, the creator:
-function module.create(parent, x, y, z, r)
+function module.create(x, y, z, r)
 
-	--create new object (belonging parent) to store all components
-	Obj=object.create(parent)
+	--create new object to track all components
+	Obj=object.create()
 
 	--create body with mass from above, and pos+rot as requested
 	local Body=body.create(Obj)
