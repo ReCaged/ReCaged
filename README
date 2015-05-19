@@ -106,8 +106,7 @@ libraries (the compiled windows binary includes these):
    RCX uses the library "Open Dynamics Engine" for most physics simulations.
 
    4.5) [LUA]
-   RCX uses the lua library for scripting, requiring version 5.0 or
-   (preferably) later.
+   RCX uses the lua library for scripting, requiring version 5.2 or later.
 
 
 
