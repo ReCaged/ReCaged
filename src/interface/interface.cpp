@@ -334,6 +334,7 @@ void HUD(Uint32 delta)
 	glLoadIdentity(); //reset
 	glOrtho (0, width, height, 0, 0, 1); //mapping = resolution
 	glMatrixMode (GL_MODELVIEW);
+	glPushMatrix();
 	glLoadIdentity();
 
 	//
@@ -399,6 +400,7 @@ void HUD(Uint32 delta)
 	glMatrixMode (GL_PROJECTION);
 	glPopMatrix(); //return to old projection
 	glMatrixMode (GL_MODELVIEW);
+	glPopMatrix();
 }
 //
 //
