@@ -293,15 +293,15 @@ void HUD(Uint32 delta)
 
 	GLfloat m[4*4]={
 		//x->x
-		camera.matrix[0]*scale,
-		camera.matrix[4]*scale,
-		camera.matrix[8]*scale,
+		camera.rotation[0]*scale,
+		camera.rotation[3]*scale,
+		camera.rotation[6]*scale,
 		0,
 
 		//y->z
-		-camera.matrix[1]*scale,
-		-camera.matrix[5]*scale,
-		-camera.matrix[9]*scale,
+		-camera.rotation[2]*scale,
+		-camera.rotation[5]*scale,
+		-camera.rotation[8]*scale,
 		0,
 
 		//z->y

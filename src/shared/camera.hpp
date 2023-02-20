@@ -68,9 +68,6 @@ class Camera
 		friend void HUD(Uint32);
 		Object *hide;
 
-		//matrix (generated from everything else)
-		float matrix[16];
-
 		//position/velocity
 		float pos[3];
 		float vel[3];
