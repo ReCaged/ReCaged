@@ -2,7 +2,7 @@
 #
 # RCX - a Free Software, Futuristic, Racing Game
 #
-# Copyright (C) 2012, 2014, 2015 Mats Wahlberg
+# Copyright (C) 2012, 2014, 2015, 2023 Mats Wahlberg
 #
 # This file is part of RCX
 #
@@ -30,7 +30,7 @@
 
 #native or cross compiling?
 case "$(uname -s)" in
-	MINGW32*|MSYS*) #mingw/msys
+	MINGW*|MSYS*) #mingw/msys
 		echo '(detected native build, mingw/msys)'
 		BUILDTYPE="W32NATIVE"
 		;;
@@ -73,6 +73,10 @@ export PATH="$PATH:$LIBDIR/bin"
 export CPPFLAGS="-I$LIBDIR/include"
 export LDFLAGS="-L$LIBDIR/lib"
 
+#use parallel jobs, equal to number of processors+1:
+#TODO!!!
+#export JOBS="-j$(($(nproc)+1))"
+export JOBS="-j4" #old mingw32 does not have nproc, use a (hopefully) safe default...
 
 #check for what to do
 case $1 in
@@ -88,7 +92,7 @@ case $1 in
 
 	#try building
 	echo "Running configure and make"
-	if ! ( ./configure --enable-w32static --enable-w32console --prefix="$BUILDDIR"  && make clean && make && make install)
+	if ! ( ./configure --enable-w32static --enable-w32console --prefix="$BUILDDIR"  && make clean && make $JOBS && make install)
 	then
 		echo ""
 		echo "ERROR!"
@@ -185,10 +189,10 @@ w32deps)
 			echo "$HOMEDRIVE/mingw /mingw" > /etc/fstab
 		fi
 
-		echo "Installing packages using msys-get..."
+		echo "Installing packages using mingw-get..."
 
 		#using mingw pre-built packages:
-		mingw-get install msys-wget mingw32-libz-dll mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-autotools msys-vim
+		mingw-get install mingw32-libz-dll mingw32-gcc mingw32-gcc-g++ mingw32-make mingw32-autotools msys-vim
 
 		echo "NOTE: WARNINGS ABOVE CAN BE IGNORED! MOST LIKELY THE PACKAGES ARE ALREADY INSTALLED!"
 
@@ -207,17 +211,14 @@ w32deps)
 		echo ""
 		echo "Getting SDL..."
 		echo ""
-		echo "Figuring out latest version (of 1.2)..."
-		SDLV=$(wget 'http://libsdl.org/download-1.2.php' -O - 2>/dev/null|grep "release/SDL-1\.2.*tar.gz\""|cut -d'"' -f 2)
-		echo "Latest version might be: "$SDLV" - trying..."
 
 		cd "$BUILDDIR"
-		wget "http://www.libsdl.org/$SDLV"
-		tar xf SDL-* &>/dev/null #ignore gid_t warning
+		curl -L -o sdl.tgz "https://github.com/libsdl-org/SDL-1.2/archive/refs/heads/main.tar.gz"
+		tar xf sdl.tgz
 
 		if ! (cd SDL-*&& \
 			./configure --disable-stdio-redirect --prefix="$LIBDIR"&& \
-			make install)
+			make $JOBS install)
 		then
 			echo ""
 			echo "ERROR!"
@@ -234,12 +235,12 @@ w32deps)
 		echo ""
 
 		cd "$BUILDDIR"
-		wget 'http://sourceforge.net/projects/opende/files/latest/download?source=files'
-		tar xf ode-*
+		curl -L -o ode.tgz 'https://bitbucket.org/odedevs/ode/downloads/ode-0.16.3.tar.gz'
+		tar xf ode.tgz
 
 		if ! (cd ode-*&& \
-			./configure --enable-libccd --prefix="$LIBDIR"&& \
-			make install)
+			./configure --enable-libccd --disable-demos --prefix="$LIBDIR"&& \
+			make $JOBS install)
 		then
 			echo ""
 			echo "ERROR!"
@@ -256,11 +257,11 @@ w32deps)
 		echo ""
 
 		cd "$BUILDDIR"
-		wget 'http://sourceforge.net/projects/glew/files/latest/download?source=files'
-		tar xf glew-*
+		curl -L -o glew.tgz 'https://sourceforge.net/projects/glew/files/glew/1.13.0/glew-1.13.0.tgz/download'
+		tar xf glew.tgz
 
 		if ! (cd glew-*&& \
-			GLEW_DEST="$LIBDIR" make install)
+			GLEW_DEST="$LIBDIR" make $JOBS install)
 		then
 			echo ""
 			echo "ERROR!"
@@ -322,7 +323,7 @@ w32quick)
 	./configure --enable-w32static --enable-w32console || exit 1
 
 	echo ""
-	echo "Okay! Now just type \"make\" to compile! (and \"src/rcx\" to run)"
+	echo "Okay! Now just type \"make\" to compile! You can also do \"make $JOBS\" to increase build speed."
 	;;
 
 
@@ -336,7 +337,6 @@ w32quick)
 	echo "(see README for more details)"
 
 	;;
-
 esac
 
 

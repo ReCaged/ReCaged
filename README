@@ -4,7 +4,7 @@
 
   A Free Software, Futuristic, Racing Game
 
- Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Mats Wahlberg
+ Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2023 Mats Wahlberg
 
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
@@ -146,7 +146,9 @@ compilers and standard libraries). The latest version can be downloaded here:
 http://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
 
 TODO: new mingw installer is different, mention installing msys in the new gui,
-finding the shell...
+finding the shell... 
+
+msys-base
 
 The only installation option really recommended to choose
 here is the "MSYS Basic System", which provides a bash shell suitable for
@@ -164,6 +166,10 @@ and ... TODO!
 
 Alternatively you can compile and install the SDL, ODE and GLEW libraries
 manually, and install NSIS. This process will not be covered in detail here.
+
+You can also use "./build.sh w32quick" to run ./configure with suitable arguments
+
+
 Then cd into the src directory of rcx and run "./configure && make" to compile.
 But if you want to create a complete installer, instead run "./configure
 --enable-w32static --enable-w32console && make" to compile and then build the
