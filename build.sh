@@ -235,10 +235,11 @@ w32deps)
 		echo ""
 
 		cd "$BUILDDIR"
-		curl -L -o ode.tgz 'https://bitbucket.org/odedevs/ode/downloads/ode-0.16.3.tar.gz'
+		curl -L -o ode.tgz 'https://bitbucket.org/odedevs/ode/get/HEAD.tar.gz'
 		tar xf ode.tgz
 
-		if ! (cd ode-*&& \
+		if ! (cd odedevs*&& \
+			./bootstrap && \
 			./configure --enable-libccd --disable-demos --prefix="$LIBDIR"&& \
 			make $JOBS install)
 		then
@@ -249,26 +250,22 @@ w32deps)
 		fi
 	fi
 
-	#z(lib)
+	#zlib
 	if [ ! -e "$LIBDIR/include/zlib.h" ]
 	then
-		echo "Getting Z..."
+		echo "Getting Zlib..."
 		echo ""
 
-		echo "Figuring out latest version..."
-		ZV=$(wget 'http://www.zlib.net/' -O - 2>/dev/null|grep -m 1 "http://zlib.net/zlib-.*.tar.gz"|cut -d'"' -f2)
-		echo "Latest version might be: "$ZV" - trying..."
-
 		cd "$BUILDDIR"
-		wget "$ZV"
-		tar xf zlib*
+		curl -L -o z.tgz "https://github.com/madler/zlib/archive/refs/heads/master.tar.gz"
+		tar xf z.tgz
 
 		export BINARY_PATH="$LIBDIR/bin"
 		export INCLUDE_PATH="$LIBDIR/include"
 		export LIBRARY_PATH="$LIBDIR/lib"
 
 		if ! (cd zlib-*&& \
-			make -f win32/Makefile.gcc install)
+			make -f win32/Makefile.gcc $JOBS install)
 		then
 			echo ""
 			echo "ERROR!"
@@ -284,16 +281,16 @@ w32deps)
 		echo ""
 
 		echo "Figuring out latest version..."
-		PNGV=$(wget 'http://www.libpng.org/pub/png/libpng.html' -O - 2>/dev/null|grep -m 1 "http://prdownloads.*libpng-.*.tar.xz"|cut -d'"' -f2)
+		PNGV=$(curl -L 'http://www.libpng.org/pub/png/libpng.html' 2>/dev/null|grep -m 1 "http://prdownloads.*libpng-.*.tar.gz"|cut -d'"' -f2)
 		echo "Latest version might be: "$PNGV" - trying..."
 
 		cd "$BUILDDIR"
-		wget "$PNGV"
-		tar xf libpng* &>/dev/null #ignore gid_t warning
+		curl -L -o png.tgz "$PNGV"
+		tar xf png.tgz &>/dev/null #ignore gid_t warning
 
 		if ! (cd libpng-*&& \
 			./configure --prefix="$LIBDIR"&& \
-			make install)
+			make $JOBS install)
 		then
 			echo ""
 			echo "ERROR!"
@@ -310,16 +307,16 @@ w32deps)
 		echo ""
 
 		echo "Figuring out latest version..."
-		JPEGV=$(wget 'http://www.ijg.org/' -O - 2>/dev/null|grep "files/jpegsrc.*tar.gz\""|cut -d'"' -f2)
+		JPEGV=$(curl -L 'http://www.ijg.org/' 2>/dev/null|grep "files/jpegsrc.*tar.gz\""|cut -d'"' -f2)
 		echo "Latest version might be: "$JPEGV" - trying..."
 
 		cd "$BUILDDIR"
-		wget "http://www.ijg.org/$JPEGV"
-		tar xf jpegsrc* &>/dev/null #ignore gid_t warning
+		curl -L -o jpeg.tgz "http://www.ijg.org/$JPEGV"
+		tar xf jpeg.tgz &>/dev/null #ignore gid_t warning
 
 		if ! (cd jpeg-*&& \
 			./configure --prefix="$LIBDIR"&& \
-			make install)
+			make $JOBS install)
 		then
 			echo ""
 			echo "ERROR!"
@@ -335,6 +332,7 @@ w32deps)
 		echo "Getting GLEW..."
 		echo ""
 
+		#NOTE: ACTUALLY NEEDS AN OLDER VERSION (problems building recent versions)
 		cd "$BUILDDIR"
 		curl -L -o glew.tgz 'https://sourceforge.net/projects/glew/files/glew/1.13.0/glew-1.13.0.tgz/download'
 		tar xf glew.tgz
@@ -348,9 +346,6 @@ w32deps)
 			exit 1
 		fi
 	fi
-
-
-	#lua TODO!
 
 	#nsis
 	if [ "$BUILDTYPE" = "W32NATIVE" ]; then
