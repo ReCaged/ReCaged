@@ -82,24 +82,34 @@ void Resize (int new_w, int new_h)
 	//the player should specify an eye_distance in internal.conf
 	float angle;
 
-	if (internal.fov) //fixed
-	{
-		angle = ( (internal.fov/2.0) * M_PI/180);
+	if (internal.vfov) { //fixed vertical
+		angle = ( (internal.vfov/2.0) * M_PI/180);
+		view_angle_rate_y = tan(angle);
+		view_angle_rate_x = view_angle_rate_y * ((GLfloat) w/h);
+
+		//just for info below
+		angle=atan(view_angle_rate_x);
 	}
-	else //dynamic
-	{
-		//angle between w/2 (distance from center of screen to right edge) and players eye distance
-		angle = atan( (((GLfloat) w)/2.0)/internal.dist );
+	else {
+		if (internal.hfov) { //fixed horizontal
+			angle = ( (internal.hfov/2.0) * M_PI/180);
+		}
+		else //dynamic
+		{
+			//angle between w/2 (distance from center of screen to right edge) and players eye distance
+			angle = atan( (((GLfloat) w)/2.0)/internal.dist );
+		}
+
+		//useful for more things:
+		//x = rate*depth
+		view_angle_rate_x = tan(angle);
+		//y = rate*depth (calculated from ratio of window resolution aspect)
+		view_angle_rate_y = view_angle_rate_x * ((GLfloat) h/w);
+		//
 	}
 
-	Log_Add(1, "Window resize: %dx%d, FOV: %f (%s)", w, h, 2*angle*180/M_PI, internal.fov? "fixed":"dynamic");
+	Log_Add(1, "Window resize: %dx%d, horizontal FOV: %f", w, h, 2*angle*180/M_PI);
 
-	//useful for more things:
-	//x = rate*depth
-	view_angle_rate_x = tan(angle);
-	//y = rate*depth (calculated from ratio of window resolution aspect)
-	view_angle_rate_y = view_angle_rate_x * ((GLfloat) h/w);
-	//
 
 	//x position at close clipping
 	GLfloat x = track.clipping[0] * view_angle_rate_x;

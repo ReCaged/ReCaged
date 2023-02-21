@@ -58,7 +58,7 @@ extern struct internal_struct {
 	int msaa;
 	int filter;
 	bool separate_specular;
-	float fov;
+	float vfov, hfov;
 	float dist;
 } internal;
 
@@ -85,7 +85,8 @@ const struct internal_struct internal_defaults = {
 	4,
 	1,
 	true,
-	45.0,
+	75.0,
+	0.0,
 	2500.0};
 
 const struct Conf_Index internal_index[] = {
@@ -120,7 +121,8 @@ const struct Conf_Index internal_index[] = {
 	{"multisample",		'i',1, offsetof(struct internal_struct, msaa)},
 	{"texture:filter",	'i',1, offsetof(struct internal_struct, filter)},
 	{"texture:separate_specular",'b',1, offsetof(struct internal_struct, separate_specular)},
-	{"FOV",			'f',1, offsetof(struct internal_struct, fov)},
+	{"vFOV",		'f',1, offsetof(struct internal_struct, vfov)},
+	{"hFOV",		'f',1, offsetof(struct internal_struct, hfov)},
 	{"eye_distance",	'f',1, offsetof(struct internal_struct, dist)},
 
 	{"",0,0}};
