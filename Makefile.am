@@ -1,22 +1,22 @@
 #
-# RCX - a Free Software, Futuristic, Racing Game
+# ReCaged - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2015 Mats Wahlberg
 #
-# This file is part of RCX.
+# This file is part of ReCaged.
 #
-# RCX is free software: you can redistribute it and/or modify
+# ReCaged is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# RCX is distributed in the hope that it will be useful,
+# ReCaged is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with RCX.  If not, see <http://www.gnu.org/licenses/>.
+# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 
@@ -38,7 +38,7 @@ EXTRA_DIST		= build.sh licenses
 
 #create ChangeLog from git log
 dist-hook:
-	( echo "Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Mats Wahlberg"; \
+	( echo "Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2023 Mats Wahlberg"; \
 	echo "Copying and distribution of this file, with or without modification,"; \
 	echo "are permitted in any medium without royalty provided the copyright"; \
 	echo "notice and this notice are preserved. This file is offered as-is,"; \

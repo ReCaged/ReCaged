@@ -1,6 +1,6 @@
-  /------------------================------------------\
- [# RCX 0.8.0 ("The Devil's Mind is an Idle Workshop") #]
-  \------------------================------------------/
+  /--------------------================--------------------\
+ [# ReCaged 0.8.0 ("The Devil's Mind is an Idle Workshop") #]
+  \--------------------================--------------------/
 
   A Free Software, Futuristic, Racing Game
 
@@ -45,20 +45,20 @@ systems and there is a windows installer.
 
 3) [LICENSING]
 
-RCX  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Mats Wahlberg
+ReCaged  Copyright (C) 2009, 2010, 2011, 2012, 2013, 2014, 2015 Mats Wahlberg
 
-RCX is free software: you can redistribute it and/or modify
+ReCaged is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-RCX is distributed in the hope that it will be useful,
+ReCaged is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with RCX.  If not, see <http://www.gnu.org/licenses/>.
+along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 
 
 TODO... See COPYING for more info!
@@ -82,31 +82,31 @@ The hardware requirements are modest, a recommended minimum would be:
 * Graphics:	OpenGL 1.5 or later, 16MiB video memory
 
 Memory and processor requirements also depends on OS and other programs 
-running at the same time as rcx. If you want to use many high detail models,
-be prepared that the requirements might increase a bit.
+running at the same time as ReCaged. If you want to use many high detail
+models, be prepared that the requirements might increase a bit.
 
 Note: hardware opengl acceleration recommended, but software rendering is a
 viable alternative (assuming you got enough processing power).
 
-Except for the usual requirements RCX needs OpenGL and a few third party
+Except for the usual requirements ReCaged needs OpenGL and a few third party
 libraries (the compiled windows binary includes these):
 
    4.1) [OPENGL]
    As mentioned above, some kind of OpenGL implementation is needed for
    rendering of 3D graphics. This is OS dependent, but it is quite common
    (either hardware or software). This version requires GL 1.5 or later.
-   Note that RCX does not use GLU or GLUT, only GL.
+   Note that ReCaged does not use GLU or GLUT, only GL.
 
    4.2) [GLEW]
-   RCX uses the library "OpenGL Extension Wrangler Library" for loading and
+   ReCaged uses the library "OpenGL Extension Wrangler Library" for loading and
    checking opengl versions and extensions.
 
    4.3) [SDL]
-   RCX uses the library "Simple DirectMedia Layer" for some OS independent
+   ReCaged uses the library "Simple DirectMedia Layer" for some OS independent
    functionality.
 
    4.4) [ODE]
-   RCX uses the library "Open Dynamics Engine" for most physics simulations.
+   ReCaged uses the library "Open Dynamics Engine" for most physics simulations.
 
 TODO:
 
@@ -128,8 +128,10 @@ compiler, libraries etc). Autotools are needed when building from git.
 
 The build process is the standard autoconf routine (see the file "INSTALL" for
 more information): run "./configure" followed by "make". "make install" will
-install (but that is not needed to run, you could just start "rcx" from the
-src directory). If you're building from the git repository (development),
+install (but that is not needed to run, you could just start "recaged" from the
+src directory).
+
+If you're building from the git repository (development),
 first run "autoreconf -vfi" to generate the configure script and other
 required files. Remember to set "CPPFLAGS" and "LDFLAGS" if necessary.
 
@@ -168,8 +170,8 @@ arguments to install the necessary libraries and compile (run "build.sh
 help" for more details). Running "./build.sh w32deps" will install the
 necessary libraries (in you home directory) and tools for compiling releases.
 
-Finally: Running "./build.sh w32inst" should configure and build RCX for w32
-with the necessary libraries statically linked (and strip out debug symbols
+Finally: Running "./build.sh w32inst" should configure and build ReCaged for
+w32 with the necessary libraries statically linked (and strip out debug symbols
 and ... TODO!
 
 Alternatively you can compile and install the SDL, ODE and GLEW libraries
@@ -177,14 +179,16 @@ manually, and install NSIS. This process will not be covered in detail here.
 
 You can also use "./build.sh w32quick" to run ./configure with suitable arguments
 
-
-Then cd into the src directory of rcx and run "./configure && make" to compile.
+Then cd into the src directory of recaged and run "./configure && make" to compile.
 But if you want to create a complete installer, instead run "./configure
 --enable-w32static --enable-w32console && make" to compile and then build the
 NSIS installer. Or just use "./build.sh w32inst". The "--enable-w32static"
 option makes sure all libraries that would normally have to be included as
-dlls are linked into the exe, and "--enable-w32console" enables console log
+DLLs are linked into the exe, and "--enable-w32console" enables console log
 output (requires SDL to have been built with "--disable-stdio-redirect").
+
+TODO: correct this, configure not necessary if using w32quick, but mention it
+as an alternative...
 
 
 
@@ -237,9 +241,9 @@ Debugging:
 8) [CONFIGURATION]
 
 TODO: note about installed vs portable file layout, xdg, $HOME, etc...
-RCX can be configured using a couple of plain-text files divided into several
-directories inside the data and config directories, such as "teams", "worlds"
-and "profiles"
+ReCaged can be configured using a couple of plain-text files divided into
+several directories inside the data and config directories, such as "teams",
+"worlds" and "profiles"
 
 What you might be most interested in is specified in internal.conf, it
 provides many ways of tweaking the precision and performance, and also is the
@@ -252,7 +256,7 @@ TODO: mention tmp_menu_selections! profile, track/car settings...
 
 9) [CREDITS]
 
-RCX credits (some people referred to by nicknames):
+ReCaged credits (some people referred to by nicknames):
 
   * Mats Wahlberg ("Slinger")	Creator/developer + development 3D models
   * K.Mac			Extensive testing, hacks and new ideas
@@ -260,20 +264,21 @@ RCX credits (some people referred to by nicknames):
   * Spontificus			Hacks, fixes, move to C++, git and new website
   * MoruganKodi/コディ[KODI]	Many High Detail 3D models for cars and tracks
   * orgyia			Testing, scramble-like test track
-  * You (yes, you)		For being interested and trying RCX!
+  * You (yes, you)		For being interested and trying ReCaged!
 
 
-Other Projects that made RCX possible:
+Other Projects that made ReCaged possible:
 
   * Free Software Foundation	"Free Software, Free Society"
   * The GNU Project		Developing a Free OS
   * TuxFamily			Amazingly generous hosting for the project!
+TODO: SAVANNAH, hosting
 
 
 
 10) [LINKS]
 
-  * RCX Homepage:	http://recaged.net/
-  * RCX Forum:		http://forum.recaged.net/
+  * ReCaged Homepage:	http://recaged.net/
+  * ReCaged Forum:	http://forum.recaged.net/
   * Page on Savannah:	https://savannah.nongnu.org/projects/recaged/
 

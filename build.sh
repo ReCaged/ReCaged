@@ -1,23 +1,23 @@
 #!/bin/sh
 #
-# RCX - a Free Software, Futuristic, Racing Game
+# ReCaged - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2014, 2015, 2023 Mats Wahlberg
 #
-# This file is part of RCX
+# This file is part of ReCaged.
 #
-# RCX is free software: you can redistribute it and/or modify
+# ReCaged is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# RCX is distributed in the hope that it will be useful,
+# ReCaged is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with RCX  If not, see <http://www.gnu.org/licenses/>.
+# along with ReCaged  If not, see <http://www.gnu.org/licenses/>.
 #
 
 #
@@ -45,15 +45,16 @@ esac
 
 #paths:
 #this would be ideal:
-#BASEDIR="$HOME/RCX"
+#BASEDIR="$HOME/ReCaged"
 #but msys can create home dirs with spaces (depending on user name)...
 case $HOME in
 	*\ *) #space
-		echo '(detected space in $HOME, using /opt/rcx instead of ~/.rcxdev)'
-		BASEDIR="/opt/rcxdev"
+		echo '(detected space in $HOME, using /opt/recaged_dev instead
+		of ~/.recaged_dev)'
+		BASEDIR="/opt/recaged_dev"
 		;;
 	*)
-		BASEDIR="$HOME/.rcxdev"
+		BASEDIR="$HOME/.recaged_dev"
 		;;
 esac
 
@@ -141,9 +142,9 @@ case $1 in
 	cp w32/version.nsh "$BUILDDIR"
 
 	#move to place
-	mv "$BUILDDIR"/games/rcx "$BUILDDIR"/RCX.exe
-	mv "$BUILDDIR"/etc/xdg/rcx "$BUILDDIR"/config
-	mv "$BUILDDIR"/share/games/rcx "$BUILDDIR"/data
+	mv "$BUILDDIR"/games/recaged "$BUILDDIR"/ReCaged.exe
+	mv "$BUILDDIR"/etc/xdg/recaged "$BUILDDIR"/config
+	mv "$BUILDDIR"/share/games/recaged "$BUILDDIR"/data
 
 	#find nsis the stupid way
 	MAKENSIS="$PROGRAMFILES/NSIS/makensis"
@@ -151,9 +152,9 @@ case $1 in
 	then
 		"$MAKENSIS" "$BUILDDIR"/installer.nsi
 
-		if [ -e "$BUILDDIR"/RCX*Setup.exe ]
+		if [ -e "$BUILDDIR"/ReCaged*Setup.exe ]
 		then
-			mv "$BUILDDIR"/RCX*Setup.exe .
+			mv "$BUILDDIR"/ReCaged*Setup.exe .
 
 			echo ""
 			echo "Installer should now have been created!"

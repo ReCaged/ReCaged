@@ -1,6 +1,6 @@
 TODO!
 
-Different parts of RCX are released under different licenses, GPL version 3
+Different parts of ReCaged are released under different licenses, GPL version 3
 unless where otherwise stated, and...
 
 Licensing information of binary media files is specified in a README file in
@@ -12,15 +12,15 @@ the file or in an accompanying README file.
 files inside the "licensing" directory ...
 
 
-RCX is free software: you can redistribute it and/or modify
+ReCaged is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-RCX is distributed in the hope that it will be useful,
+ReCaged is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with RCX.  If not, see <http://www.gnu.org/licenses/>.
+along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.

@@ -10,7 +10,7 @@
 # one single user (with one profile) controls all cars ("players")
 #
 #the idea here is to mimic menu selections for now:
-#hello, welcome to rcx!
+#hello, welcome to recaged!
 #select a profile (or create a new):
 profile default
 

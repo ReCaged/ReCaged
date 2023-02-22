@@ -1,22 +1,22 @@
 /*
- * RCX - a Free Software, Futuristic, Racing Game
+ * ReCaged - a Free Software, Futuristic, Racing Game
  *
  * Copyright (C) 2012, 2013, 2014, 2015 Mats Wahlberg
  *
- * This file is part of RCX.
+ * This file is part of ReCaged.
  *
- * RCX is free software: you can redistribute it and/or modify
+ * ReCaged is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * RCX is distributed in the hope that it will be useful,
+ * ReCaged is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with RCX.  If not, see <http://www.gnu.org/licenses/>.
+ * along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
  */ 
 
 #include <sys/stat.h>
@@ -421,7 +421,7 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 #ifdef _WIN32
 	//try to get path to installed dir from registry
 	HKEY hKey;
-	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\RCX", 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS)
+	if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "SOFTWARE\\ReCaged", 0, KEY_QUERY_VALUE, &hKey) == ERROR_SUCCESS)
 	{
 		if (!w32buf)
 			w32buf = new char[W32BUFSIZE];
@@ -531,11 +531,11 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 			(Try_Set_Path(&user_cache, WRITE, user_data, "../cache")) )
 			Log_Add(2, "Found suitable cache directory next to the others");
 #ifndef _WIN32
-		else if (Try_Set_Path(&user_cache, WRITE, "/tmp/rcx/cache", ""))
+		else if (Try_Set_Path(&user_cache, WRITE, "/tmp/recaged/cache", ""))
 			Log_Add(0, "WARNING: found no suitable user cache directory, using \"/tmp\" instead!");
 #else
 		//w32 got variable for tmp dir (check TMP and TEMP)...
-		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/rcx/cache"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
 			Log_Add(0, "WARNING: found no suitable user cache directory, using temporary directory instead!");
 #endif
 		else
@@ -569,18 +569,18 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	}
 	else
 	{
-		if ( (var=getenv("XDG_CONFIG_HOME")) && Try_Set_Path(&user_conf, WRITE, var, "rcx") )
+		if ( (var=getenv("XDG_CONFIG_HOME")) && Try_Set_Path(&user_conf, WRITE, var, "recaged") )
 			Log_Add(2, "XDG path to user config directory");
-		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_conf, WRITE, var, ".config/rcx") )
+		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_conf, WRITE, var, ".config/recaged") )
 			Log_Add(2, "Fallback path to user config directory (HOME)");
 #ifdef _WIN32
-		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_conf, WRITE, var, "rcx/config") )
+		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_conf, WRITE, var, "recaged/config") )
 			Log_Add(2, "Fallback, \"native\", path to user config directory (USERPROFILE)");
-		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/rcx/config"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/config"))
 			Log_Add(0, "WARNING: found no suitable user config directory, using temporary directory instead!");
 #else
-		else if ( Try_Set_Path(&user_conf, WRITE, "/tmp/rcx/config", "") )
-			Log_Add(0, "WARNING: found no suitable user config directory, using \"/tmp/rcx/config\" instead!");
+		else if ( Try_Set_Path(&user_conf, WRITE, "/tmp/recaged/config", "") )
+			Log_Add(0, "WARNING: found no suitable user config directory, using \"/tmp/recaged/config\" instead!");
 #endif
 		else
 			Log_Add(0, "WARNING: found NO user config directory!");
@@ -599,18 +599,18 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 	}
 	else
 	{
-		if ( (var=getenv("XDG_DATA_HOME")) && Try_Set_Path(&user_data, WRITE, var, "rcx") )
+		if ( (var=getenv("XDG_DATA_HOME")) && Try_Set_Path(&user_data, WRITE, var, "recaged") )
 			Log_Add(2, "XDG path to user data directory");
-		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_data, WRITE, var, ".local/share/rcx") )
+		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_data, WRITE, var, ".local/share/recaged") )
 			Log_Add(2, "Fallback path to user data directory (HOME)");
 #ifdef _WIN32
-		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_data, WRITE, var, "rcx/data") )
+		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_data, WRITE, var, "recaged/data") )
 			Log_Add(2, "Fallback, \"native\", path to user data directory (USERPROFILE)");
-		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/rcx/data"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/data"))
 			Log_Add(0, "WARNING: found no suitable user data directory, using temporary directory instead!");
 #else
-		else if ( Try_Set_Path(&user_data, WRITE, "/tmp/rcx/data", "") )
-			Log_Add(0, "WARNING: found no suitable user data directory, using \"/tmp/rcx/data\" instead!");
+		else if ( Try_Set_Path(&user_data, WRITE, "/tmp/recaged/data", "") )
+			Log_Add(0, "WARNING: found no suitable user data directory, using \"/tmp/recaged/data\" instead!");
 #endif
 		else
 			Log_Add(0, "WARNING: found NO user data directory!");
@@ -632,18 +632,18 @@ bool Directories::Init(	const char *arg0, bool installed_force, bool portable_fo
 		if (user_override)
 			Log_Add(0, "WARNING: path to user files is incorrect (for cache). Ignoring!");
 
-		if ( (var=getenv("XDG_CACHE_HOME")) && Try_Set_Path(&user_cache, WRITE, var, "rcx") )
+		if ( (var=getenv("XDG_CACHE_HOME")) && Try_Set_Path(&user_cache, WRITE, var, "recaged") )
 			Log_Add(2, "XDG path to user cache directory");
-		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_cache, WRITE, var, ".cache/rcx") )
+		else if ( (var=getenv("HOME")) && Try_Set_Path(&user_cache, WRITE, var, ".cache/recaged") )
 			Log_Add(2, "Fallback path to user cache directory (HOME)");
 #ifdef _WIN32
-		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_cache, WRITE, var, "rcx/cache") )
+		else if ( (var=getenv("USERPROFILE")) && Try_Set_Path(&user_cache, WRITE, var, "recaged/cache") )
 			Log_Add(2, "Fallback, \"native\", path to user cache directory (USERPROFILE)");
-		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/rcx/cache"))
+		else if ( ((var=getenv("TMP")) || (var=getenv("TEMP"))) && Try_Set_Path(&user_cache, WRITE, var, "/recaged/cache"))
 			Log_Add(0, "WARNING: found no suitable user cache directory, using temporary directory instead!");
 #else
-		else if ( Try_Set_Path(&user_cache, WRITE, "/tmp/rcx/cache", "") )
-			Log_Add(0, "WARNING: found no suitable user cache directory, using \"/tmp/rcx/cache\" instead!");
+		else if ( Try_Set_Path(&user_cache, WRITE, "/tmp/recaged/cache", "") )
+			Log_Add(0, "WARNING: found no suitable user cache directory, using \"/tmp/recaged/cache\" instead!");
 #endif
 		else
 			Log_Add(0, "WARNING: found NO user cache directory!");

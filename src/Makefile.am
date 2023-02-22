@@ -1,22 +1,22 @@
 #
-# RCX - a Free Software, Futuristic, Racing Game
+# ReCaged - a Free Software, Futuristic, Racing Game
 #
 # Copyright (C) 2012, 2014, 2015 Mats Wahlberg
 #
-# This file is part of RCX.
+# This file is part of ReCaged.
 #
-# RCX is free software: you can redistribute it and/or modify
+# ReCaged is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# RCX is distributed in the hope that it will be useful,
+# ReCaged is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with RCX.  If not, see <http://www.gnu.org/licenses/>.
+# along with ReCaged.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 
@@ -24,19 +24,20 @@ AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS = ${ACLOCAL_FLAGS}
 
 #compiler flags
-AM_CPPFLAGS =	$(RCX_FLAGS) -Wall \
-		-DDATADIR='"$(datadir)/games/rcx/"' \
-		-DCONFDIR='"$(sysconfdir)/xdg/rcx/"'
+AM_CPPFLAGS =	$(RC_FLAGS) -Wall \
+		-DDATADIR='"$(datadir)/games/recaged/"' \
+		-DCONFDIR='"$(sysconfdir)/xdg/recaged/"'
 
 #AM_LDFLAGS not used right now
-LDADD = $(RCX_LIBS)
+LDADD = $(RC_LIBS)
 
 #place in subdir "games" instead of "bin"
 bindir=$(exec_prefix)/games
 
-bin_PROGRAMS = rcx
+bin_PROGRAMS = recaged
 
-rcx_SOURCES =	./rcx.cpp \
+recaged_SOURCES = \
+		recaged.cpp \
 		assets/assets.cpp \
 		assets/assets.hpp \
 		assets/car.cpp \
@@ -99,7 +100,7 @@ rcx_SOURCES =	./rcx.cpp \
 		simulation/wheel.hpp
 
 #a trick to make all objects recompile if Makefile gets updated (reconfigure)
-$(rcx_OBJECTS): Makefile
+$(recaged_OBJECTS): Makefile
 
 #remove w32 files on all platforms (just in case)
 CLEANFILES = resources.rc resources.o
@@ -124,7 +125,7 @@ resources.rc: Makefile
 	echo "BEGIN"; \
 	echo "BLOCK \"00000000\""; \
 	echo "BEGIN"; \
-	echo "VALUE \"ProductName\", \"RCX\""; \
+	echo "VALUE \"ProductName\", \"ReCaged\""; \
 	echo "VALUE \"FileVersion\", \"$(PACKAGE_VERSION)\""; \
 	echo "VALUE \"ProductVersion\", \"$(PACKAGE_VERSION)\""; \
 	echo "VALUE \"Comments\", \"A Free Software, Futuristic, Racing Game\""; \
