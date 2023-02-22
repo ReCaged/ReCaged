@@ -588,8 +588,8 @@ Car *Car_Module::Create (dReal x, dReal y, dReal z, Model_Draw *wheel3D, Profile
 
 		//body is still body of car main body
 		dJointAttach (car->joint[i], car->bodyid, wheel_body[i]);
-		dJointSetHinge2Axis1 (car->joint[i],0,0,1);
-		dJointSetHinge2Axis2 (car->joint[i],1,0,0);
+		const dVector3 v_up={0,0,1}, v_side={1,0,0};
+		dJointSetHinge2Axes (car->joint[i],v_up,v_side);
 
 		//setup suspension
 		dJointSetHinge2Param (car->joint[i],dParamSuspensionERP,car->sERP);
@@ -676,8 +676,8 @@ void Car::Recreate (dReal x, dReal y, dReal z)
 
 			//body is still body of car main body
 			dJointAttach (joint[i], bodyid, wheel_body[i]);
-			dJointSetHinge2Axis1 (joint[i],0,0,1);
-			dJointSetHinge2Axis2 (joint[i],1,0,0);
+			const dVector3 v_up={0,0,1}, v_side={1,0,0};
+			dJointSetHinge2Axes (joint[i],v_up,v_side);
 
 			//setup suspension
 			dJointSetHinge2Param (joint[i],dParamSuspensionERP,sERP);
