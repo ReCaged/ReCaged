@@ -1,4 +1,4 @@
- Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015 Mats Wahlberg
+ Copyright (C) 2009, 2010, 2011, 2012, 2014, 2015, 2023 Mats Wahlberg
 
  Copying and distribution of this file, with or without modification,
  are permitted in any medium without royalty provided the copyright
@@ -7,36 +7,39 @@
 
 TODO: more info in header!
 
-RCX 0.8.0 "The Devil's Mind is an Idle Workshop" (?/?/2015)
+User visible changes/noteworthy changes:
+
+?/?/? - ReCaged 0.8.0 "The Devil's Mind is an Idle Workshop"
 ---------------------------------------------------------------
 TODO: more stuff here!
- * Change of name: "ReCaged" is now "RCX"
 
- * Move to Autotools (Automake, Autoconf) for building
+super good handling :)
 
- * Added simple script ("build.sh") for automating tedious builds (w32 for now)
++ Textures (merge)
+   * PNG
+   * JPEG
+   * BMP
 
- * Detect if running in "installed" or "portable" mode
++ HUD (fps+velocity+buttons/gamepad. .......
+
+ * Moved to Autotools (Automake, Autoconf) for building
+ * Added a simple script ("build.sh") for automating tedious builds (w32 for now)
+
+ * Detect if running in "installed" or "portable" mode:
    * Uses xdg or platform-specific paths when running in installed mode
    * Only uses local directories when running in portable mode
    * Automatic detection and paths can be overridden by invocation arguments
 
  * New set of invocation flags and arguments (includes long arguments)
-
  * NSIS installer for windows
-
  * Support for OS X
-
  * Fixed various insufficient memory allocations
-
  * Prevent rare occurrences of random joint damage
-
  * Clipping and fog are now track-specific, and more fog options are available
-
  * Separate tyre and rim models replaced by single wheel models (by world/track)
 
  * New models and tracks:
-   * New wheels, ramps and stunt objects by CodieMorgan/MoruganKodi/コディ[KODI]
+   * New wheels, ramps and stunt objects by CodieMorgan/MoruganKodi/コディ[KODI]  ---TODO: FLER SAKER NU!
    * Scramble-like test road by orgyia
    * superbowl and vertigo roads reworked to be much more pleasant to drive
 
